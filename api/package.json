@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/daquinoaldo/MCPS/issues"
   },
-  "homepage": "https://github.com/daquinoaldo/MCPS#readme"
+  "homepage": "https://github.com/daquinoaldo/MCPS#readme",
+  "dependencies": {
+    "express": "latest"
+  }
 }
