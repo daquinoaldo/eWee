@@ -14,13 +14,15 @@
 
 class SampleTraker 
 {
-  private: 
+  private:
+    BLEServer *mServer;
+    BLEClient *mClient; 
     std::unordered_map<std::string, int> mCharacteristicTable;
     std::unordered_map<std::string, RemoteSample*> mSamplersAddresses;
     
   public:
-    SampleTraker();
-    void InitSubService(std::string tUuid);
+    SampleTraker(std::string tUuid);
+    void InitSubService();
     std::set<BLEAddress> GetAddresses();
     std::unordered_map<std::string, std::string> Sample();
 

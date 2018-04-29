@@ -17,6 +17,7 @@
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2AC4)).toString()
 #define MOVMENT_UUID         (BLEUUID((uint16_t)0x2AC5)).toString()
 
+#define MAX_GATEWAY_FAILS 15
 
 // ----- ----- GLOBALS ----- ----- //
 std::string gSamplerUUID;
@@ -38,19 +39,29 @@ void setup() {
   aus.ServiceSetup(SENSING_SERVICE_UUID);
   aus.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
   aus.ServiceStart();
-  aus.FindMaster();
 }
 
 
 // ----- ----- MAIN ----- ----- //
 void loop() {
+  static int gatewayFails = 0;
   static bool gotMaster = false;
-  if(!gotMaster) 
-  {
-    Serial.println("Attempting to connect");
+
+  if (!gotMaster)  {
+    Serial.println("Searching gateways");
     gotMaster = aus.SubscribeToMaster();
-    if(gotMaster) Serial.println("Connected to master");
-  }
+    if(gotMaster) Serial.println("Subscribed to gateway");
+    else Serial.println("Nothing found");
+  } // Searching gateways
+  else if(!aus.IsConnected()) {
+    Serial.println("Gateway not connected");
+    gatewayFails++;
+    if (gatewayFails>MAX_GATEWAY_FAILS) {
+      gotMaster = false;
+      gatewayFails = 0;
+    }  
+  } // Subscribed to master but it's not connected
+  else gatewayFails = 0;
   
   sampleCycle();
   delay(1000);

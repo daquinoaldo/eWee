@@ -16,18 +16,15 @@
 
 class RemoteSample 
 {
-  int mfails = 0;
-  BLEClient* mClient = NULL;
   BLEAddress* mBleAddress;
   
+  
   public:
-    RemoteSample(std::string);
-    ~RemoteSample();
-    bool GetSample(std::string* res);
-    int GetFails();
-    
+    RemoteSample(std::string mac);
+    bool GetSample(BLEClient* client, std::string* res);
+  
   private:
-    class ClientCallback;
+    bool ConnectToServer();
 };
 
 #endif

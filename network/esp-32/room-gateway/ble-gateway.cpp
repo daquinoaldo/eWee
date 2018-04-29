@@ -21,31 +21,30 @@ class SampleTraker::Subscription: public BLECharacteristicCallbacks {
       mAddresses = tAddresses;
     }
   
-  void onWrite(BLECharacteristic* pCharacteristic) {  
+  void onWrite(BLECharacteristic* pCharacteristic) {
     std::string samplerMac = pCharacteristic->getValue();
-//    if (mAddresses->find(samplerMac) == mAddresses->end()) return; // Already subscribed
+    if (mAddresses->find(samplerMac) != mAddresses->end()) return; // Already subscribed
 
     RemoteSample* rsample = new RemoteSample(samplerMac);
     mAddresses->emplace(samplerMac, rsample);    
-  
     Serial.println(("new Subscription: " + samplerMac).c_str());
   } 
 };
 
 
-SampleTraker::SampleTraker() 
+SampleTraker::SampleTraker(std::string tUuid) 
 {
-
+  BLEDevice::init(tUuid);
+  mClient = BLEDevice::createClient();
+  mServer = BLEDevice::createServer();
 }
 
 
 // ----- ----- BLE SETUP ----- ----- //
-void SampleTraker::InitSubService(std::string tUuid)
+void SampleTraker::InitSubService()
 {
   // BLE service initialization
-  BLEDevice::init(tUuid);
-  BLEServer *pServer = BLEDevice::createServer();
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  BLEService *pService = mServer->createService(SERVICE_UUID);
 
   // BLE characteristic setup
   BLECharacteristic *subscription = pService->createCharacteristic(SUBSCRIBE_UUID, BLECharacteristic::PROPERTY_WRITE);
@@ -53,7 +52,7 @@ void SampleTraker::InitSubService(std::string tUuid)
   
   // Starting the service
   pService->start();
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
+  BLEAdvertising *pAdvertising = mServer->getAdvertising();
   pAdvertising->addServiceUUID(pService->getUUID());
   pAdvertising->start();
 }
@@ -70,11 +69,10 @@ std::unordered_map<std::string, std::string> SampleTraker::Sample()
     // Retrieving data
     std::string sampleData;
     RemoteSample* remoteS = i.second;
-    bool success = remoteS->GetSample(&sampleData);
+    bool success = remoteS->GetSample(mClient, &sampleData);
     // Handling success/fails
     if(success) Serial.println(sampleData.c_str());
-    else if (i.second->GetFails() >= MAX_SAMPLE_FAILS) { delete remoteS; mSamplersAddresses.erase(blemac); }
-    else Serial.println("Unable to get sensing data");
+    else { mSamplersAddresses.erase(blemac); delete remoteS; }
   }
   
   Serial.println("");

@@ -2,42 +2,40 @@
 
 #include <HardwareSerial.h>
 #include <string>
+#include <climits>
 #include <unordered_map>
+#include <vector>
 
 #include "BLEDevice.h"
 #include "BLEScan.h"
 
 
-// ----- ----- BLE AD FOUND CALLBACK ----- ----- //
-class BleSamplerManager::BleAdCallbacks: public BLEAdvertisedDeviceCallbacks 
+class BleSamplerManager::BleServerCallback: public BLEServerCallbacks
 {
-  BleSamplerManager* mParent;
+  bool* mIsConnected;
 
   public:
-    BleAdCallbacks(BleSamplerManager* tParent): BLEAdvertisedDeviceCallbacks()
+    BleServerCallback(bool* tIsConnected): BLEServerCallbacks()
     {
-      mParent = tParent;
+      mIsConnected = tIsConnected;
     }
-  
-  void onResult(BLEAdvertisedDevice advertisedDevice) {
-    if (advertisedDevice.haveServiceUUID()) { 
-      BLEUUID serviceUUID = advertisedDevice.getServiceUUID();
-      std::string uuid_16bit = serviceUUID.toString().substr(4, 4); // Extracting 16bit service uuid
-      if (uuid_16bit=="180a") {        
-        BLEAddress* advertiseAddress = new BLEAddress(advertisedDevice.getAddress());
-        mParent->SetMasterAddress(advertiseAddress);
-        advertisedDevice.getScan()->stop();
-      } // Found a device capable of routing to Master Head
-    }
-  } // onResult
-}; // BleSamplerManager
 
+  void onConnect(BLEServer* pServer) {
+    *mIsConnected = true;
+    Serial.println("///// ///// CONNECTED ///// /////");
+  }
+
+  void onDisconnect(BLEServer* pServer) {
+    *mIsConnected = false;
+    Serial.println("///// ///// DISCONNECTED ///// /////");
+  }
+};
 
 
 // ----- ----- CONSTRUCTOR ----- ----- //
 BleSamplerManager::BleSamplerManager() 
 {
-  
+
 }
 
 
@@ -46,6 +44,7 @@ void BleSamplerManager::ServiceSetup(std::string tUuid)
 {
   BLEDevice::init(tUuid);
   mBleServer = BLEDevice::createServer();
+  mBleServer->setCallbacks(new BleServerCallback(&mConnected));
   mEnvirService = mBleServer->createService(tUuid);
 }
 
@@ -68,41 +67,54 @@ void BleSamplerManager::SetCharacteristic(std::string tUuid, std::string tValue)
   mCharacteristicTable[tUuid]->setValue(tValue);
 }
 
-
-// ----- ----- GATEWAY MANAGEMENT ----- ----- //
-void BleSamplerManager::SetMasterAddress(BLEAddress* tMasterAddress)
-{
-  if (mBleMasterAddress!=NULL) delete mBleMasterAddress;
-  mBleMasterAddress = tMasterAddress;
-}
-
 bool BleSamplerManager::SubscribeToMaster() 
 {
-  if (mBleMasterAddress==NULL) return false;
+  bool subscribed = false;
 
-  BLEClient*  client  = BLEDevice::createClient();
-  client->connect(*mBleMasterAddress);
-
-  BLERemoteService* subscribeService = client->getService(SUBSCRIBE_SERV_UUID);
-  if (subscribeService == NULL) return false;
-
-  BLERemoteCharacteristic* subscribeCharacteristic = subscribeService->getCharacteristic(SUBSCRIBE_CHAR_UUID);
-  if (subscribeCharacteristic == NULL) return false;
-
-  std::string myMacAddress = (BLEDevice::getAddress()).toString();
-  subscribeCharacteristic->writeValue(myMacAddress.c_str());
-  delay(50); // Delay to make sure the device wrote
-  client->disconnect(); // Now we can disconnect
+  BLEScan* pBLEScan = BLEDevice::getScan();
+  pBLEScan->setActiveScan(true);
+  BLEScanResults devices = pBLEScan->start(15);
+  pBLEScan->stop();
   
-  return true;
+  BLEAddress* gatewayAddr = NULL;
+  if(devices.getCount()!=0) {
+    for (int i=0; i<devices.getCount(); i++) {
+      BLEAdvertisedDevice dev = devices.getDevice(i);
+      if (dev.haveServiceUUID()) { 
+        BLEUUID serviceUUID = dev.getServiceUUID();
+        std::string uuid_16bit = serviceUUID.toString().substr(4, 4); // Extracting 16bit service uuid
+        if (uuid_16bit=="180a") {       
+          gatewayAddr = new BLEAddress(dev.getAddress());
+          break;
+        } // Found a device capable of routing to Master Head
+      } // Found a potential gateway
+    } // for each device found
+  } // Found some device
+      
+  if (gatewayAddr!=NULL) {
+    BLEClient* mClient = BLEDevice::createClient();
+    if(mClient->connect(*gatewayAddr)) {
+      BLERemoteService* subscribeService = mClient->getService(SUBSCRIBE_SERV_UUID);
+      if (subscribeService != NULL) {
+        BLERemoteCharacteristic* subscribeCharacteristic = subscribeService->getCharacteristic(SUBSCRIBE_CHAR_UUID);
+        if (subscribeCharacteristic != NULL) {
+          std::string myMacAddress = (BLEDevice::getAddress()).toString();
+          subscribeCharacteristic->writeValue(myMacAddress.c_str());
+          subscribed = true;
+        } // Found the subscription characteristic
+      } // Found gateway service
+    } // Successful connection
+    delay(50); // Delay to make sure the device wrote
+    mClient->disconnect(); // Now we can disconnect
+//    delete mClient;
+    delete gatewayAddr;
+  }
+
+  return subscribed;
 }
 
-void BleSamplerManager::FindMaster() 
+bool BleSamplerManager::IsConnected() 
 {
-  SetMasterAddress(NULL);
-  BLEScan* pBLEScan = BLEDevice::getScan();
-  pBLEScan->setAdvertisedDeviceCallbacks(new BleAdCallbacks(this));
-  pBLEScan->setActiveScan(true);
-  pBLEScan->start(30);
+  return mConnected;
 }
 

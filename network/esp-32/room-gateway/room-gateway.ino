@@ -12,7 +12,7 @@
 // ----- ----- GLOBALS ----- ----- //
 std::string gGatewayUUID;
 int gHarvestRate = 1000;
-SampleTraker s;
+SampleTraker* s;
 
 
 // ----- ----- SETUP ----- ----- //
@@ -26,15 +26,16 @@ void setup() {
   std::string gGatewayUUID = "gateway_" + std::string(uuid);
   
   Serial.println(gGatewayUUID.c_str());
-  s.InitSubService(gGatewayUUID);
+  s = new SampleTraker(gGatewayUUID);
+  s->InitSubService();
 }
 
 
 // ----- ----- MAIN ----- ----- //
 void loop() {
-  s.Sample();
+  s->Sample();
 
-  delay(1000);
+  delay(5000);
 }
 
 

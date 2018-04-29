@@ -13,14 +13,13 @@
 class BleSamplerManager
 {
   private:
-    int abc = 2;
-    BLEAddress* mBleMasterAddress;
+    bool mConnected = false;
     // Ble main values
     BLEServer  *mBleServer;
     BLEService *mEnvirService;
     // Ble characteristics
     std::unordered_map<std::string, BLECharacteristic*> mCharacteristicTable;
-  
+    
   public:
     BleSamplerManager();
     // Ble Server
@@ -29,12 +28,11 @@ class BleSamplerManager
     void SetCharacteristic(std::string uuid, std::string value);
     void ServiceStart();
     // Gateway
-    void SetMasterAddress(BLEAddress* masterAddress);
-    void FindMaster();
     bool SubscribeToMaster();
+    bool IsConnected();
   
   private:
-    class BleAdCallbacks;
+    class BleServerCallback;
 };
 
 #endif
