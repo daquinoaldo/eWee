@@ -14,5 +14,6 @@ RemoteSample::RemoteSample (std::string mac)
 
 bool RemoteSample::GetSample()
 {
-  
+  // TODO: leggere id dati dal sensore con mac mBleAddress e
+  // ritornare false in caso di fallimento
 }
