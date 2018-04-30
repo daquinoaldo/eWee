@@ -35,7 +35,7 @@ class SampleTraker::Subscription: public BLECharacteristicCallbacks {
 SampleTraker::SampleTraker(std::string tUuid) 
 {
   BLEDevice::init(tUuid);
-  mClient = BLEDevice::createClient();
+  mClient = NULL;
   mServer = BLEDevice::createServer();
 }
 
@@ -71,8 +71,8 @@ std::unordered_map<std::string, std::string> SampleTraker::Sample()
     RemoteSample* remoteS = i.second;
     bool success = remoteS->GetSample(mClient, &sampleData);
     // Handling success/fails
-    if(success) Serial.println(sampleData.c_str());
-    else { mSamplersAddresses.erase(blemac); delete remoteS; }
+    Serial.println(sampleData.c_str());
+    if(!success) { mSamplersAddresses.erase(blemac); delete remoteS; }
   }
   
   Serial.println("");

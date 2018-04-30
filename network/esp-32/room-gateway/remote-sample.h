@@ -22,9 +22,6 @@ class RemoteSample
   public:
     RemoteSample(std::string mac);
     bool GetSample(BLEClient* client, std::string* res);
-  
-  private:
-    bool ConnectToServer();
 };
 
 #endif

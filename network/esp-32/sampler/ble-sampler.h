@@ -13,7 +13,7 @@
 class BleSamplerManager
 {
   private:
-    bool mConnected = false;
+    int mConnected = 0;
     // Ble main values
     BLEServer  *mBleServer;
     BLEService *mEnvirService;
@@ -29,7 +29,7 @@ class BleSamplerManager
     void ServiceStart();
     // Gateway
     bool SubscribeToMaster();
-    bool IsConnected();
+    int IsConnected();
   
   private:
     class BleServerCallback;

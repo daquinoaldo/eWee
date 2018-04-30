@@ -12,22 +12,20 @@
 
 class BleSamplerManager::BleServerCallback: public BLEServerCallbacks
 {
-  bool* mIsConnected;
+  int* mIsConnected;
 
   public:
-    BleServerCallback(bool* tIsConnected): BLEServerCallbacks()
+    BleServerCallback(int* tIsConnected): BLEServerCallbacks()
     {
       mIsConnected = tIsConnected;
     }
 
   void onConnect(BLEServer* pServer) {
-    *mIsConnected = true;
-    Serial.println("///// ///// CONNECTED ///// /////");
+    *mIsConnected=0;
   }
 
   void onDisconnect(BLEServer* pServer) {
-    *mIsConnected = false;
-    Serial.println("///// ///// DISCONNECTED ///// /////");
+    
   }
 };
 
@@ -69,6 +67,7 @@ void BleSamplerManager::SetCharacteristic(std::string tUuid, std::string tValue)
 
 bool BleSamplerManager::SubscribeToMaster() 
 {
+  mConnected = 0;
   bool subscribed = false;
 
   BLEScan* pBLEScan = BLEDevice::getScan();
@@ -113,8 +112,9 @@ bool BleSamplerManager::SubscribeToMaster()
   return subscribed;
 }
 
-bool BleSamplerManager::IsConnected() 
+int BleSamplerManager::IsConnected() 
 {
+  mConnected++;
   return mConnected;
 }
 

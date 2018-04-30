@@ -44,7 +44,6 @@ void setup() {
 
 // ----- ----- MAIN ----- ----- //
 void loop() {
-  static int gatewayFails = 0;
   static bool gotMaster = false;
 
   if (!gotMaster)  {
@@ -53,15 +52,10 @@ void loop() {
     if(gotMaster) Serial.println("Subscribed to gateway");
     else Serial.println("Nothing found");
   } // Searching gateways
-  else if(!aus.IsConnected()) {
+  else if(aus.IsConnected()>MAX_GATEWAY_FAILS) {
     Serial.println("Gateway not connected");
-    gatewayFails++;
-    if (gatewayFails>MAX_GATEWAY_FAILS) {
-      gotMaster = false;
-      gatewayFails = 0;
-    }  
+    gotMaster = false;
   } // Subscribed to master but it's not connected
-  else gatewayFails = 0;
   
   sampleCycle();
   delay(1000);
