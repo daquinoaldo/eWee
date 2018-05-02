@@ -10,26 +10,6 @@
 #include "BLEScan.h"
 
 
-class BleSamplerManager::BleServerCallback: public BLEServerCallbacks
-{
-  int* mIsConnected;
-
-  public:
-    BleServerCallback(int* tIsConnected): BLEServerCallbacks()
-    {
-      mIsConnected = tIsConnected;
-    }
-
-  void onConnect(BLEServer* pServer) {
-    *mIsConnected=0;
-  }
-
-  void onDisconnect(BLEServer* pServer) {
-    
-  }
-};
-
-
 // ----- ----- CONSTRUCTOR ----- ----- //
 BleSamplerManager::BleSamplerManager() 
 {
@@ -37,19 +17,12 @@ BleSamplerManager::BleSamplerManager()
 }
 
 
-// ----- ----- BLE SERVER ----- ----- //
-void BleSamplerManager::ServiceSetup(std::string tUuid)
+// ----- ----- BLE TOP LEVEL ----- ----- //
+void BleSamplerManager::ServiceSetup(std::string tuuid)
 {
-  BLEDevice::init(tUuid);
+  BLEDevice::init(tuuid);
   mBleServer = BLEDevice::createServer();
-  mBleServer->setCallbacks(new BleServerCallback(&mConnected));
-  mEnvirService = mBleServer->createService(tUuid);
-}
-
-void BleSamplerManager::NewCharacteristic(std::string tUuid, uint32_t tProperties)
-{
-  BLECharacteristic* aus = mEnvirService->createCharacteristic(tUuid, tProperties);
-  mCharacteristicTable.emplace(tUuid, aus);
+  mEnvirService = mBleServer->createService(tuuid);
 }
 
 void BleSamplerManager::ServiceStart()
@@ -60,61 +33,21 @@ void BleSamplerManager::ServiceStart()
   pAdvertising->start();
 }
 
-void BleSamplerManager::SetCharacteristic(std::string tUuid, std::string tValue)
+
+// ----- ----- BLE CHARACTERISTICS MANAGEMENT ----- ----- //
+void BleSamplerManager::NewCharacteristic(std::string tuuid, uint32_t tProperties)
 {
-  mCharacteristicTable[tUuid]->setValue(tValue);
+  // Initializing a new characteristic
+  BLECharacteristic* aus = mEnvirService->createCharacteristic(tuuid, tProperties);
+  // Mapping the characteristic
+  mCharacteristicTable.emplace(tuuid, aus);
 }
 
-bool BleSamplerManager::SubscribeToMaster() 
+
+bool BleSamplerManager::SetCharacteristic(std::string tuuid, std::string tValue)
 {
-  mConnected = 0;
-  bool subscribed = false;
-
-  BLEScan* pBLEScan = BLEDevice::getScan();
-  pBLEScan->setActiveScan(true);
-  BLEScanResults devices = pBLEScan->start(15);
-  pBLEScan->stop();
-  
-  BLEAddress* gatewayAddr = NULL;
-  if(devices.getCount()!=0) {
-    for (int i=0; i<devices.getCount(); i++) {
-      BLEAdvertisedDevice dev = devices.getDevice(i);
-      if (dev.haveServiceUUID()) { 
-        BLEUUID serviceUUID = dev.getServiceUUID();
-        std::string uuid_16bit = serviceUUID.toString().substr(4, 4); // Extracting 16bit service uuid
-        if (uuid_16bit=="180a") {       
-          gatewayAddr = new BLEAddress(dev.getAddress());
-          break;
-        } // Found a device capable of routing to Master Head
-      } // Found a potential gateway
-    } // for each device found
-  } // Found some device
-      
-  if (gatewayAddr!=NULL) {
-    BLEClient* mClient = BLEDevice::createClient();
-    if(mClient->connect(*gatewayAddr)) {
-      BLERemoteService* subscribeService = mClient->getService(SUBSCRIBE_SERV_UUID);
-      if (subscribeService != NULL) {
-        BLERemoteCharacteristic* subscribeCharacteristic = subscribeService->getCharacteristic(SUBSCRIBE_CHAR_UUID);
-        if (subscribeCharacteristic != NULL) {
-          std::string myMacAddress = (BLEDevice::getAddress()).toString();
-          subscribeCharacteristic->writeValue(myMacAddress.c_str());
-          subscribed = true;
-        } // Found the subscription characteristic
-      } // Found gateway service
-    } // Successful connection
-    delay(50); // Delay to make sure the device wrote
-    mClient->disconnect(); // Now we can disconnect
-//    delete mClient;
-    delete gatewayAddr;
-  }
-
-  return subscribed;
-}
-
-int BleSamplerManager::IsConnected() 
-{
-  mConnected++;
-  return mConnected;
+  if (mCharacteristicTable.find(tuuid) == mCharacteristicTable.end()) return false;
+  mCharacteristicTable[tuuid]->setValue(tValue);
+  return true; 
 }
 

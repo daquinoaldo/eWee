@@ -7,32 +7,39 @@
 #include "BLEDevice.h"
 #include "BLEScan.h"
 
-#define SUBSCRIBE_SERV_UUID (BLEUUID((uint16_t)0x180A)).toString()
-#define SUBSCRIBE_CHAR_UUID (BLEUUID((uint16_t)0x8888)).toString()
 
 class BleSamplerManager
 {
   private:
-    int mConnected = 0;
     // Ble main values
     BLEServer  *mBleServer;
     BLEService *mEnvirService;
-    // Ble characteristics
+    // Ble characteristics map
     std::unordered_map<std::string, BLECharacteristic*> mCharacteristicTable;
     
   public:
     BleSamplerManager();
-    // Ble Server
-    void ServiceSetup(std::string tUuid);
+    /* 
+     *  Set up a new service with uuid 'tUuid' 
+     *  @param tuuid: the service uuid
+     */
+    void ServiceSetup(std::string tuuid);
+    /* 
+     * Add a new characteristic to the last added service
+     * @param tuuid: the new characteristic uuid
+     * @param tProperties: the read write characteristic's properties
+     */
     void NewCharacteristic(std::string uuid, uint32_t properties);
-    void SetCharacteristic(std::string uuid, std::string value);
+    /*
+     * Set the characteristic's value with uuid==tuuid
+     * @param tuuid: the target characteristic uuid
+     * @param tValue: the new value
+     */
+    bool SetCharacteristic(std::string uuid, std::string value);
+    /*
+     * Starts a new server containing the given service with the given characteristics
+     */
     void ServiceStart();
-    // Gateway
-    bool SubscribeToMaster();
-    int IsConnected();
-  
-  private:
-    class BleServerCallback;
 };
 
 #endif
