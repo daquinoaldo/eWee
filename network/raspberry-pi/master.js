@@ -1,11 +1,17 @@
+// ----- ----- REQUIREMENTS ----- ----- //
+var noble = require('noble');
+
+
+// ----- ----- COSTANTS ----- ----- //
 var ENVIR_SENSING = '181a'
 var NOT_A_SAMPLE = 'not a sample'
 
 SEPARET = '\n ///// ///// ///// ///// \n'
 
-// ----- ----- SETUP ----- ----- //
-var noble = require('noble');
+
+// ----- ----- GLOBALS ----- ----- //
 var connectedIDs = {};
+
 
 /*
  * Starting the ble interface and start scanning
@@ -31,6 +37,11 @@ noble.on('discover', (peripheral) => {
 
 // ----- ----- MAIN LOGIC ----- ----- //
 var masterLogic = async function (peripheral) {
+  peripheral.once('disconnect', () => {
+    if (connectedIDs[peripheral.id]=='connected')
+      connectedIDs[peripheral.id] = null;
+  });
+
   // Trying to connect
   let connectionPromise = getConnectionPromise(peripheral);
   let result = await connectionPromise;
@@ -96,37 +107,6 @@ var masterLogic = async function (peripheral) {
   sampleCycle();
 }
 
-
-
-// ----- ----- DATA READING ----- ----- //
-var readSample = async function (peripheral, characteristicTable) {
-  let peripheralData = { 'device': peripheral.advertisement.localName };
-  for (let characteristic of characteristicTable) {
-    let readPromise = getReadPromise(characteristic);
-    var res = await readPromise;
-    if (!res) return null;
-    peripheralData[res.uuid_16] = res.data;
-  }
-  return peripheralData;
-}
-
-var getSamplePromise = function (peripheral, characteristicTable) {
-  var samplePromise = new Promise(async function(resolve, reject) {
-    // Adding basic info
-    let peripheralData = { 'device': peripheral.advertisement.localName };
-    // Iterating over all the characteristics
-    for (let characteristic of characteristicTable) {
-      let readPromise = getReadPromise(characteristic);
-      var res = await readPromise;
-      if (!res) reject(null); // Something went wrong
-      peripheralData[res.uuid_16] = res.data; // Updating sample data
-    }
-    resolve(peripheralData);
-  });
-  return samplePromise;
-}
-
-
 // ----- ----- PROMISES LAND ----- ----- //
 var getConnectionPromise = function (peripheral) {
   var connectionPromise = new Promise(function(resolve, reject) {
@@ -155,7 +135,7 @@ var getCharacteristicPromise = function (service) {
   return characteristicPromise;
 }
 
-var getReadPromise = function (characteristic) {
+var getReadPromise = function (peripheral, characteristic) {
   let readPromise = new Promise(function(resolve, reject) {
     characteristic.read( (error, data) => {
       if (error) reject(null); // Ooops, something went wrong
@@ -166,6 +146,22 @@ var getReadPromise = function (characteristic) {
     });
   });
   return readPromise;
+}
+
+var getSamplePromise = function (peripheral, characteristicTable) {
+  var samplePromise = new Promise(async function(resolve, reject) {
+    // Adding basic info
+    let peripheralData = { 'device': peripheral.advertisement.localName };
+    // Iterating over all the characteristics
+    for (let characteristic of characteristicTable) {
+      let readPromise = getReadPromise(peripheral, characteristic);
+      var res = await readPromise;
+      if (!res) reject(null); // Something went wrong
+      peripheralData[res.uuid_16] = res.data; // Updating sample data
+    }
+    resolve(peripheralData);
+  });
+  return samplePromise;
 }
 
 var getDelayPromise = function (msec) {
