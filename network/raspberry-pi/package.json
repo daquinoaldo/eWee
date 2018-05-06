@@ -1,0 +1,14 @@
+{
+  "name": "raspberry-pi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "master.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "noble": "^1.9.1"
+  }
+}
