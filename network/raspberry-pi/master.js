@@ -3,18 +3,16 @@ var noble = require('noble');
 
 
 // ----- ----- COSTANTS ----- ----- //
-var ENVIR_SENSING = '181a'
+var ENVIR_SENSING = '181a' // Our main service
 var NOT_A_SAMPLE = 'not a sample'
-
-SEPARET = '\n ///// ///// ///// ///// \n'
 
 
 // ----- ----- GLOBALS ----- ----- //
-var connectedIDs = {};
+var connectedIDs = {}; // Devices seen
 
 
 /*
- * Starting the ble interface and start scanning
+ * Starting the ble interface and scanning
  */
 noble.on('stateChange', (state) => {
   if (state == 'poweredOn') {
@@ -26,7 +24,7 @@ noble.on('stateChange', (state) => {
 // ----- ----- SCANNER ----- ----- //
 noble.on('discover', (peripheral) => {
   let devId = peripheral.id;
-  let devName = peripheral.advertisement.localName;
+  let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
   if (!connectedIDs[devId] && devName.substring(0, 7)=='sampler') {
     console.log('New esp32 discovered: ' + devName);
     connectedIDs[peripheral.id] = 'known'; // Updating the known device table
@@ -108,6 +106,11 @@ var masterLogic = async function (peripheral) {
 }
 
 // ----- ----- PROMISES LAND ----- ----- //
+/*
+ * Promises to connect to a peripheral device
+ * @returns: the string 'connected' if no error occur, otherwise the error
+ *   itself
+ */
 var getConnectionPromise = function (peripheral) {
   var connectionPromise = new Promise(function(resolve, reject) {
     peripheral.connect(
@@ -117,6 +120,10 @@ var getConnectionPromise = function (peripheral) {
   return connectionPromise;
 }
 
+/*
+ * Promises to discover all service exposed by peripheral
+ * @returns: null if an error occurres, an array of services otherwise
+ */
 var getServiceDiscoveryPromise = function (peripheral) {
   let servicePromise = new Promise(function(resolve, reject) {
     peripheral.discoverServices([],
@@ -126,16 +133,27 @@ var getServiceDiscoveryPromise = function (peripheral) {
   return servicePromise;
 }
 
+/*
+ * Promises to discover all the characteristic hosted on a given service
+ * @return: null if an error occurres, an array of characteristic otherwise
+ */
 var getCharacteristicPromise = function (service) {
   let characteristicPromise = new Promise(function(resolve, reject) {
-    service.discoverCharacteristics([],
-      (error, characteristics) => { error ? reject(null) : resolve(characteristics); }
-    );
+    service.discoverCharacteristics([], (error, characteristics) => {
+      error ? reject(null) : resolve(characteristics);
+    });
   });
   return characteristicPromise;
 }
 
-var getReadPromise = function (peripheral, characteristic) {
+/*
+ * Promises to read a characteristic
+ * @return: null if some error occurred. An object containing
+ *   the data read, in the 'data' field, and the characteristic 16bit uuid, into
+ *   the 'uuid_16' field, otherwise.
+ * @note: the function read hangs if the connection is lost
+ */
+var getReadPromise = function (characteristic) {
   let readPromise = new Promise(function(resolve, reject) {
     characteristic.read( (error, data) => {
       if (error) reject(null); // Ooops, something went wrong
@@ -148,13 +166,21 @@ var getReadPromise = function (peripheral, characteristic) {
   return readPromise;
 }
 
+/*
+ * Promises to read all the characteristics (a sample) from
+ * the result of a 'discoverCharacteristics' invocation
+ * @return: null if some error occurres, otherwise an object containing the
+ *   sample read and the device name stored into the 'device' field
+ * @note: the promise isn't resolved/rejected if the connection is lost
+ *   (characteristic.read doesn't throw errors, it simply hangs)
+ */
 var getSamplePromise = function (peripheral, characteristicTable) {
   var samplePromise = new Promise(async function(resolve, reject) {
     // Adding basic info
     let peripheralData = { 'device': peripheral.advertisement.localName };
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
-      let readPromise = getReadPromise(peripheral, characteristic);
+      let readPromise = getReadPromise(characteristic);
       var res = await readPromise;
       if (!res) reject(null); // Something went wrong
       peripheralData[res.uuid_16] = res.data; // Updating sample data
@@ -173,6 +199,9 @@ var getDelayPromise = function (msec) {
 
 
 // ----- ----- CALLBACK LAND ----- ----- //
+/*
+ * Callback for disconnections events
+ */
 var handleDisconnection = function (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
