@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "noble": "^1.9.1"
+    "noble": "github:sandeepmistry/noble"
   }
 }

@@ -25,7 +25,7 @@ noble.on('stateChange', (state) => {
 noble.on('discover', (peripheral) => {
   let devId = peripheral.id;
   let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
-  if (!connectedIDs[devId] && devName.substring(0, 7)=='sampler') {
+  if (!connectedIDs[devId] && devName && devName.substring(0, 7)=='sampler') {
     console.log('New esp32 discovered: ' + devName);
     connectedIDs[peripheral.id] = 'known'; // Updating the known device table
     masterLogic(peripheral);
@@ -50,6 +50,7 @@ var masterLogic = async function (peripheral) {
   } // Handling error
 
   // We are now connected
+  noble.startScanning();
   connectedIDs[peripheral.id] = 'connected';
 
   // Trying to discover services
