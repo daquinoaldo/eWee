@@ -42,12 +42,13 @@ var masterLogic = async function (peripheral) {
 
   // Trying to connect
   let connectionPromise = getConnectionPromise(peripheral);
-  let result = await connectionPromise;
-  if (result != 'connected') {
-    console.log(result);
+  try {
+    var result = await connectionPromise;
+  } catch (e) {
+    console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     return false;
-  } // Handling error
+  } // Connection error
 
   // We are now connected
   noble.startScanning();
@@ -55,9 +56,10 @@ var masterLogic = async function (peripheral) {
 
   // Trying to discover services
   let serviceDiscoveryPromise = getServiceDiscoveryPromise(peripheral);
-  let services = await serviceDiscoveryPromise;
-  if (!services) {
-    console.log(SEPARET + 'Error while discovering services' + SEPARET);
+  try {
+    var services = await serviceDiscoveryPromise;
+  } catch (e) {
+    console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     peripheral.disconnect();
     return false;
@@ -80,9 +82,10 @@ var masterLogic = async function (peripheral) {
 
   // We have our service, let's browse the available characteristic
   let characteristicPromise = getCharacteristicPromise(sensingService);
-  let characteristicTable = await characteristicPromise;
-  if (!characteristicTable) {
-    console.log(SEPARET + 'Error while discovering characteristic' + SEPARET);
+  try {
+    var characteristicTable = await characteristicPromise;
+  } catch (e) {
+    console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     return false;
   }
@@ -90,9 +93,10 @@ var masterLogic = async function (peripheral) {
   let sampleCycle = async function () {
     // Traing to retrieving data
     samplePromise = getSamplePromise(peripheral, characteristicTable);
-    let sample = await samplePromise;
-
-    if (!sample) {
+    try {
+      var sample = await samplePromise;
+    } catch (e) {
+      console.log(SEPARET + e + SEPARET);
       console.log('Disconnected');
       connectedIDs[peripheral.id] = null;
     } // Stop if some error occurs
@@ -128,7 +132,7 @@ var getConnectionPromise = function (peripheral) {
 var getServiceDiscoveryPromise = function (peripheral) {
   let servicePromise = new Promise(function(resolve, reject) {
     peripheral.discoverServices([],
-      (error, services) => { error ? reject(null) : resolve(services); }
+      (error, services) => { error ? reject(error) : resolve(services); }
     );
   });
   return servicePromise;
@@ -141,7 +145,7 @@ var getServiceDiscoveryPromise = function (peripheral) {
 var getCharacteristicPromise = function (service) {
   let characteristicPromise = new Promise(function(resolve, reject) {
     service.discoverCharacteristics([], (error, characteristics) => {
-      error ? reject(null) : resolve(characteristics);
+      error ? reject(error) : resolve(characteristics);
     });
   });
   return characteristicPromise;
@@ -157,7 +161,7 @@ var getCharacteristicPromise = function (service) {
 var getReadPromise = function (characteristic) {
   let readPromise = new Promise(function(resolve, reject) {
     characteristic.read( (error, data) => {
-      if (error) reject(null); // Ooops, something went wrong
+      if (error) reject(error); // Ooops, something went wrong
       // Let's return a good formatted data structure
       let asciiData = data.toString('ascii');
       let uuid_16 = characteristic.uuid.toString().substring(4, 8);
