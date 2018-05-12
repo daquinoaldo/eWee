@@ -36,8 +36,10 @@ noble.on('discover', (peripheral) => {
 // ----- ----- MAIN LOGIC ----- ----- //
 var masterLogic = async function (peripheral) {
   peripheral.once('disconnect', () => {
-    if (connectedIDs[peripheral.id]=='connected')
+    if (connectedIDs[peripheral.id]=='connected') {
       connectedIDs[peripheral.id] = null;
+    }
+    console.log('Disconnected: '+peripheral.advertisement.localName);
   });
 
   // Trying to connect
