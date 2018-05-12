@@ -1,8 +1,10 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/";
-const dbname = "envir_sensing";
 
-let db;
+// ----- ----- CONSTANTS AND GLOBALS ----- ----- //
+const URL = "mongodb://localhost:27017/";
+const DB_NAME = "envir_sensing";
+
+let gMongoDb;
 
 
 // ----- ----- FS ORDER API ----- ----- //
@@ -12,9 +14,10 @@ let db;
  */
 function mongoDropPromise() {
     return new Promise((resolve, reject) => {
-        MongoClient.connect(url, function (err, db) {
+        MongoClient.connect(URL, function (err, db) {
           if (err) reject(err);
           db.dropDatabase(function(err, result){
+            db.close();
             err ? reject(err) : resolve(true);
           });
         });
@@ -27,8 +30,8 @@ function mongoDropPromise() {
  */
 function mongoConnectionPromise() {
     return new Promise((resolve, reject) => {
-        MongoClient.connect(url, function (err, db) {
-            err ? reject(err) : resolve(db.db(dbname));
+        MongoClient.connect(URL, function (err, db) {
+            err ? reject(err) : resolve(db.db(DB_NAME));
         })
     })
 }
@@ -39,9 +42,21 @@ function mongoConnectionPromise() {
  */
 function insertPromise(collection, obj) {
     return new Promise((resolve, reject) => {
-        db.collection(collection).insertOne(obj, function (err, res) {
+        gMongoDb.collection(collection).insertOne(obj, function (err, res) {
             err ? reject(err) : resolve(true);
         });
+    });
+}
+
+/*
+ * Promises to insert an object in a collection
+ * @return: true if no error occurred, the error otherwise
+ */
+function getAllPromise(collection) {
+    return new Promise((resolve, reject) => {
+      gMongoDb.collection(collection).find({}).toArray(function(err, result) {
+        err ? reject(err) : resolve(result);
+      });
     });
 }
 
@@ -51,9 +66,7 @@ function insertPromise(collection, obj) {
  */
 function getSensorPromise(sensorId) {
     return new Promise((resolve, reject) => {
-        db.collection(collection).insertOne(obj, function (err, res) {
-            err ? reject(err) : resolve(true);
-        });
+      // TODO: tutto
     });
 }
 
@@ -63,16 +76,14 @@ function getSensorPromise(sensorId) {
  */
 function getRoomPromise(roomId) {
     return new Promise((resolve, reject) => {
-        db.collection(collection).insertOne(obj, function (err, res) {
-            err ? reject(err) : resolve(true);
-        });
+      // TODO: tutto
     });
 }
 
 
 // ----- ----- TESTING FUNCTIONS ----- ----- //
 // An array of testing sensors ids
-let sensorIds = [
+let sensorMac = [
   'sampler_12345',
   'sampler_00001',
   'sampler_00002',
@@ -104,13 +115,15 @@ let charUUID = {
  * @note: there is a small chance that some measure fail to be read
  */
 let randomSens = function () {
-  let id = charUUID[getRandomInt(0, charUUID.length)];
-  let entry = { 'device': id };
+  let mac = sensorMac[getRandomInt(0, sensorMac.length-1)];
+
+  let entry = { 'device': mac };
   for (uuid in charUUID) {
     if (Math.random() < 0.9) {
       entry[uuid] = charUUID[uuid]();
     } // Adding a small chance of getting no sample for that uuid
   } // Iterating for all the available characteristic
+
   return entry;
 };
 
@@ -119,23 +132,22 @@ let randomSens = function () {
  * @param x: the number of entry to insert
  */
 let Atlante = async function(x) {
-  await mongoDropPromise();
-
-  for (int i=0; i<x; x++) {
+  for (let i=0; i<x; i++) {
     let r = randomSens();
-    await insertPromise(r);
+    await insertPromise('Samples', r);
   }
+
+  return new Promise((resolve, reject) => resolve(true));
 }
 
-async function main() {
-  db = await connect();
-  const testObj = {
-      id: 1,
-      temp: 18,
-      humid: 88
-  };
-
-  if(await insert("prova", testObj) === true) console.log("Funge");
-}
-
-main();
+let main = async function () {
+  // Cleaning everything
+  await mongoDropPromise();
+  // Connecting to mongo
+  gMongoDb = await mongoConnectionPromise();
+  // Rising up
+  await Atlante(10);
+  // Getting all samples
+  let dbData = await getAllPromise('Samples');
+  console.log(dbData);
+}()
