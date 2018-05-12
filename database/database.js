@@ -3,6 +3,9 @@ const MongoClient = require('mongodb').MongoClient;
 // ----- ----- CONSTANTS AND GLOBALS ----- ----- //
 const URL = "mongodb://localhost:27017/";
 const DB_NAME = "envir_sensing";
+const sampleCollection = "samples"
+
+const PIR = '2AC5';
 
 let gMongoDb;
 
@@ -61,6 +64,18 @@ function getAllPromise(collection) {
 }
 
 /*
+ * Promises to get an object with
+ * @return: 
+ */
+function getSinglePromise(collection, obj) {
+    return new Promise((resolve, reject) => {
+      // TODO: tutto
+    });
+}
+
+
+// ----- ----- SC ORDER API ----- ----- //
+/*
  * Promises to insert an object in a collection
  * @return: true if no error occurred, the error otherwise
  */
@@ -75,9 +90,9 @@ function getSensorPromise(sensorId) {
  * @return: true if no error occurred, the error otherwise
  */
 function getRoomPromise(roomId) {
-    return new Promise((resolve, reject) => {
-      // TODO: tutto
-    });
+  return new Promise((resolve, reject) => {
+    // TODO: tutto
+  });
 }
 
 
@@ -131,13 +146,14 @@ let randomSens = function () {
  * Rise up the database
  * @param x: the number of entry to insert
  */
-let Atlante = async function(x) {
-  for (let i=0; i<x; i++) {
-    let r = randomSens();
-    await insertPromise('Samples', r);
-  }
-
-  return new Promise((resolve, reject) => resolve(true));
+let Atlante = function(x) {
+  return new Promise(async (resolve, reject) => {
+    for (let i=0; i<x; i++) {
+      let r = randomSens();
+      await insertPromise(sampleCollection, r);
+    }
+    resolve(true);
+  });
 }
 
 let main = async function () {
@@ -148,6 +164,6 @@ let main = async function () {
   // Rising up
   await Atlante(10);
   // Getting all samples
-  let dbData = await getAllPromise('Samples');
+  let dbData = await getAllPromise(sampleCollection);
   console.log(dbData);
 }()
