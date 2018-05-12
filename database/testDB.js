@@ -1,3 +1,16 @@
+/*
+***** ***** ***** ***** ***** ***** ***** ***** ***** *****
+*  The master pushes into the database object in the
+*  following format:
+*    {
+*    device : samples_xxxxx,
+*    uuid_1 : value,
+*    ...
+*    uuid_n : value
+*    }
+***** ***** ***** ***** ***** ***** ***** ***** ***** *****
+*/
+
 // ----- ----- TESTING FUNCTIONS ----- ----- //
 const db = require('./database.js');
 let gDatabase = new db.Database();
