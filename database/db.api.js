@@ -1,43 +1,14 @@
-//Import the mongoose module
-var mongoose = require('mongoose');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/test";
 
-
-// ----- ----- FS ORDER API ----- ----- //
-/*
- *
- * @returns: 
- */
-var getConnectionPromise = function (url) {
-  mongoose.connect(url);
-  var db = mongoose.connection;
-  var connectionPromise = new Promise(function(resolve, reject) {
-    db.once('open', () => resolve(true));
-    db.on('error', () => reject(false));
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log(42);
+  var dbo = db.db("mydb");
+  var query = { address: "Park Lane 38" };
+  dbo.collection("customers").find(query).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+    db.close();
   });
-  return connectionPromise;
-}
-
-/*
- *
- * @returns:
- */
-var getSensorId = function (url) {
-
-}
-
-// ----- ----- SC ORDER API ----- ----- //
-/*
- *
- * @returns:
- */
-var getCharacteristic = function (url) {
-
-}
-
-
-
-// ----- ----- Main for Testing ----- ----- //
-(async () => {
-  let connectionPromise = getConnectionPromise('mongodb://127.0.0.10/envir_sensing');
-  let res = await connectionPromise;
-})();
+});
