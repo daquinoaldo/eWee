@@ -1,0 +1,14 @@
+@import "src/theme.scss";
+@import "@material/button/mdc-button";
+
+.foo-button {
+  margin: 50px;
+
+  @include mdc-button-ink-color(white);
+  @include mdc-button-container-fill-color(teal);
+}
+
+.my-button {
+  margin: 50px;
+  @include mdc-button-filled-accessible($mdc-theme-secondary)
+}
