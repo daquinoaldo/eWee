@@ -1,0 +1,5 @@
+@import "@material/button/mdc-button";
+
+.fill-secondary {
+  @include mdc-button-filled-accessible($mdc-theme-secondary)
+}
