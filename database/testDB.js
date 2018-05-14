@@ -2,12 +2,12 @@
 ***** ***** ***** ***** ***** ***** ***** ***** ***** *****
 *  The master pushes into the database object in the
 *  following format:
-*    {
+*  {
 *    device : samples_xxxxx,
 *    uuid_1 : value,
 *    ...
 *    uuid_n : value
-*    }
+*  }
 ***** ***** ***** ***** ***** ***** ***** ***** ***** *****
 */
 
@@ -37,9 +37,9 @@ let charUUID = {
   '2AC5' : () => { return getRandomInt(0, 1); },   // PIR
   '2A1F' : () => { return getRandomInt(20, 30); }, // Temperature Celsius
   '2A6F' : () => { return getRandomInt(20, 30); }, // Humidity
-  '0000' : () => { return getRandomInt(0, 1); },   // Door sensor
+  '0000' : () => { return getRandomInt(0, 1); },   //TODO: Door sensor
   '2A77' : () => { return getRandomInt(0, 42); },  // Irradiance
-  '0001' : () => { return getRandomInt(0, 1); }    // ??? ¯\_(ツ)_/¯
+  '0001' : () => { return getRandomInt(0, 1); }    // TODO: MQ135 for air quality
 }
 
 /**
@@ -62,13 +62,13 @@ let randomSens = function () {
 
 /*
  * Rise up the database
- * @param x: the number of entry to insert
+ * @param x: the number of entry to insertMeasure
  */
 let Atlante = function(x) {
   return new Promise(async (resolve, reject) => {
     for (let i=0; i<x; i++) {
       let r = randomSens();
-      await gDatabase.insertPromise(db.sampleCollection, r);
+      await gDatabase.insert(db.collection.measures, r);
 
     }
     resolve(true);
@@ -77,12 +77,12 @@ let Atlante = function(x) {
 
 let main = async function () {
   // Connecting
-  let res = await gDatabase.connectPromise();
+  let res = await gDatabase.connect();
   // Cleaning
-  await gDatabase.dropPromise();
+  await gDatabase.drop();
   // Rising up
   await Atlante(10);
   // Getting all samples
-  let dbData = await gDatabase.getAllPromise(db.sampleCollection);
+  let dbData = await gDatabase.getAllPromise(db.collection.measures);
   console.log(dbData);
 }();

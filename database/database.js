@@ -8,16 +8,23 @@ const DB_NAME = "envir_sensing";
 
 // ----- ----- DATABASE OBJECT ----- ----- //
 class Database {
-  constructor() {
+  constructor() { }
 
+  connect() {
+    let thisbd = this;
+    return new Promise((resolve, reject) => {
+      MongoClient.connect(URL, function (err, res) {
+        thisbd.mMongoDb = res.db(DB_NAME);
+        err ? reject(err) : resolve(true);
+      })
+    });
   }
 
-  // ----- First order api ----- //
-  /*
-   * Promises to drop the database
-   * @return: true on success, an error otherwise
-   */
-  dropPromise() {
+  disconnect() {
+    if (this.mMongoDb) this.mMongoDb.close();
+  }
+
+  drop() {
     return new Promise((resolve, reject) => {
       this.mMongoDb.dropDatabase(function(err, result) {
         err ? reject(err) : resolve(true);
@@ -25,36 +32,30 @@ class Database {
     });
   }
 
-  /*
-   * Promises to connect to the database
-   * @return: ?
-   */
-  connectPromise() {
-    let thisbd = this;
-    return new Promise((resolve, reject) => {
-      MongoClient.connect(URL, function (err, db) {
-        thisbd.mMongoDb = db.db(DB_NAME);
-        err ? reject(err) : resolve(true);
-      })
-    });
+  insert(collection, obj) {
+    return this.mMongoDb.collection(collection).insertOne(obj);
   }
 
-  /*
-   * Promises to insert an object in a collection
-   * @return: true if no error occurred, the error otherwise
-   */
-  insertPromise(collection, obj) {
+  /*query(collection, query) {
     return new Promise((resolve, reject) => {
-      this.mMongoDb.collection(collection).insertOne(obj, function (err, res) {
-        err ? reject(err) : resolve(true);
+      //TODO: converting a cursor in an array: not a got idea!
+      // USE .find().limit(5).toArray
+      this.mMongoDb.collection(collection).find(query).toArray(function(err, result) {
+        err ? reject(err) : resolve(result);
       });
     });
+  }*/
+
+  query(collection, query) {
+    return this.mMongoDb.collection(collection).find(query);
   }
 
+
   /*
-   * Promises to insert an object in a collection
+   * Promises to insertMeasure an object in a collection
    * @return: true if no error occurred, the error otherwise
    */
+  // TODO: Used only for tests, must be removed
   getAllPromise(collection) {
     return new Promise((resolve, reject) => {
       this.mMongoDb.collection(collection).find({}).toArray(function(err, result) {
@@ -62,42 +63,16 @@ class Database {
       });
     });
   }
+}
 
-  /*
-   * Promises to get an object with
-   * @return:
-   */
-  getSinglePromise(collection, query) {
-    return new Promise((resolve, reject) => {
-      this.mMongoDb.collection(collection).find(query).toArray(function(err, result) {
-        err ? reject(err) : resolve(result);
-      });
-    });
-  }
-
-  // ----- Second order api ----- //
-  /*
-   * Promises to insert an object in a collection
-   * @return: true if no error occurred, the error otherwise
-   */
-  getSensorPromise(sensorId) {
-    return getSinglePromise(sampleCollection, {device: sensorId});
-  }
-
-  /*
-   * Promises to insert an object in a collection
-   * @return: true if no error occurred, the error otherwise
-   */
-  static getRoomPromise(roomId) {
-    return new Promise((resolve, reject) => {
-      // TODO: tutto
-    });
-  }
+const collection = {
+  measures: "measures",
+  rooms: "rooms"
 }
 
 
-// ----- ----- ESPORTS ----- ----- //
+// ----- ----- EXPORTS ----- ----- //
 module.exports = {
   Database : Database,
-  sampleCollection: "samples"
+  collection: collection
 }
