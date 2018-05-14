@@ -24,12 +24,10 @@ noble.on('stateChange', (state) => {
 
 // ----- ----- SCANNER ----- ----- //
 noble.on('discover', (peripheral) => {
-console.log(peripheral.id);
-console.log(peripheral.address);
   let devId = peripheral.id;
   let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
-  if (!connectedIDs[devId] && devName && devName.substring(0, 7)=='sampler') {
-    console.log('New esp32 discovered: ' + devName);
+  if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)=='sampler') {
+console.log(connectedIDs);
     connectedIDs[peripheral.id] = 'known'; // Updating the known device table
     masterLogic(peripheral);
   } // The device is a sample
@@ -38,17 +36,18 @@ console.log(peripheral.address);
 
 // ----- ----- MAIN LOGIC ----- ----- //
 var masterLogic = async function (peripheral) {
+  peripheral.cname = peripheral.advertisement.localName;
+
   peripheral.once('disconnect', () => {
-    if (connectedIDs[peripheral.id]=='connected') {
-      connectedIDs[peripheral.id] = null;
-    }
-    console.log('Disconnected: '+peripheral.advertisement.localName);
+    console.log(peripheral.cname + ' (disconnected)');
+    // connectedIDs[peripheral.id] = null;
   });
 
   // Trying to connect
   let connectionPromise = getConnectionPromise(peripheral);
   try {
     var result = await connectionPromise;
+    console.log(peripheral.cname + ' (connected)');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
@@ -62,7 +61,8 @@ var masterLogic = async function (peripheral) {
   // Trying to discover services
   let serviceDiscoveryPromise = getServiceDiscoveryPromise(peripheral);
   try {
-    var services = await serviceDiscoveryPromise;
+    var services = await serviceDiscoveryPromise; // TODO: qui si pianta se il device si disconnette
+    console.log('1)' + peripheral.cname + ': got services');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
@@ -73,13 +73,12 @@ var masterLogic = async function (peripheral) {
   // We have found services, need to look for ENVIR_SENSING service
   let sensingService = null;
   for (var i in services) {
-    // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representatio of 16bit UUID)
+    // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
     serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 == ENVIR_SENSING) { sensingService = services[i]; break; }
   }
   // If we haven't our service, let's disconnect and no reconncet anymore
   if(sensingService == null) {
-    console.log('Environmental Sensing not found');
     connectedIDs[peripheral.id] = 'notAnEsp32'; // the device isn't an esp32
     peripheral.disconnect();
     return false;
@@ -89,6 +88,7 @@ var masterLogic = async function (peripheral) {
   let characteristicPromise = getCharacteristicPromise(sensingService);
   try {
     var characteristicTable = await characteristicPromise;
+    console.log('2)' + peripheral.cname + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
     connectedIDs[peripheral.id] = null;
@@ -102,7 +102,6 @@ var masterLogic = async function (peripheral) {
       var sample = await samplePromise;
     } catch (e) {
       console.log(SEPARET + e + SEPARET);
-      console.log('Disconnected');
       connectedIDs[peripheral.id] = null;
     } // Stop if some error occurs
 
@@ -137,7 +136,7 @@ var getConnectionPromise = function (peripheral) {
 var getServiceDiscoveryPromise = function (peripheral) {
   let servicePromise = new Promise(function(resolve, reject) {
     peripheral.discoverServices([],
-      (error, services) => { error ? reject(error) : resolve(services); }
+      (error, services) => { error ? reject('error') : resolve(services); }
     );
   });
   return servicePromise;
@@ -150,7 +149,7 @@ var getServiceDiscoveryPromise = function (peripheral) {
 var getCharacteristicPromise = function (service) {
   let characteristicPromise = new Promise(function(resolve, reject) {
     service.discoverCharacteristics([], (error, characteristics) => {
-      error ? reject(error) : resolve(characteristics);
+      error ? reject('error') : resolve(characteristics);
     });
   });
   return characteristicPromise;
@@ -190,15 +189,18 @@ var getSamplePromise = function (peripheral, characteristicTable) {
     var time = moment();
     var time_format = time.format('YYYY-MM-DD HH:mm:ss Z');
     let peripheralData = {
-      'device': peripheral.advertisement.localName,
+      'device': peripheral.address,
       'timestamp': time_format
     };
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       let readPromise = getReadPromise(characteristic);
-      var res = await readPromise;
-      if (!res) reject(null); // Something went wrong
-      peripheralData[res.uuid_16] = res.data; // Updating sample data
+      try {
+        var res = await readPromise;
+        peripheralData[res.uuid_16] = res.data; // Updating sample data
+      } catch (e) {
+        console.log(e);
+      }
     }
     resolve(peripheralData);
   });

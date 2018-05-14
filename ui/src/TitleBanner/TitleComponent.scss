@@ -1,0 +1,37 @@
+@import "@material/tabs/mdc-tabs";
+
+.banner {
+  position: relative;
+
+  color: white;
+  width: 100%;
+  background-color: $mdc-theme-primary;
+}
+
+.vertical-wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.nav-correction {
+  margin: 0;
+}
+
+.vertical-wrapper h1 {
+  margin: 0;
+  margin: 24px;
+  padding-left: 10px;
+}
+
+.bottom-right {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  transform:translate(-50%, +50%);
+}
