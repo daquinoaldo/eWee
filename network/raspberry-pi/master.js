@@ -1,5 +1,6 @@
 // ----- ----- REQUIREMENTS ----- ----- //
 var noble = require('noble');
+var moment = require('moment');
 
 
 // ----- ----- COSTANTS ----- ----- //
@@ -23,6 +24,8 @@ noble.on('stateChange', (state) => {
 
 // ----- ----- SCANNER ----- ----- //
 noble.on('discover', (peripheral) => {
+console.log(peripheral.id);
+console.log(peripheral.address);
   let devId = peripheral.id;
   let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
   if (!connectedIDs[devId] && devName && devName.substring(0, 7)=='sampler') {
@@ -184,7 +187,12 @@ var getReadPromise = function (characteristic) {
 var getSamplePromise = function (peripheral, characteristicTable) {
   var samplePromise = new Promise(async function(resolve, reject) {
     // Adding basic info
-    let peripheralData = { 'device': peripheral.advertisement.localName };
+    var time = moment();
+    var time_format = time.format('YYYY-MM-DD HH:mm:ss Z');
+    let peripheralData = {
+      'device': peripheral.advertisement.localName,
+      'timestamp': time_format
+    };
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       let readPromise = getReadPromise(characteristic);

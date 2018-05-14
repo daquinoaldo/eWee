@@ -10,5 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "noble": "github:sandeepmistry/noble"
+  },
+  "dependencies": {
+    "moment": "^2.22.1"
   }
 }
