@@ -9,9 +9,8 @@ import {MDCTabBar, MDCTabBarFoundation} from '@material/tabs';
 export default class Head extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      sectionChangeCallback: props.callback
-    }
+    this.state = {}
+
     this.tab_bar = React.createRef();
     this.floatingAction = React.createRef();
   }
@@ -21,13 +20,13 @@ export default class Head extends React.Component {
   }
 
   sectionChange = (newSection) => {
-    if (newSection=='Management') {
+    if (newSection=='management') {
       this.floatingAction.current.riseUp()
     }
     else {
       this.floatingAction.current.collapse()
     }
-    this.state.sectionChangeCallback(newSection);
+    window.history.pushState({"html":{},"pageTitle":''},"", newSection);
   }
 
   render() {
@@ -36,8 +35,8 @@ export default class Head extends React.Component {
         <div className="vertical-wrapper">
           <h1>ESTIA<span>v0.1</span></h1>
           <nav ref={this.tab_bar} id="my-mdc-tab-bar" className="mdc-tab-bar nav-correction">
-            <span className="mdc-tab mdc-tab--active" href="#one" onClick={() => this.sectionChange('Analitica')}>Analitica</span>
-            <span className="mdc-tab" href="#two" onClick={() => this.sectionChange('Management')}>Management</span>
+            <span className="mdc-tab mdc-tab--active" href="#one" onClick={() => this.sectionChange('analitica')}>Analitica</span>
+            <span className="mdc-tab" href="#two" onClick={() => this.sectionChange('management')}>Management</span>
             <span className="mdc-tab-bar__indicator"></span>
           </nav>
         </div>
