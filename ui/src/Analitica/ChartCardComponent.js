@@ -1,4 +1,5 @@
 import React from 'react';
+import * as utils from './chart.js';
 
 export default class ChartCard extends React.Component {
   constructor(props) {
@@ -11,16 +12,25 @@ export default class ChartCard extends React.Component {
   componentDidMount() {
     this.timeTick = setInterval(this.fetchData, 1000);
     var ctx = document.getElementById("the-chart").getContext('2d');
+    utils.createChart(ctx, 10, {min:15, max:35});
   }
 
+  /*
+   * Fetches data from the rest api and convert it in plottable data
+   */
   fetchData = () => {
     fetch('https://jsonplaceholder.typicode.com/posts/1')
     .then(result=>result.json())
     .then(items=>{ this.updateData(items) });
   }
 
-  updateData = (items) => {
-    console.log(items);
+  /*
+   * Update the chart
+   * @param item: the value to add to the graph
+   */
+  updateData = (item) => {
+    let newValue = 20+Math.floor(Math.random(10) * 10);
+    utils.updateChart(newValue);
   }
 
   render() {
