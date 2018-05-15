@@ -6,7 +6,7 @@
 const Query = require('./query.js').Query;
 const query = new Query();
 const Database = require('./database.js').Database;
-let db = new Database();
+const db = new Database();
 
 /* LOCAL STRUCTS and VARIABLES */
 const rooms = [];
@@ -56,7 +56,7 @@ function prepareRooms(roomsNumber, sensorsInRoom) {
       things.push(device.id);
       devices.push(device);
     }
-    promises.push(query.addRoom("room"+i, things).then(id => rooms.push(id)));
+    promises.push(query.createRoom("room"+i, things).then(id => rooms.push(id)));
   }
   return Promise.all(promises);
 }
@@ -81,7 +81,7 @@ function fillMeasures(measuresNumber) {
   measuresNumber = measuresNumber | 100;
   const promises = [];
   for (let i = 0; i < measuresNumber; i++)
-    promises.push(query.insertMeasure(getSample()));
+    promises.push(Query.insertMeasure(getSample()));
   return Promise.all(promises);
 }
 
@@ -103,8 +103,8 @@ function fill() {
 
 function printDb() {
   const promises = [];
-  for (const collection in db.collection)
-    promises.push(Database.queryAll(db.collection[collection]).then(data => console.log(data)));
+  for (const collection in db.collections)
+    promises.push(Database.queryAll(db.collections[collection]).then(data => console.log(data)));
   return Promise.all(promises);
 }
 
