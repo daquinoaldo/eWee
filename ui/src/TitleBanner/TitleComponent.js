@@ -24,7 +24,7 @@ export default class Head extends React.Component {
     return (
       <div className="banner">
         <div className="vertical-wrapper">
-          <h1>MCPS</h1>
+          <h1>ESTIA<span>v0.1</span></h1>
           <nav ref={this.tab_bar} id="my-mdc-tab-bar" className="mdc-tab-bar nav-correction">
             <span className="mdc-tab mdc-tab--active" href="#one" onClick={() => this.floatingAction.current.collapse()}>Analitica</span>
             <span className="mdc-tab" href="#two" onClick={() => this.floatingAction.current.riseUp()}>Management</span>

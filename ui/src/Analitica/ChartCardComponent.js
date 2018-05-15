@@ -1,4 +1,5 @@
 import React from 'react';
+import * as utils from './chart.js';
 
 export default class ChartCard extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class ChartCard extends React.Component {
   componentDidMount() {
     this.timeTick = setInterval(this.fetchData, 1000);
     var ctx = document.getElementById("the-chart").getContext('2d');
+    utils.createChart(ctx, 10, {min:15, max:35});
   }
 
   fetchData = () => {
@@ -20,7 +22,8 @@ export default class ChartCard extends React.Component {
   }
 
   updateData = (items) => {
-    console.log(items);
+    let newValue = 20+Math.floor(Math.random(10) * 10);
+    utils.updateChart(newValue);
   }
 
   render() {
