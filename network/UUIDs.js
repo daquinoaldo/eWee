@@ -5,7 +5,7 @@ const UUIDs = {
   "pir": "2AC5",
   "door": "0000",
   "carbon": "0001"
-}
+};
 
 function UUIDToProperty(uuid) {
 
@@ -37,4 +37,4 @@ module.exports = {
   UUIDs : UUIDs,
   UUIDToProperty: UUIDToProperty,
   propertyToUUID: propertyToUUID
-}
+};
