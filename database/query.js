@@ -1,5 +1,6 @@
 const database = require('./database.js');
-let db = new database.Database();
+let Database = database.Database;
+let db = new Database();
 
 class Query {
   constructor() { }

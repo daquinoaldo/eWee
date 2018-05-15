@@ -45,7 +45,7 @@ function prepareRooms(roomsNumber, sensorsInRoom) {
       // Assign a MAC address and decide randomly which sensors have
       const a = 3;
       const b = 5;
-      const device = {
+      let device = {
         id: randMAC(),
         temp: probability(a, b),
         humidity: probability(a, b),
@@ -56,24 +56,24 @@ function prepareRooms(roomsNumber, sensorsInRoom) {
       things.push(device.id);
       devices.push(device);
     }
-    promises.push(query.addRoom("room"+1, things).then(id => rooms.push(id)));
+    promises.push(query.addRoom("room"+i, things).then(id => rooms.push(id)));
   }
   return Promise.all(promises);
 }
 
 /* SAMPLING */
-function getSample(deviceId) {
-  deviceId = deviceId | devices[randInt(0, devices.length)].id;
+function getSample(device) {
+  if(!device) device = devices[randInt(0, devices.length - 1)];
   lastDate = new Date(lastDate.getTime() + randInt(30, 60) * 100);  // Add from 30 to 60 seconds
   const obj = {
-    id: deviceId.id,
+    id: device.id,
     timestamp: lastDate.toLocaleString()
   };
-  if (deviceId.temp) obj['temp'] = randInt(15, 40);
-  if (deviceId.humidity) obj['humidity'] = randInt(30, 100);
-  if (deviceId.light) obj['light'] = randInt(5, 90);
-  if (deviceId.pir) obj['pir'] = randInt(0, 1);
-  if (deviceId.door) obj['door'] = randInt(0, 1);
+  if (device.temp) obj['temp'] = randInt(15, 40);
+  if (device.humidity) obj['humidity'] = randInt(30, 100);
+  if (device.light) obj['light'] = randInt(5, 90);
+  if (device.pir) obj['pir'] = randInt(0, 1);
+  if (device.door) obj['door'] = randInt(0, 1);
   return obj;
 }
 
@@ -113,7 +113,6 @@ async function main () {
   await init();
   await fill();
   //await printDb();
+  process.exit()
 }
-
-// Run main then exit
-main().then(process.exit());
+main();
