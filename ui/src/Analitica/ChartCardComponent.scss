@@ -1,0 +1,25 @@
+@import "@material/card/mdc-card";
+
+.wrapper {
+  margin: 10px;
+  position: absolute;
+}
+
+
+// /// /// /// CARDS /// /// /// //
+.card__primary {
+  padding: 1rem;
+}
+
+.card__subtitle {
+  @include mdc-theme-prop(color, text-secondary-on-background);
+
+  margin: 0;
+}
+
+.card__secondary {
+  @include mdc-theme-prop(color, text-secondary-on-background);
+  word-wrap: break-word;
+  width: 400px;
+  padding: 0 1rem 8px 1rem;
+}
