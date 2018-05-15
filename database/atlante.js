@@ -45,7 +45,7 @@ function prepareRooms(roomsNumber, sensorsInRoom) {
       // Assign a MAC address and decide randomly which sensors have
       const a = 3;
       const b = 5;
-      let device = {
+      const device = {
         id: randMAC(),
         temp: probability(a, b),
         humidity: probability(a, b),
@@ -85,6 +85,25 @@ function fillMeasures(measuresNumber) {
   return Promise.all(promises);
 }
 
+/* DEFAULT DATA FOR TEST */
+function addDefaultData(roomName, deviceMAC) {
+  roomName = roomName ? roomName : "default_room";
+  deviceMAC = deviceMAC ? deviceMAC : "00:00:00:00:00:00";
+  const device = {
+    id: deviceMAC,
+    temp: 1,
+    humidity: 1,
+    light: 1,
+    pir: 1,
+    door: 1
+  };
+  devices.push(device);
+  return query.createRoom(roomName, [device.id]).then(id => {
+    rooms.push(id);
+    return Query.insertMeasure(getSample(device));
+  })
+}
+
 /* HIGH LEVEL FUNCTIONS */
 async function init() {
   // Clear and init
@@ -112,6 +131,7 @@ function printDb() {
 async function main () {
   await init();
   await fill();
+  await addDefaultData();
   //await printDb();
   process.exit()
 }
