@@ -13,6 +13,7 @@ class Query {
     return db.connect();
   }
 
+
   /*******************
    *     INSERTS     *
    *******************/
@@ -44,21 +45,13 @@ class Query {
       Db.insert(collections.rooms, {name: name, things: things}).then(res => resolve(res.insertedId.toString()));
     });
   }
-  /*createRoom(name, things) {
-    things = things | [];
-    return new Promise((resolve, reject) => {
-      db.query(collections.rooms, {name: name}).hasNext().then(res => {
-        if (res) reject("Error: a room with name "+name+" already exists.");
-        db.insert(collections.rooms, {name: name, things: []}).then(res => resolve(res.insertedId));
-      });
-    })
-  }*/
+
 
   /*******************
    *     UPDATES     *
    *******************/
 
-  // Low level function, NOT TESTED
+  // TODO: Low level function, NOT TESTED
   static updateRoom(id, newName, things) {
     const set = {};
     if (name) set.name = name;
@@ -66,8 +59,53 @@ class Query {
     return Db.update(collections.rooms, id, {$set: set});
   }
 
+  /**
+   * Bind a device to a room
+   * @param deviceID
+   * @param roomID
+   * @returns Promise<any> with true if everything is gone ok
+   */
   static bind(deviceID, roomID) {
-    return Db.update(collections.rooms, roomID, {$addToSet: {things: deviceID}});
+    return new Promise((resolve, reject) => {
+      Db.update(collections.rooms, roomID, {$addToSet: {things: deviceID}}).then(res => {
+        if (!res.result.ok) reject("Unknown error.");
+        resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
+  }
+
+
+  /*******************
+   *     DELETES     *
+   *******************/
+
+  /**
+   * Delete a room
+   * @param id of the room to be deleted
+   * @returns Promise<any> with true if deleted
+   */
+  static deleteRoom(id) {
+    return new Promise((resolve, reject) => {
+      Db.delete(collections.rooms, id).then(res => {
+        if (!res.result.ok) reject("Unknown error.");
+        resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
+  }
+
+  /**
+   * Unbind a device from a room
+   * @param deviceID
+   * @param roomID
+   * @returns Promise<any> with true if everything is gone ok
+   */
+  static unbind(deviceID, roomID) {
+    return new Promise((resolve, reject) => {
+      Db.update(collections.rooms, roomID, {$pull: {things: deviceID}}).then(res => {
+        if (!res.result.ok) reject("Unknown error.");
+        resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
   }
 
 

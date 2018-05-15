@@ -51,6 +51,10 @@ class Database {
     return mongoDB.collection(collection).updateOne({_id: ObjectID(id)}, update);
   }
 
+  static delete(collection, id) {
+    return mongoDB.collection(collection).deleteOne({_id: ObjectID(id)});
+  }
+
   // Used only for tests
   static queryAll(collection) {
     return mongoDB.collection(collection).find({}).toArray();

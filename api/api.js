@@ -31,38 +31,38 @@ app.delete('/:some_data', function (req, res) {
     res.send('Got a DELETE request for '+req.params.some_data)
 })*/
 
-//TODO: check if not exist (404) or there are other problems (5xx)
 
 /* ********************************
  ********** GET REQUESTS **********
  **********************************/
 
 // Get last measure from a specific sensor
-app.get('/sensor/:id', function (req, res) {
+app.get('/sensor/:id', (req, res) => {
   Query.getLastMeasure(req.params.id)
     .then(measure => res.send(measure))
     .catch(err => res.status(404).send(err))
 });
 
 // Get a specific attribute of the last measure from a specific sensor
-app.get('/sensor/:id/:attribute', function (req, res) {
+app.get('/sensor/:id/:attribute', (req, res) => {
   Query.getLastMeasure(req.params.id, req.params.attribute)
     .then(attr => res.send(attr.toString()))
     .catch(err => res.status(404).send(err))
 });
 
 //TODO: la query deve prendere dalla collections status
-app.get('/home/:attribute', function (req, res) {
+app.get('/home/:attribute', (req, res) => {
   Query.getLastMeasure(null, req.params.attribute)
     .then(measure => res.send(measure[req.params.attribute].toString()))
 });
+
 
 /* *********************************
  ********** POST REQUESTS **********
  ***********************************/
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
-app.post('/home/room/', function (req, res) {
+app.post('/home/room/',  (req, res) => {
   query.createRoom(req.body.name)
     .then(id => res.send(id))
     .catch(err => res.status(403).send(err))
@@ -70,9 +70,31 @@ app.post('/home/room/', function (req, res) {
 
 // Bind a sensor to a room, no body required
 //TODO: should I verify that there is a sensors in the network with this mac that streams data?
-app.post('/room/:roomID/sensor/:sensorID', function (req, res) {
-  Query.bind(req.params.sensorID, req.params.roomID)
-    .then(() => res.send("ok"))
+app.post('/room/:roomID/device/:deviceID', (req, res) => {
+  Query.bind(req.params.deviceID, req.params.roomID)
+    .then((ok) => res.send(ok))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("Unknown error.");
+    })
+});
+
+
+/* ***********************************
+ ********** DELETE REQUESTS **********
+ *************************************/
+
+// Delete a room
+app.delete('/home/room/:id', (req, res) => {
+  Query.deleteRoom(req.params.id)
+    .then((ok) => res.send(ok))
+    .catch(err => res.status(403).send(err))
+});
+
+// Unbind a sensor from a room, no body required
+app.delete('/room/:roomID/device/:deviceID', (req, res) => {
+  Query.unbind(req.params.deviceID, req.params.roomID)
+    .then((ok) => res.send(ok))
     .catch(err => {
       console.error(err);
       res.status(500).send("Unknown error.");
@@ -99,11 +121,9 @@ room/<id>/<attribute=value>
 home/<attribute=value>
 
 - home/room/<name=value>
-- room/<id>/sensor/<id=value>
-room/<id>/actuator/<id=value>
+- room/<id>/device/<id=value>
 
 DELETE
-home/room/<id>
-room/<id>/sensor/<id>
-room/<id>/actuator/<id>
+- home/room/<id>
+- room/<id>/device/<id>
 */
