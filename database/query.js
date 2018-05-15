@@ -1,24 +1,6 @@
-const UUIDs = require('./UUIDs.js');
+// const UUIDs = require('./UUIDs.js');
 const database = require('./database.js');
 let db = new database.Database();
-
-///////// TODO: MOVE IN THE FUNCTIONS THAT ADD TO DATABASE
-function UUIDsToProperties(obj) {
-  const dbObj = {};
-  for (const key in obj)
-    dbObj[UUIDs.UUIDToProperty(key)] = obj[key];
-  return dbObj;
-}
-
-function propertiesToUUIDs(obj) {
-  const dbObj = {};
-  for (const key in obj)
-    if (key in UUIDs.UUIDs)
-      dbObj[UUIDs.propertyToUUID(key)] = obj[key];
-    else dbObj[key] = obj[key];
-  return dbObj;
-}
-//////////////////////////////////////////////////
 
 class Query {
   constructor() { }

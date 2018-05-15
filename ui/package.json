@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "start": "webpack-dev-server --progress"
+    "start": "webpack-dev-server --progress --host 0.0.0.0"
   },
   "license": "Apache-2.0",
   "devDependencies": {
@@ -22,10 +22,12 @@
   },
   "dependencies": {
     "@material/button": "^0.35.0",
+    "@material/card": "^0.35.0",
     "@material/fab": "^0.35.0",
     "@material/tabs": "^0.35.0",
     "@material/top-app-bar": "^0.35.0",
     "@material/typography": "^0.35.0",
+    "chart.js": "^2.7.2",
     "classnames": "^2.2.5",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
