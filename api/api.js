@@ -31,27 +31,52 @@ app.delete('/:some_data', function (req, res) {
     res.send('Got a DELETE request for '+req.params.some_data)
 })*/
 
+//TODO: check if not exist (404) or there are other problems (5xx)
+
+/* ********************************
+ ********** GET REQUESTS **********
+ **********************************/
+
+// Get last measure from a specific sensor
 app.get('/sensor/:id', function (req, res) {
-  Query.getLastMeasure(req.params.id).then(measure => {
-    res.send(measure);
-  })
+  Query.getLastMeasure(req.params.id)
+    .then(measure => res.send(measure))
+    .catch(err => res.status(404).send(err))
 });
 
+// Get a specific attribute of the last measure from a specific sensor
 app.get('/sensor/:id/:attribute', function (req, res) {
-  Query.getLastMeasure(req.params.id, req.params.attribute).then(measure => {
-    res.send(measure[req.params.attribute].toString());
-  })
+  Query.getLastMeasure(req.params.id, req.params.attribute)
+    .then(attr => res.send(attr.toString()))
+    .catch(err => res.status(404).send(err))
 });
 
+//TODO: la query deve prendere dalla collections status
 app.get('/home/:attribute', function (req, res) {
-  Query.getLastMeasure(null, req.params.attribute).then(measure =>
-    res.send(measure[req.params.attribute].toString()));
+  Query.getLastMeasure(null, req.params.attribute)
+    .then(measure => res.send(measure[req.params.attribute].toString()))
 });
 
+/* *********************************
+ ********** POST REQUESTS **********
+ ***********************************/
+
+// Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
 app.post('/home/room/', function (req, res) {
-  query.addRoom(req.body.name)
+  query.createRoom(req.body.name)
     .then(id => res.send(id))
-    .catch(err => res.status(403).send(err));
+    .catch(err => res.status(403).send(err))
+});
+
+// Bind a sensor to a room, no body required
+//TODO: should I verify that there is a sensors in the network with this mac that streams data?
+app.post('/room/:roomID/sensor/:sensorID', function (req, res) {
+  Query.bind(req.params.sensorID, req.params.roomID)
+    .then(() => res.send("ok"))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("Unknown error.");
+    })
 });
 
 /*GET
@@ -60,7 +85,7 @@ app.post('/home/room/', function (req, res) {
 room/<id>
 room/<id>/<attribute>
 home
-- home/<attribute>
+home/<attribute>
 
 home/rooms
 home/sensors
@@ -74,7 +99,7 @@ room/<id>/<attribute=value>
 home/<attribute=value>
 
 - home/room/<name=value>
-room/<id>/sensor/<id=value>
+- room/<id>/sensor/<id=value>
 room/<id>/actuator/<id=value>
 
 DELETE

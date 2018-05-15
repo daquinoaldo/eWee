@@ -1,6 +1,6 @@
-const database = require('./database.js');
-let Database = database.Database;
-let db = new Database();
+const collections = require('./database.js').collections;
+const Db = require('./database.js').Database;
+const db = new Db();
 
 class Query {
   constructor() { }
@@ -21,35 +21,35 @@ class Query {
    * Insert an obj in the database and return a promise
    * @param obj of type {id: <device_id>, timestamp: <timestamp>, temp: <int, in celsius>, humidity: <int in 0..100>,
        * light: <int in 0..100>, pir: <movement (boolean)>, door: <movement (boolean)>}
-   * @returns a promise
+   * @returns Promise<any>
    */
-  insertMeasure(obj) {
+  static insertMeasure(obj) {
     //TODO: add the room id
     if (!obj || typeof obj !== typeof {}) return new Promise((resolve, reject) => {
-      reject("Error: a room with name "+name+" already exists.");
+      reject("Error: you must specify the object to be inserted.");
     });
-    return Database.insert(database.collection.measures, obj);
+    return Db.insert(collections.measures, obj);
   }
 
   /**
    * Create a new room and return the id
    * @param name of the room
    * @param things, an array of devices in the room, can be null
-   * @returns a promise resolved with the id of the inserted room or rejected if the room with this name already exists
+   * @returns Promise<any> resolved with the id of the inserted room
    */
-  addRoom(name, things) {
+  createRoom(name, things) {
     return new Promise((resolve, reject) => {
-      if (!name) reject("Error: a room with name "+name+" already exists.");
+      if (!name) reject("Error: the room must have a name.");
       things = (things && typeof things === typeof []) ? things : [];
-      Database.insert(database.collection.rooms, {name: name, things: things}).then(res => resolve(res.insertedId.toString()));
+      Db.insert(collections.rooms, {name: name, things: things}).then(res => resolve(res.insertedId.toString()));
     });
   }
-  /*addRoom(name, things) {
+  /*createRoom(name, things) {
     things = things | [];
     return new Promise((resolve, reject) => {
-      db.query(database.collection.rooms, {name: name}).hasNext().then(res => {
+      db.query(collections.rooms, {name: name}).hasNext().then(res => {
         if (res) reject("Error: a room with name "+name+" already exists.");
-        db.insert(database.collection.rooms, {name: name, things: []}).then(res => resolve(res.insertedId));
+        db.insert(collections.rooms, {name: name, things: []}).then(res => resolve(res.insertedId));
       });
     })
   }*/
@@ -58,14 +58,18 @@ class Query {
    *     UPDATES     *
    *******************/
 
-  updateRoom(id, name, things) {
-    return new Promise((resolve, reject) => {
-      Database.query(database.collection.rooms, {_id: id}).next().then(res => {
-        if (res) reject("Error: a room with name "+name+" already exists.");
-        Database.insert(database.collection.rooms, {name: name, things: []}).then(res => resolve(res.insertedId));
-      });
-    })
+  // Low level function, NOT TESTED
+  static updateRoom(id, newName, things) {
+    const set = {};
+    if (name) set.name = name;
+    if (things) set.things = things;
+    return Db.update(collections.rooms, id, {$set: set});
   }
+
+  static bind(deviceID, roomID) {
+    return Db.update(collections.rooms, roomID, {$addToSet: {things: deviceID}});
+  }
+
 
   /*******************
    *     QUERIES     *
@@ -75,16 +79,21 @@ class Query {
    * Return the last measure available in the database
    * @param sensorID, optional, the ID of the sensor
    * @param attribute, optional, specify that this attribute have to exist
-   * @returns a promise
+   * @returns Promise<any> promise
    */
   static getLastMeasure(sensorID, attribute) {
-    const query = {};
-    if (sensorID) query.id = sensorID;
-    if (attribute) query[attribute] = { $exists: true };
-    return Database.query(database.collection.measures, query).sort({"timestamp": -1}).next();
+    return new Promise((resolve, reject) => {
+      const query = {};
+      if (sensorID) query.id = sensorID;
+      if (attribute) query[attribute] = { $exists: true };
+      Db.query(collections.measures, query).sort({"timestamp": -1}).next()
+        .then(measure => resolve(attribute ? measure[attribute] : measure))
+        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist"))
+    })
   }
+
 }
 
 module.exports = {
   Query : Query
-}
+};
