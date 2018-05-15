@@ -10,13 +10,23 @@ import './app.scss';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      section: 'analitica'
+    }
+  }
+
+  updateSection = (newSection) => {
+    console.log(newSection);
+    this.setState({ section: newSection })
   }
 
   render() {
     return(
       <div>
-        <TitleBanner />
-        <ChartCard url="cose"/>
+        <TitleBanner callback={this.updateSection}/>
+        <div>
+          <ChartCard url="cose"/>
+        </div>
       </div>
     )
   };
