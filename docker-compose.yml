@@ -1,0 +1,26 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:2.4.14
+    restart: "no"
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongo:/data/db
+  api:
+    container_name: api
+    image: daquinoaldo/api
+    restart: always
+    ports:
+      - "3000:3000"
+    links:
+      - mongo
+  atlante:
+      container_name: atlante
+      image: daquinoaldo/api
+      restart: "no"
+      links:
+        - mongo
