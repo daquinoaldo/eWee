@@ -5,11 +5,11 @@ services:
   mongo:
     container_name: mongo
     image: mongo:2.4.14
-    restart: "no"
+    restart: always
     ports:
       - '27017:27017'
     volumes:
-      - ./mongo:/data/db
+      - ./database/mongo:/data/db
   atlante:
     container_name: atlante
     image: daquinoaldo/atlante
@@ -25,4 +25,4 @@ services:
     links:
       - mongo
     volumes:
-      - .:/usr/src/app/
+      - .:/usr/src/app
