@@ -1,5 +1,4 @@
 FROM node:latest
-ENV MONGO=mongo
 #Atlante
 RUN mkdir -p /usr/src/app/database
 WORKDIR /usr/src/app/database
