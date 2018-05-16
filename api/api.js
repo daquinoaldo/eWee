@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const port = process.env.PORT || 3000;
@@ -6,6 +7,23 @@ const port = process.env.PORT || 3000;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+/*
+ * https://stackoverflow.com/questions/18310394/no-access-control-allow-origin-node-apache-port-issue
+ * Corsair is needed to set the correct headers and allow third party
+ * applications to access the api
+ */
+app.use(cors());
+
+/*
+app.listen(port, "0.0.0.0");
+app.get('/:some_data', function (req, res) {
+    console.log('Got a GET request for '+req.params.some_data);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({ a: 1 }));
+})
+*/
+
 
 const Query = require('../database/query.js').Query;
 const query = new Query();
@@ -15,26 +33,11 @@ Query.init()
     console.log("API running on port " + port);
   });
 
-/* SAMPLES
-app.get('/:some_data', function (req, res) {
-    console.log('Got a GET request for '+req.params.some_data)
-    res.send('Got a GET request for '+req.params.some_data)
-})
-
-app.post('/:some_data', function (req, res) {
-    console.log('Got a POST request for '+req.params.some_data)
-    res.send('Got a POST request for '+req.params.some_data)
-})
-
-app.delete('/:some_data', function (req, res) {
-    console.log('Got a DELETE request for '+req.params.some_data)
-    res.send('Got a DELETE request for '+req.params.some_data)
-})*/
-
 
 /* ********************************
  ********** GET REQUESTS **********
  **********************************/
+
 
 // Get last measure from a specific sensor
 app.get('/sensor/:id', (req, res) => {

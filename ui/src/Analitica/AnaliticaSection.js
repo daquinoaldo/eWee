@@ -7,8 +7,7 @@ var tempt = {title: 'Temperature', subtitle: 'room 123', description:'abc'}
 var humidity = {subtitle: 'room 123', description:'abc'}
 
 var temptUpdate = (toUpdate) => {
-  console.log(2);
-  fetch('http://p1.aldodaquino.com:3000/sensor/00:00:00:00:00:00')
+  fetch('http://localhost:3000/somedata')
   .then(response => response.json())
   .then(json => console.log(json));
 }

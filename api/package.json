@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/daquinoaldo/MCPS#readme",
   "dependencies": {
-    "express": "latest",
-    "body-parser": "^1.18.3"
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "latest"
   }
 }
