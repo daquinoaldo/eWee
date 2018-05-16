@@ -8,11 +8,9 @@ export default class ChartCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      api_url: props.url,
-      fetchData: props.dataFetcher,
-      title: this.props.data.title,
-      subtitle: this.props.data.subtitle,
-      description: this.props.data.description
+      title: this.props.descriptor.title,
+      subtitle: this.props.descriptor.subtitle,
+      description: this.props.descriptor.description
     }
     this.canvas = React.createRef();
   }
@@ -26,30 +24,20 @@ export default class ChartCard extends React.Component {
   componentDidMount() {
     this.cleanEnvir();
 
-    timeTick = setInterval(this.fetchData, 1000);
     canvasCtx = this.canvas.current.getContext('2d');
     utils.createChart(canvasCtx, 10, {min:15, max:35});
   }
 
   cleanEnvir = () => {
-    clearInterval(timeTick);
-    timeTick = null;
     utils.destroyChart();
-  }
-
-  /*
-   * Fetches data from the rest api and convert it in plottable data
-   */
-  fetchData = () => {
-    this.state.fetchData()
-    .then(items=>{ this.updateData(items) });
   }
 
   /*
    * Update the chart
    * @param item: the value to add to the graph
    */
-  updateData = (item) => {
+  update = (item) => {
+    console.log(item);
     let newValue = 20+Math.floor(Math.random(10) * 10);
     utils.updateChart(newValue);
   }
