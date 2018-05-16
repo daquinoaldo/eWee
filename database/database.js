@@ -2,7 +2,8 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 
 // ----- ----- CONSTANTS AND GLOBALS ----- ----- //
-const URL = "mongodb://localhost:27017/";
+const MONGO = process.env.MONGO || "localhost";
+const URL = "mongodb://"+MONGO+":27017/";
 const DB_NAME = "mcps";
 
 let mongoDB;
