@@ -6,15 +6,10 @@ var gLineChart = null;
 var chartConfig = {
   type: 'line',
   options: {
+    showTooltips: false,
     responsive: true,
-    tooltips: {
-      mode: 'index',
-      intersect: false,
-    },
-    hover: {
-      mode: 'nearest',
-      intersect: true
-    },
+    tooltips: {enabled: false},
+    hover: {mode: null},
     scales: {
       yAxes: [{
         ticks: {
@@ -76,4 +71,8 @@ export function updateChart(v) {
   gLineChart.data.datasets[0].data.shift();
   gLineChart.data.datasets[0].data.push(v);
   gLineChart.update();
+}
+
+export function destroyChart() {
+  if(gLineChart) gLineChart.destroy();
 }
