@@ -1,26 +1,47 @@
 import React from 'react';
 import * as utils from './chart.js';
 
+var timeTick = null;
+var canvasCtx = null;
+
 export default class ChartCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      api_url: props.url
+      api_url: props.url,
+      fetchData: props.dataFetcher,
+      title: this.props.data.title,
+      subtitle: this.props.data.subtitle,
+      description: this.props.data.description
     }
+    this.canvas = React.createRef();
   }
 
+  /*
+   * @note !important: with routes it may happen that 'componentWillUnmount'
+   *   will be invoked after 'componentDidMount' (e.g. fast switch between
+   *   routes) so the environment should be cleaned by 'componentDidMount'
+   *   otherwise 'componentWillUnmount' would mess up the work
+   */
   componentDidMount() {
-    this.timeTick = setInterval(this.fetchData, 1000);
-    var ctx = document.getElementById("the-chart").getContext('2d');
-    utils.createChart(ctx, 10, {min:15, max:35});
+    this.cleanEnvir();
+
+    timeTick = setInterval(this.fetchData, 1000);
+    canvasCtx = this.canvas.current.getContext('2d');
+    utils.createChart(canvasCtx, 10, {min:15, max:35});
+  }
+
+  cleanEnvir = () => {
+    clearInterval(timeTick);
+    timeTick = null;
+    utils.destroyChart();
   }
 
   /*
    * Fetches data from the rest api and convert it in plottable data
    */
   fetchData = () => {
-    fetch('https://jsonplaceholder.typicode.com/posts/1')
-    .then(result=>result.json())
+    this.state.fetchData()
     .then(items=>{ this.updateData(items) });
   }
 
@@ -34,15 +55,19 @@ export default class ChartCard extends React.Component {
   }
 
   render() {
+    // const charContainer = { width: '300px', height:'300px' }
+    const charContainer = {}
     return (
       <div className="mdc-card wrapper">
-        <canvas id="the-chart" width="100" height="100"></canvas>
+        <div style={charContainer}>
+          <canvas ref={this.canvas}></canvas>
+        </div>
         <div className="card__primary">
-          <h2 className="card__title mdc-typography--headline6">Our Changing Planet</h2>
-          <h3 className="card__subtitle mdc-typography--subtitle2">by Kurt Wagner</h3>
+          <h2 className="card__title mdc-typography--headline6">{this.state.title}</h2>
+          <h3 className="card__subtitle mdc-typography--subtitle2">{this.state.subtitle}</h3>
         </div>
         <div className="card__secondary mdc-typography--body2">
-          Visit ten places on our planet that are undergoing the biggest changes today.
+          {this.state.description}
         </div>
       </div>
   )};

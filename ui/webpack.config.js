@@ -1,7 +1,10 @@
+var path = require('path');
 module.exports = [
   {
     entry: "./index.js",
     output: {
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: '/',
       filename: "bundle.js"
     },
     module: {
@@ -27,6 +30,9 @@ module.exports = [
         test: /\.js$/,
         loader: 'babel-loader',
       },]
+    },
+    devServer: {
+      historyApiFallback: true,
     },
   },
 ];

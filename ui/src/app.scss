@@ -8,6 +8,11 @@ $mdc-theme-background: #fff;
 @import "./FloatingAction/FloatingAction.scss";
 @import "./TitleBanner/TitleComponent.scss";
 @import "./Analitica/ChartCardComponent.scss";
+@import "./Foot/FootComponent.scss";
+@import "./Management/ManagementSection.scss";
 
-
-// ----- ----- ROUTING CLASSES ----- ----- //
+.body-wrapper {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
