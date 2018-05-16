@@ -8,14 +8,14 @@ export default class ValueCard extends React.Component {
 
     this.state = {
       data: '0',
-      subtitle: this.props.data.subtitle,
-      description: this.props.data.description
+      subtitle: this.props.descriptor.subtitle,
+      description: this.props.descriptor.description
     }
   }
 
   render() {
     return (
-      <div className="mdc-card wrapper">
+      <div className="mdc-card value-card-wrapper">
         <div className="card__primary">
           <h2 className="card__title mdc-typography--headline6">
             Humidity:&ensp;

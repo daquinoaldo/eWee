@@ -13,7 +13,6 @@ $mdc-theme-background: #fff;
 @import "./Management/ManagementSection.scss";
 
 .body-wrapper {
-  height: 100%;
   width: 100%;
-  position: absolute;
+  position: relative;
 }

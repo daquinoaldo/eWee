@@ -36,8 +36,8 @@ export default class ChartCard extends React.Component {
    * Update the chart
    * @param item: the value to add to the graph
    */
-  update = (item) => {
-    console.log(item);
+  updateGraph = (item) => {
+    console.log('Value read ' + item + ' (updating with fake data)');
     let newValue = 20+Math.floor(Math.random(10) * 10);
     utils.updateChart(newValue);
   }
@@ -46,7 +46,7 @@ export default class ChartCard extends React.Component {
     // const charContainer = { width: '300px', height:'300px' }
     const charContainer = {}
     return (
-      <div className="mdc-card wrapper">
+      <div className="mdc-card chart-card-wrapper">
         <div style={charContainer}>
           <canvas ref={this.canvas}></canvas>
         </div>
