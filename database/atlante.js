@@ -5,8 +5,9 @@
 
 const Query = require('./query.js').Query;
 const query = new Query();
-const Database = require('./database.js').Database;
-const db = new Database();
+const Db = require('./database.js').Database;
+const collections = require('./database.js').collections;
+const db = new Db();
 
 /* LOCAL STRUCTS and VARIABLES */
 const rooms = [];
@@ -104,34 +105,45 @@ function addDefaultData(roomName, deviceMAC) {
   })
 }
 
+function setFakeStatus() {
+  const promises = [];
+  for (let i = 0; i < rooms.length - 1; i++) {
+    const obj = {
+      room: rooms[i],
+      timestamp: lastDate.toLocaleString(),
+      occupied: !!+randInt(0, 1),
+      temp: randInt(15, 40),
+      humidity: randInt(30, 100),
+      light: randInt(5, 90)
+    };
+    Db.insert(collections.status, obj);
+  }
+  return Promise.all(promises);
+}
+
 /* HIGH LEVEL FUNCTIONS */
 async function init() {
   // Clear and init
   await db.connect();
-  await Database.drop();
-  await Database.disconnect();
+  await Db.drop();
+  await Db.disconnect();
   await Query.init();
-}
-
-function fill() {
-  const promises = [];
-  promises.push(prepareRooms());
-  promises.push(fillMeasures());
-  return Promise.all(promises);
 }
 
 function printDb() {
   const promises = [];
   for (const collection in db.collections)
-    promises.push(Database.queryAll(db.collections[collection]).then(data => console.log(data)));
+    promises.push(Db.queryAll(db.collections[collection]).then(data => console.log(data)));
   return Promise.all(promises);
 }
 
 /* MAIN */
 async function main () {
   await init();
-  await fill();
+  await prepareRooms();
+  await fillMeasures();
   await addDefaultData();
+  await setFakeStatus();
   //await printDb();
   process.exit()
 }
