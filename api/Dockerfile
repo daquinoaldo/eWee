@@ -1,8 +1,7 @@
 FROM node:latest
-RUN mkdir -p /usr/src/app
-COPY .. /usr/src/app
+RUN mkdir -p /usr/src/app/api
 WORKDIR /usr/src/app/api
-#COPY package.json /usr/src/app/
+COPY package.json /usr/src/app/api
 RUN npm install
 #COPY . /usr/src/app
 EXPOSE 3000
