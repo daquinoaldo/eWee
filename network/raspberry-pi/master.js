@@ -17,14 +17,14 @@ const pendingActions = {}; // Actuators to be set
 
 
 // ----- ----- SETUP AND START ----- ----- //
-async () => {
+async function setup() {
   await Query.init();
 
   /*
    * Starting the ble interface and scanning
    */
   noble.on('stateChange', (state) => {
-    if (state == 'poweredOn') {
+    if (state === 'poweredOn') {
       noble.startScanning([], true);
     }
   });
@@ -33,14 +33,15 @@ async () => {
    * Manages the device discovery
    */
   noble.on('discover', (peripheral) => {
-    let devId = peripheral.id;
-    let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
-    if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)=='sampler') {
+    let devId = peripheral.id;  //TODO: not used
+    let devName = peripheral.advertisement.localName; // Ble advertisement name (sampler_xxxxx)
+    if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)==='sampler') {
       connectedIDs[peripheral.id] = 'known'; // Updating the known device table
       masterLogic(peripheral);
     } // The device is a sample
   });
-}();
+}
+setup();
 
 
 // ----- ----- MAIN LOGIC ----- ----- //
@@ -54,7 +55,7 @@ async function masterLogic (peripheral) {
 
   // Trying to connect
   try {
-    const result = await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
+    await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
     console.log(peripheral.cname + ' (connected)');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -80,7 +81,7 @@ async function masterLogic (peripheral) {
 
   // We have found services, need to look for ENVIR_SENSING service
   let sensingService = null;
-  for (const i in services) {
+  for (const i in services) { //TODO: questo services non è quello del try, lo scope cambia! Va portato fuori?
     // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
     const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
@@ -94,7 +95,7 @@ async function masterLogic (peripheral) {
 
   // We have our service, let's browse the available characteristic
   try {
-    const characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
+    await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
     console.log('2) ' + peripheral.cname + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -103,13 +104,13 @@ async function masterLogic (peripheral) {
     return false;
   }
 
-  let sampleCycle = async function () {
-    // Traing to retrieving data
+  async function sampleCycle () {
+    // Trying to retrieving data
     try {
-      const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
+      const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT); //TODO: characteristicTable non è nello scope
       // Data retrieved correctly, we can use it
       console.log(sample);
-      // Query.insertMeasure(translator(sample));
+      Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 1000);
     } catch (e) {
@@ -117,7 +118,7 @@ async function masterLogic (peripheral) {
       connectedIDs[peripheral.id] = null;
       peripheral.disconnect();
     } // Stop if some error occurs
-  };
+  }
   sampleCycle();
 }
 
@@ -215,7 +216,7 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       try {
-        const uuid_16 = characteristic.uuid.toString().substring(4, 8); //TODO: uuid_16 dever used
+        const uuid_16 = characteristic.uuid.toString().substring(4, 8); //TODO: uuid_16 never used
         if (todo != null && todo.uuid_16 != null) {
           await getWritePromise(characteristic, todo.uuid_16, timeout);
         } // There are some actions to be taken
@@ -242,6 +243,7 @@ function getDelayPromise (msec) {
 /*
  * Callback for disconnections events
  */
+//TODO: never used
 function handleDisconnection (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
@@ -250,6 +252,6 @@ function handleDisconnection (peripheral, error) {
 
 
 // ----- ----- TRANSLATOR ----- ----- //
-var translator = function (obj) {
+function translator (obj) {
   return obj;
 }
