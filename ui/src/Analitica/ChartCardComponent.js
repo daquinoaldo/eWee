@@ -36,8 +36,8 @@ export default class ChartCard extends React.Component {
    * Update the chart
    * @param item: the value to add to the graph
    */
-  updateGraph = (item) => {
-    console.log('Value read ' + item + ' (updating with fake data)');
+  updateGraph = (v) => {
+    console.log('Value read ' + v + ' (updating with fake data)');
     let newValue = 20+Math.floor(Math.random(10) * 10);
     utils.updateChart(newValue);
   }

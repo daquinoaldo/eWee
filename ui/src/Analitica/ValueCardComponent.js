@@ -7,10 +7,15 @@ export default class ValueCard extends React.Component {
     super(props);
 
     this.state = {
-      data: '0',
+      data: '',
+      title: this.props.descriptor.title,
       subtitle: this.props.descriptor.subtitle,
       description: this.props.descriptor.description
     }
+  }
+
+  updateValue = (v) => {
+    this.setState({ data: v });
   }
 
   render() {
@@ -18,7 +23,7 @@ export default class ValueCard extends React.Component {
       <div className="mdc-card value-card-wrapper">
         <div className="card__primary">
           <h2 className="card__title mdc-typography--headline6">
-            Humidity:&ensp;
+            {this.state.title}:&ensp;
             <span className="highlight-value">{this.state.data}</span>
           </h2>
           <h3 className="card__subtitle mdc-typography--subtitle2">{this.state.subtitle}</h3>

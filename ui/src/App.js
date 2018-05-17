@@ -28,9 +28,9 @@ export default class App extends React.Component {
 
   render() {
     return(
-      <div>
+      <div className="body-wrapper">
         <Router>
-          <div className="body-wrapper">
+          <div >
             <TitleBanner />
             <AnimatedSwitch
              atEnter={{ opacity: 0 }}

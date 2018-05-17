@@ -1,5 +1,29 @@
 @import "@material/layout-grid/mdc-layout-grid";
 
 .analitica-wrapper {
-  position: relative;
+  margin: 10px;
+  position: absolute;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.simple-data {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: flex-start;
+}
+
+.flex-item {
+  margin: 10px;
+}
+
+.demo-grid {
+  background: rgba(0,0,0,.2);
+  min-width: 360px;
+}
+
+.demo-cell {
+  background: rgba(0,0,0,.2);
+  height: 100px;
 }
