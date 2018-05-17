@@ -22,8 +22,8 @@ export default class AnaliticaSection extends React.Component {
   }
 
   componentDidMount() {
-    api.cleanTimers();
-    api.startFullDataPulse(
+    clearInterval(this.updateTimer);
+    this.updateTimer = api.startFullDataPulse(
       this.temperature.current.updateGraph,
       this.humidity.current.updateValue,
       this.light.current.updateValue,

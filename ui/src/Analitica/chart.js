@@ -1,26 +1,25 @@
-// This is the chart reference
-var gLineChart = null;
-
-
 // ----- ----- STATIC CONFIG ----- ----- //
-var chartConfig = {
-  type: 'line',
-  options: {
-    showTooltips: false,
-    responsive: true,
-    tooltips: {enabled: false},
-    hover: {mode: null},
-    scales: {
-      yAxes: [{
-        ticks: {
-            beginAtZero:true,
-            min: 0,
-            max: 50
-        }
-      }]
+var newChartConfig = () => {
+  let chartConfig = {
+    type: 'line',
+    options: {
+      showTooltips: false,
+      responsive: true,
+      tooltips: {enabled: false},
+      hover: {mode: null},
+      scales: {
+        yAxes: [{
+          ticks: {
+              beginAtZero:true,
+              min: 0,
+              max: 50
+          }
+        }]
+      }
     }
-  }
-};
+  };
+  return chartConfig;
+}
 
 
 // ----- ----- GENERATOR ----- ----- //
@@ -43,6 +42,8 @@ let nZeros = (n) => { return Array.from(new Array(n), (x,i) => 0); }
  *   the object has to be in the format: {min: minValue, max: maxValue}
  */
 export function createChart(ctx, queueSize, bounds) {
+  let chartConfig = newChartConfig();
+
   // Configuring initial data
   chartConfig.data = {
     labels: nLinear(queueSize),
@@ -61,18 +62,5 @@ export function createChart(ctx, queueSize, bounds) {
       chartConfig.options.scales.yAxes[0].ticks.max = bounds.max;
   }
   // We can now create the chart
-  gLineChart = new Chart(ctx, chartConfig);
-}
-
-/*
- * Update the chart with a new value and shift the others
- */
-export function updateChart(v) {
-  gLineChart.data.datasets[0].data.shift();
-  gLineChart.data.datasets[0].data.push(v);
-  gLineChart.update();
-}
-
-export function destroyChart() {
-  if(gLineChart) gLineChart.destroy();
+  return new Chart(ctx, chartConfig);
 }

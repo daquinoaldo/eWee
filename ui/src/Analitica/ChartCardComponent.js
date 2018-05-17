@@ -13,6 +13,7 @@ export default class ChartCard extends React.Component {
       description: this.props.descriptor.description
     }
     this.canvas = React.createRef();
+    this._mount = false;
   }
 
   /*
@@ -25,11 +26,12 @@ export default class ChartCard extends React.Component {
     this.cleanEnvir();
 
     canvasCtx = this.canvas.current.getContext('2d');
-    utils.createChart(canvasCtx, 10, {min:15, max:35});
+    this.chart = utils.createChart(canvasCtx, 10, {min:15, max:35});
+    this._mount = true;
   }
 
   cleanEnvir = () => {
-    utils.destroyChart();
+    if(this.chart) this.chart.destroy();
   }
 
   /*
@@ -37,9 +39,13 @@ export default class ChartCard extends React.Component {
    * @param item: the value to add to the graph
    */
   updateGraph = (v) => {
+    if(!this._mount) return;
     console.log('Value read ' + v + ' (updating with fake data)');
     let newValue = 20+Math.floor(Math.random(10) * 10);
-    utils.updateChart(newValue);
+    // Updating the chart
+    this.chart.data.datasets[0].data.shift();
+    this.chart.data.datasets[0].data.push(newValue);
+    this.chart.update();
   }
 
   render() {

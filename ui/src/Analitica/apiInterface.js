@@ -1,5 +1,3 @@
-var timers = { }
-
 export function startTemptPulse(pushData) {
   timers.temptInterval = setInterval(() => {
     fetch('http://p1.aldodaquino.com:3000/sensor/00:00:00:00:00:00')
@@ -13,7 +11,7 @@ export function startTemptPulse(pushData) {
 export function startFullDataPulse(
   temptPush, humPush, lightPush, pirPush, doorPush)
   {
-  timers.temptInterval = setInterval(() => {
+  return setInterval(() => {
     fetch('http://p1.aldodaquino.com:3000/sensor/00:00:00:00:00:00')
     .then(response => response.json())
     .then(json => {
