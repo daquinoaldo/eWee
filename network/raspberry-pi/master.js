@@ -69,8 +69,9 @@ async function masterLogic (peripheral) {
   connectedIDs[peripheral.id] = 'connected';
 
   // Trying to discover services
+  let services;
   try {
-    const services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
+    services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
     console.log('1) ' + peripheral.cname + ': got services');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -81,7 +82,7 @@ async function masterLogic (peripheral) {
 
   // We have found services, need to look for ENVIR_SENSING service
   let sensingService = null;
-  for (const i in services) { //TODO: questo services non è quello del try, lo scope cambia! Va portato fuori?
+  for (const i in services) {
     // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
     const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
@@ -94,8 +95,9 @@ async function masterLogic (peripheral) {
   }
 
   // We have our service, let's browse the available characteristic
+  let characteristicTable;
   try {
-    await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
+    characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
     console.log('2) ' + peripheral.cname + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -107,7 +109,7 @@ async function masterLogic (peripheral) {
   async function sampleCycle () {
     // Trying to retrieving data
     try {
-      const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT); //TODO: characteristicTable non è nello scope
+      const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
       Query.insertMeasure(translator(sample));
