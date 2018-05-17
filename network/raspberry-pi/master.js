@@ -1,18 +1,17 @@
 // ----- ----- REQUIREMENTS ----- ----- //
-var noble = require('noble');
-var moment = require('moment');
+const noble = require('noble');
+const moment = require('moment');
 
 
 // ----- ----- COSTANTS ----- ----- //
-const ENVIR_SENSING = '181a' // Our main service
-const NOT_A_SAMPLE = 'not a sample'
+const ENVIR_SENSING = '181a'; // Our main service
 const CONNECTION_TIMEOUT = 2000;
-const SEPARET = '\n/// ///// ///// /// \n'
+const SEPARET = '\n/// ///// ///// /// \n';
 
 
 // ----- ----- GLOBALS ----- ----- //
-var connectedIDs = {}; // Devices seen
-var pendingActions = {}; // Actuators to be set
+const connectedIDs = {}; // Devices seen
+const pendingActions = {}; // Actuators to be set
 
 
 // ----- ----- SETUP ----- ----- //
@@ -20,7 +19,7 @@ var pendingActions = {}; // Actuators to be set
  * Starting the ble interface and scanning
  */
 noble.on('stateChange', (state) => {
-  if (state == 'poweredOn') {
+  if (state === 'poweredOn') {
     noble.startScanning([], true);
   }
 });
@@ -32,7 +31,7 @@ console.log(connectedIDs);
 console.log(peripheral.id);
   let devId = peripheral.id;
   let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
-  if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)=='sampler') {
+  if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)==='sampler') {
     connectedIDs[peripheral.id] = 'known'; // Updating the known device table
     masterLogic(peripheral);
   } // The device is a sample
@@ -40,10 +39,9 @@ console.log(peripheral.id);
 
 
 // ----- ----- MAIN LOGIC ----- ----- //
-var masterLogic = async function (peripheral) {
+async function masterLogic (peripheral) {
   peripheral.cname = peripheral.advertisement.localName;
 
-  let promise_workaround = null;
   peripheral.once('disconnect', () => {
     console.log(peripheral.cname + ' (disconnected)');
     // connectedIDs[peripheral.id] = null;
@@ -51,7 +49,7 @@ var masterLogic = async function (peripheral) {
 
   // Trying to connect
   try {
-    var result = await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
+    const result = await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
     console.log(peripheral.cname + ' (connected)');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -66,7 +64,7 @@ var masterLogic = async function (peripheral) {
 
   // Trying to discover services
   try {
-    var services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
+    const services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
     console.log('1) ' + peripheral.cname + ': got services');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -77,10 +75,10 @@ var masterLogic = async function (peripheral) {
 
   // We have found services, need to look for ENVIR_SENSING service
   let sensingService = null;
-  for (var i in services) {
+  for (const i in services) {
     // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
-    serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
-    if (serviceUUID_16 == ENVIR_SENSING) { sensingService = services[i]; break; }
+    const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
+    if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
   }
   // If we haven't our service, let's disconnect and no reconncet anymore
   if(sensingService == null) {
@@ -91,7 +89,7 @@ var masterLogic = async function (peripheral) {
 
   // We have our service, let's browse the available characteristic
   try {
-    var characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
+    const characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
     console.log('2) ' + peripheral.cname + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
@@ -103,7 +101,7 @@ var masterLogic = async function (peripheral) {
   let sampleCycle = async function () {
     // Traing to retrieving data
     try {
-      var sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
+      const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
       // Ensuring to continue sampling
@@ -113,7 +111,7 @@ var masterLogic = async function (peripheral) {
       connectedIDs[peripheral.id] = null;
       peripheral.disconnect();
     } // Stop if some error occurs
-  }
+  };
   sampleCycle();
 }
 
@@ -124,29 +122,23 @@ var masterLogic = async function (peripheral) {
  * @returns: the string 'connected' if no error occur, otherwise the error
  *   itself
  */
-var getConnectionPromise = function (peripheral, timeout) {
-  var connectionPromise = new Promise(function(resolve, reject) {
-    peripheral.connect(
-      (error) => { error ? reject(error) : resolve('connected'); }
-    );
+function getConnectionPromise (peripheral, timeout) {
+  return new Promise(function (resolve, reject) {
+    peripheral.connect((error) => error ? reject(error) : resolve('connected'));
     setTimeout(() => reject('connect: max time elapsed'), timeout);
   });
-  return connectionPromise;
 }
 
 /*
  * Promises to discover all service exposed by peripheral at most in 'timeout'
  *   milliseconds. Otherwise the promise is rejected.
- * @returns: null if an error occurres, an array of services otherwise
+ * @returns: null if an error occurs, an array of services otherwise
  */
-var getServiceDiscoveryPromise = function (peripheral, timeout) {
-  let servicePromise = new Promise(function(resolve, reject) {
-    peripheral.discoverServices([],
-      (error, services) => { error ? reject('error') : resolve(services); }
-    );
+function getServiceDiscoveryPromise (peripheral, timeout) {
+  return new Promise(function (resolve, reject) {
+    peripheral.discoverServices([], (error, services) => error ? reject('error') : resolve(services));
     setTimeout(() => reject('discoverServices: max time elapsed'), timeout);
   });
-  return servicePromise;
 }
 
 /*
@@ -154,14 +146,11 @@ var getServiceDiscoveryPromise = function (peripheral, timeout) {
  *   most in 'timeout' milliseconds. Otherwise the promise is rejected.
  * @return: null if an error occurres, an array of characteristic otherwise
  */
-var getCharacteristicPromise = function (service, timeout) {
- let characteristicPromise = new Promise(function(resolve, reject) {
-   service.discoverCharacteristics([], (error, characteristics) => {
-     error ? reject(error) : resolve(characteristics);
-   });
+function getCharacteristicPromise (service, timeout) {
+  return new Promise(function (resolve, reject) {
+   service.discoverCharacteristics([], (error, characteristics) => error ? reject(error) : resolve(characteristics));
    setTimeout(() => reject('discoverCharacteristics: max time elapsed'), timeout);
  });
- return characteristicPromise;
 }
 
 /*
@@ -172,18 +161,17 @@ var getCharacteristicPromise = function (service, timeout) {
  *   the 'uuid_16' field, otherwise.
  * @note: the function read hangs if the connection is lost
  */
-var getReadPromise = function (characteristic, timeout) {
-  let readPromise = new Promise(function(resolve, reject) {
-    characteristic.read( (error, data) => {
+function getReadPromise (characteristic, timeout) {
+  return new Promise(function (resolve, reject) {
+    characteristic.read((error, data) => {
       if (error) reject(error); // Ooops, something went wrong
       // Let's return a good formatted data structure
-      let asciiData = data.toString('ascii');
+      let asciiData = data.toString('ascii'); //TODO: credo che ascii vada tolto
       let uuid_16 = characteristic.uuid.toString().substring(4, 8);
       resolve({'uuid_16': uuid_16, 'data': asciiData});
     });
     setTimeout(() => reject('read: max time elapsed'), timeout);
   });
-  return readPromise;
 }
 
 /*
@@ -191,14 +179,11 @@ var getReadPromise = function (characteristic, timeout) {
  *   Otherwise the promise is rejected.
  * @return: True if the characteristic has been properly wrote, false otherwise
  */
-var getWritePromise = function (characteristic, data, timeout) {
-  let readPromise = new Promise(function(resolve, reject) {
-    characteristic.write(data, true, (error) => {
-      error ? reject(false) : resolve(true);
-    });
+function getWritePromise (characteristic, data, timeout) {
+  return new Promise(function (resolve, reject) {
+    characteristic.write(data, true, (error) => error ? reject(false) : resolve(true));
     setTimeout(() => reject('read: max time elapsed'), timeout);
   });
-  return readPromise;
 }
 
 /*
@@ -210,13 +195,13 @@ var getWritePromise = function (characteristic, data, timeout) {
  * @note: the promise isn't resolved/rejected if the connection is lost
  *   (characteristic.read doesn't throw errors, it simply hangs)
  */
-var getSamplePromise = function (peripheral, characteristicTable, timeout) {
+function getSamplePromise (peripheral, characteristicTable, timeout) {
   // Getting all pending actions
   let todo = pendingActions[peripheral.address];
-  var samplePromise = new Promise(async function(resolve, reject) {
+  return new Promise(async function (resolve, reject) {
     // Adding basic info
-    var time = moment();
-    var time_format = time.format('YYYY-MM-DD/HH:mm:ss');
+    const time = moment();
+    const time_format = time.format('YYYY-MM-DD/HH:mm:ss');
     let peripheralData = {
       'device': peripheral.address,
       'timestamp': time_format
@@ -224,12 +209,12 @@ var getSamplePromise = function (peripheral, characteristicTable, timeout) {
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       try {
-        let uuid_16 = characteristic.uuid.toString().substring(4, 8);
+        const uuid_16 = characteristic.uuid.toString().substring(4, 8); //TODO: uuid_16 dever used
         if (todo != null && todo.uuid_16 != null) {
           await getWritePromise(characteristic, todo.uuid_16, CONNECTION_TIMEOUT);
         } // There are some actions to be taken
         // Now is the time to read the value
-        var res = await getReadPromise(characteristic, timeout);
+        const res = await getReadPromise(characteristic, timeout);
         peripheralData[res.uuid_16] = res.data; // Updating sample data
       } catch (e) {
         reject(e);
@@ -237,14 +222,13 @@ var getSamplePromise = function (peripheral, characteristicTable, timeout) {
     }
     resolve(peripheralData);
   });
-  return samplePromise;
 }
 
-var getDelayPromise = function (msec) {
-  let promise = new Promise((resolve, reject) => {
+//TODO: never used
+function getDelayPromise (msec) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => resolve("done!"), msec)
-  });
-  return promise
+  })
 }
 
 
@@ -252,7 +236,7 @@ var getDelayPromise = function (msec) {
 /*
  * Callback for disconnections events
  */
-var handleDisconnection = function (peripheral, error) {
+function handleDisconnection (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
   if (error) console.log(error);
