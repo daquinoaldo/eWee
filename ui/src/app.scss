@@ -9,13 +9,13 @@ $mdc-theme-background: #fff;
 @import "./TitleBanner/TitleComponent.scss";
 @import "./Analitica/ChartCardComponent.scss";
 @import "./Analitica/ValueChartComponent.scss";
-@import "./Analitica/AnaliticaSection.scss";
 @import "./Foot/FootComponent.scss";
 @import "./Management/ManagementSection.scss";
 @import "./Analitica/SwitchComponent.scss";
+@import "./Analitica/AnaliticaSection.scss";
+@import "./Analitica/RoomAnaliticaComponent.scss";
 
 .body-wrapper {
   width: 100%;
-  height: 100%;
   position: relative;
 }

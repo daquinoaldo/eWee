@@ -10,12 +10,17 @@ export default class ValueCard extends React.Component {
       data: '',
       title: this.props.descriptor.title,
       subtitle: this.props.descriptor.subtitle,
-      description: this.props.descriptor.description
+      description: this.props.descriptor.description,
+      _mount: false,
     }
   }
 
+  componentDidMount() {
+    this.setState({ _mount: true });
+  }
+
   updateValue = (v) => {
-    this.setState({ data: v });
+    if (this._mount) this.setState({ data: v });
   }
 
   render() {
