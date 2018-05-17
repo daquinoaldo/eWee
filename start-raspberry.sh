@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd network/raspberry-pi
 npm install
-git
+sudo nohup node master.js 2>1 &
 cd ../../database
 npm install
 cd ../api
