@@ -15,7 +15,7 @@ function propertyToUUID(property) {
 
 }
 
-///////// TODO: è solo una bozzada rivedere, da usare per cnvertire gli oggetti della rete in oggetti db e vice versa
+///////// TODO: è solo una bozza da rivedere, da usare per cnvertire gli oggetti della rete in oggetti db e vice versa
 function UUIDsToProperties(obj) {
   const dbObj = {};
   for (const key in obj)
