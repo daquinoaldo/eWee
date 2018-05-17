@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-cd MCPS/network/raspberry-pi
+cd network/raspberry-pi
 npm install
 git
 cd ../../database
