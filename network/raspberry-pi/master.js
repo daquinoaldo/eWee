@@ -12,6 +12,7 @@ const SEPARET = '\n/// ///// ///// /// \n'
 
 // ----- ----- GLOBALS ----- ----- //
 var connectedIDs = {}; // Devices seen
+var pendingActions = {}; // Actuators to be set
 
 
 // ----- ----- SETUP ----- ----- //
@@ -154,13 +155,13 @@ var getServiceDiscoveryPromise = function (peripheral, timeout) {
  * @return: null if an error occurres, an array of characteristic otherwise
  */
 var getCharacteristicPromise = function (service, timeout) {
-  let characteristicPromise = new Promise(function(resolve, reject) {
-    service.discoverCharacteristics([], (error, characteristics) => {
-      error ? reject('error') : resolve(characteristics);
-    });
-    setTimeout(() => reject('discoverCharacteristics: max time elapsed'), timeout);
-  });
-  return characteristicPromise;
+ let characteristicPromise = new Promise(function(resolve, reject) {
+   service.discoverCharacteristics([], (error, characteristics) => {
+     error ? reject(error) : resolve(characteristics);
+   });
+   setTimeout(() => reject('discoverCharacteristics: max time elapsed'), timeout);
+ });
+ return characteristicPromise;
 }
 
 /*
@@ -186,6 +187,21 @@ var getReadPromise = function (characteristic, timeout) {
 }
 
 /*
+ * Promises to write a characteristic at most in 'timeout' milliseconds.
+ *   Otherwise the promise is rejected.
+ * @return: True if the characteristic has been properly wrote, false otherwise
+ */
+var getWritePromise = function (characteristic, data, timeout) {
+  let readPromise = new Promise(function(resolve, reject) {
+    characteristic.write(data, true, (error) => {
+      error ? reject(false) : resolve(true);
+    });
+    setTimeout(() => reject('read: max time elapsed'), timeout);
+  });
+  return readPromise;
+}
+
+/*
  * Promises to read all the characteristics (a sample) from
  *   the result of a 'discoverCharacteristics' invocation at most in 'timeout'
  *   milliseconds. Otherwise the promise is rejected.
@@ -195,6 +211,8 @@ var getReadPromise = function (characteristic, timeout) {
  *   (characteristic.read doesn't throw errors, it simply hangs)
  */
 var getSamplePromise = function (peripheral, characteristicTable, timeout) {
+  // Getting all pending actions
+  let todo = pendingActions[peripheral.address];
   var samplePromise = new Promise(async function(resolve, reject) {
     // Adding basic info
     var time = moment();
@@ -206,6 +224,11 @@ var getSamplePromise = function (peripheral, characteristicTable, timeout) {
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       try {
+        let uuid_16 = characteristic.uuid.toString().substring(4, 8);
+        if (todo != null && todo.uuid_16 != null) {
+          await getWritePromise(characteristic, todo.uuid_16, CONNECTION_TIMEOUT);
+        } // There are some actions to be taken
+        // Now is the time to read the value
         var res = await getReadPromise(characteristic, timeout);
         peripheralData[res.uuid_16] = res.data; // Updating sample data
       } catch (e) {
