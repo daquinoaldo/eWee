@@ -2,6 +2,8 @@
 var noble = require('noble');
 var moment = require('moment');
 
+const Query = require('../../database/query.js').Query;
+
 
 // ----- ----- COSTANTS ----- ----- //
 const ENVIR_SENSING = '181a' // Our main service
@@ -15,28 +17,31 @@ var connectedIDs = {}; // Devices seen
 var pendingActions = {}; // Actuators to be set
 
 
-// ----- ----- SETUP ----- ----- //
-/*
- * Starting the ble interface and scanning
- */
-noble.on('stateChange', (state) => {
-  if (state == 'poweredOn') {
-    noble.startScanning([], true);
-  }
-});
+// ----- ----- SETUP AND START ----- ----- //
+async () => {
+  await Query.init();
 
+  /*
+   * Starting the ble interface and scanning
+   */
+  noble.on('stateChange', (state) => {
+    if (state == 'poweredOn') {
+      noble.startScanning([], true);
+    }
+  });
 
-// ----- ----- SCANNER ----- ----- //
-noble.on('discover', (peripheral) => {
-console.log(connectedIDs);
-console.log(peripheral.id);
-  let devId = peripheral.id;
-  let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
-  if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)=='sampler') {
-    connectedIDs[peripheral.id] = 'known'; // Updating the known device table
-    masterLogic(peripheral);
-  } // The device is a sample
-});
+  /*
+   * Manages the device discovery
+   */
+  noble.on('discover', (peripheral) => {
+    let devId = peripheral.id;
+    let devName = peripheral.advertisement.localName; // Ble advertisment name (sampler_xxxxx)
+    if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)=='sampler') {
+      connectedIDs[peripheral.id] = 'known'; // Updating the known device table
+      masterLogic(peripheral);
+    } // The device is a sample
+  });
+}();
 
 
 // ----- ----- MAIN LOGIC ----- ----- //
@@ -106,6 +111,7 @@ var masterLogic = async function (peripheral) {
       var sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
+      // Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 1000);
     } catch (e) {
@@ -226,7 +232,7 @@ var getSamplePromise = function (peripheral, characteristicTable, timeout) {
       try {
         let uuid_16 = characteristic.uuid.toString().substring(4, 8);
         if (todo != null && todo.uuid_16 != null) {
-          await getWritePromise(characteristic, todo.uuid_16, CONNECTION_TIMEOUT);
+          await getWritePromise(characteristic, todo.uuid_16, timeout);
         } // There are some actions to be taken
         // Now is the time to read the value
         var res = await getReadPromise(characteristic, timeout);
@@ -256,4 +262,10 @@ var handleDisconnection = function (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
   if (error) console.log(error);
+}
+
+
+// ----- ----- TRANSLATOR ----- ----- //
+var translator = function (obj) {
+  return obj;
 }
