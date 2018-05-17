@@ -23,7 +23,7 @@
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
 #define BHUT_UUID            (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
 
-#define PIR_PIN
+#define PIR_PIN -1
 #define DHT_PIN 18
 #define RS_PIN 2
 #define TEMT_PIN 23
@@ -50,13 +50,13 @@ void setup() {
   // Setting up a new sensing service
   aus.ServiceSetup(SENSING_SERVICE_UUID);
   // Creating new characteristic
-  if(PIR_PIN) aus.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN) aus.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN) aus.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
-  if(RS_PIN) aus.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(TEMT_PIN) aus.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ135_PIN) aus.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ3_PIN) aus.NewCharacteristic(BHUT_UUID, BLECharacteristic::PROPERTY_READ);
+  if(PIR_PIN > 0) aus.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
+  if(DHT_PIN > 0) aus.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
+  if(DHT_PIN > 0) aus.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
+  if(RS_PIN > 0) aus.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
+  if(TEMT_PIN > 0) aus.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ135_PIN > 0) aus.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ3_PIN > 0) aus.NewCharacteristic(BHUT_UUID, BLECharacteristic::PROPERTY_READ);
   // Starting the server
   aus.ServiceStart();
 
@@ -68,13 +68,13 @@ void setup() {
 // ----- ----- MAIN LOOP ----- ----- //
 void loop() {
   // Get sensing data and update the characteristics
-  if(PIR_PIN) aus.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
-  if(DHT_PIN) aus.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
-  if(DHT_PIN) aus.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
-  if(RS_PIN) aus.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
-  if(TEMT_PIN) aus.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
-  if(MQ135_PIN) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
-  if(MQ3_PIN) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ3()));
+  if(PIR_PIN > 0) aus.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
+  if(DHT_PIN > 0) aus.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
+  if(DHT_PIN > 0) aus.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
+  if(RS_PIN > 0) aus.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
+  if(TEMT_PIN > 0) aus.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
+  if(MQ135_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
+  if(MQ3_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ3()));
   delay(1000);
 }
 

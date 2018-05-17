@@ -25,7 +25,7 @@ void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, in
   pinMode(TEMT_PIN, INPUT);
   pinMode(MQ135_PIN, INPUT);
   pinMode(MQ3_PIN, INPUT);
-  if(DHT_PIN) dht.setup(DHT_PIN);
+  if(DHT_PIN > 0) dht.setup(DHT_PIN);
 }
 
 /*

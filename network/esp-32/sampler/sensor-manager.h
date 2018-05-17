@@ -9,7 +9,8 @@ class SensorManager {
     int DHT_PIN;
     int RS_PIN;
     int TEMT_PIN;
-    int MQ_PIN;
+    int MQ135_PIN;
+    int MQ3_PIN;
     
   public:
     /*
@@ -21,7 +22,7 @@ class SensorManager {
      * Setup
      * to be called in the setup function of the Arduino sketch
      */
-    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, int MQ_PIN);
+    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, int MQ135_PIN, int MQ3_PIN);
 
     /*
      * Get movement information from PIR
@@ -65,7 +66,7 @@ class SensorManager {
      * Get bhutan presence in the house
      * @return ?
      */
-    float getMQ135();
+    float getMQ3();
 };
 
 #endif
