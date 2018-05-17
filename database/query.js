@@ -126,7 +126,25 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.query(collections.measures, query).sort({"timestamp": -1}).next()
         .then(measure => resolve(attribute ? measure[attribute] : measure))
-        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist"))
+        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist."))
+    })
+  }
+
+  /**
+   * Return the last measure available in the database
+   * @param roomID
+   * @param attribute, optional, specify the attribute that you want to know
+   * @returns Promise<any> promise
+   */
+  static getRoomStatus(roomID, attribute) {
+    return new Promise((resolve, reject) => {
+      const query = {};
+      if (!roomID) reject("You must specify the room id.");
+      query._id = roomID;
+      if (attribute) query[attribute] = { $exists: true };
+      Db.query(collections.status, query).sort({"timestamp": -1}).next()
+        .then(measure => resolve(attribute ? measure[attribute] : measure))
+        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
     })
   }
 
