@@ -1,0 +1,17 @@
+[Unit]
+Description=Smartness daemon
+
+[Service]
+Type=simple
+ExecStart=/opt/mcps/smartd.py
+ExecReload=/bin/kill -USR1 $MAINPID
+WorkingDirectory=/opt/mcps
+Restart=always
+RestartSec=1
+TimeoutStartSec=10
+TimeoutStopSec=1
+Requires=mongod.service
+After=mongod.service
+
+[Install]
+WantedBy=multi-user.target
