@@ -12,18 +12,20 @@ SensorManager::SensorManager() { }
  * Setup
  * to be called in the setup function of the Arduino sketch
  */
-void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, int MQ_PIN) {
+void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, int MQ135_PIN, int MQ3_PIN) {
   this->PIR_PIN = PIR_PIN;
   this->DHT_PIN = DHT_PIN;
   this->RS_PIN = RS_PIN;
   this->TEMT_PIN = TEMT_PIN;
-  this->MQ_PIN = MQ_PIN;
+  this->MQ135_PIN = MQ135_PIN;
+  this->MQ3_PIN = MQ3_PIN;
   pinMode(PIR_PIN, INPUT);
   pinMode(DHT_PIN, INPUT);
-  dht.setup(DHT_PIN);
   pinMode(RS_PIN, INPUT);
   pinMode(TEMT_PIN, INPUT);
-  pinMode(MQ_PIN, INPUT);
+  pinMode(MQ135_PIN, INPUT);
+  pinMode(MQ3_PIN, INPUT);
+  if(DHT_PIN) dht.setup(DHT_PIN);
 }
 
 /*
@@ -90,8 +92,19 @@ float SensorManager::getLight() {
  * @return ?
  */
 float SensorManager::getMQ135() {
-  int mq = digitalRead(MQ_PIN);
+  int mq = digitalRead(MQ135_PIN);
   Serial.print("MQ135: ");
+  Serial.println(mq);
+  return mq;
+}
+
+/*
+ * Get bhutan presence in the house
+ * @return ?
+ */
+float SensorManager::getMQ3() {
+  int mq = digitalRead(MQ3_PIN);
+  Serial.print("MQ3: ");
   Serial.println(mq);
   return mq;
 }
