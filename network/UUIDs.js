@@ -7,31 +7,25 @@ const UUIDs = {
   "carbon": "0001"
 };
 
+/**
+ * Given a UUID return the property corresponding to that UUID
+ * @param uuid
+ * @return string, the property, or null if the UUID is not in the list
+ */
 function UUIDToProperty(uuid) {
-
+  for (const key in UUIDs)
+    if(UUIDs[key] === uuid) return key;
+  return null;
 }
 
+/**
+ * Given a property return the UUID corresponding to that property
+ * @param property
+ * @returns string, the UUID, or null if the property is not in the list
+ */
 function propertyToUUID(property) {
-
+  return UUIDs[property] ? UUIDs[property] : null;
 }
-
-///////// TODO: è solo una bozza da rivedere, da usare per cnvertire gli oggetti della rete in oggetti db e vice versa
-function UUIDsToProperties(obj) {
-  const dbObj = {};
-  for (const key in obj)
-    dbObj[UUIDToProperty(key)] = obj[key];
-  return dbObj;
-}
-
-function propertiesToUUIDs(obj) {
-  const dbObj = {};
-  for (const key in obj)
-    if (key in UUIDs)
-      dbObj[propertyToUUID(key)] = obj[key];
-    else dbObj[key] = obj[key];
-  return dbObj;
-}
-//////////////////////////////////////////////////
 
 module.exports = {
   UUIDs : UUIDs,

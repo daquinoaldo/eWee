@@ -2,6 +2,7 @@
 const noble = require('noble');
 const moment = require('moment');
 
+const UUID = require('../UUIDs.js');
 const Query = require('../../database/query.js').Query;
 
 
@@ -255,5 +256,12 @@ function handleDisconnection (peripheral, error) {
 
 // ----- ----- TRANSLATOR ----- ----- //
 function translator (obj) {
+  const newObj = {};
+  newObj.id = obj.device;
+  newObj.timestamp = obj.timestamp;
+  for (const uuid in obj) {
+    const property = UUID.UUIDToProperty(uuid);
+    if (property) newObj[property] = obj[uuid];
+  }
   return obj;
 }
