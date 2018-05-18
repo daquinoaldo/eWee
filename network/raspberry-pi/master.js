@@ -70,9 +70,16 @@ async function masterLogic (peripheral) {
   connectedIDs[peripheral.id] = 'connected';
 
   // Trying to discover services
-  let services;
+  let services = [];
   try {
-    services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
+    await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
+      .then(res => services = res)
+      .catch(e => {
+        console.log(SEPARET + "Service discovery error: " + e + SEPARET);
+        connectedIDs[peripheral.id] = null;
+        peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
+        return false;
+      });
     console.log('1) ' + peripheral.cname + ': got services');
   } catch (e) {
     console.log(SEPARET + "Service discovery error: " + e + SEPARET);
@@ -87,6 +94,7 @@ async function masterLogic (peripheral) {
     // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
     const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
+    else console.log(serviceUUID_16);
   }
   // If we haven't our service, let's disconnect and no reconnect anymore
   if(sensingService == null) {
