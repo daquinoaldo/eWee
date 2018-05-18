@@ -31,6 +31,8 @@
 #define MQ135_PIN -1//19
 #define MQ3_PIN -1//5
 
+#define DEVICE_NAME "corridor"
+
 // ----- ----- GLOBALS ----- ----- //
 BleSamplerManager aus;
 SensorManager sensors;
@@ -44,7 +46,7 @@ void setup() {
   // Setting up ble device UUID
   char uuid[5];
   rndStr(uuid, 5);
-  std::string samplerUUID = "sampler_" + std::string(uuid);
+  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);//std::string(uuid);
 
   // BLE device initialization
   BLEDevice::init(samplerUUID);
@@ -75,7 +77,7 @@ void loop() {
   if(RS_PIN > 0) aus.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
   if(TEMT_PIN > 0) aus.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
   if(MQ135_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
-  if(MQ3_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ3()));
+  if(MQ3_PIN > 0) aus.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
   delay(1000);
 }
 
