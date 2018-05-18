@@ -59,7 +59,7 @@ async function masterLogic (peripheral) {
     await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
     console.log(peripheral.cname + ' (connected)');
   } catch (e) {
-    console.log(SEPARET + e + SEPARET);
+    console.log(SEPARET + "Connection error: " + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     peripheral.disconnect();
     return false;
@@ -75,7 +75,7 @@ async function masterLogic (peripheral) {
     services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
     console.log('1) ' + peripheral.cname + ': got services');
   } catch (e) {
-    console.log(SEPARET + e + SEPARET);
+    console.log(SEPARET + "Service discovery error: " + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
     return false;
@@ -88,9 +88,10 @@ async function masterLogic (peripheral) {
     const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
   }
-  // If we haven't our service, let's disconnect and no reconncet anymore
+  // If we haven't our service, let's disconnect and no reconnect anymore
   if(sensingService == null) {
     connectedIDs[peripheral.id] = 'notAnEsp32'; // the device isn't an esp32
+    console.log("Not an ESP32, disconnect.");
     peripheral.disconnect();
     return false;
   }
