@@ -263,5 +263,5 @@ function translator (obj) {
     const property = UUID.UUIDToProperty(uuid);
     if (property) newObj[property] = obj[uuid];
   }
-  return obj;
+  return newObj;
 }
