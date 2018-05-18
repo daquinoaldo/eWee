@@ -80,7 +80,8 @@ async function masterLogic (peripheral) {
         peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
         return false;
       });
-    console.log('1) ' + peripheral.cname + ': got services');
+    if(services !== []) console.log(peripheral.cname + ': got services: ' + services);
+    else console.log(peripheral.cname + ': has not services');
   } catch (e) {
     console.log(SEPARET + "Service discovery error: " + e + SEPARET);
     connectedIDs[peripheral.id] = null;
