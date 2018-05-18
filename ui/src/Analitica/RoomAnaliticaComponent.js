@@ -22,14 +22,14 @@ export default class AnaliticaSection extends React.Component {
   }
 
   componentDidMount() {
-    clearInterval(this.updateTimer);
-    this.updateTimer = api.startFullDataPulse(
-      this.temperature.current.updateGraph,
-      this.humidity.current.updateValue,
-      this.light.current.updateValue,
-      this.pir.current.updateValue,
-      this.door.current.updateValue
-    );
+    // clearInterval(this.updateTimer);
+    // this.updateTimer = api.startFullDataPulse(
+    //   this.temperature.current.updateGraph,
+    //   this.humidity.current.updateValue,
+    //   this.light.current.updateValue,
+    //   this.pir.current.updateValue,
+    //   this.door.current.updateValue
+    // );
   }
 
   render() {

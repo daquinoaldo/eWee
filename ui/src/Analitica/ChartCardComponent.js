@@ -57,11 +57,7 @@ export default class ChartCard extends React.Component {
           <canvas ref={this.canvas}></canvas>
         </div>
         <div className="card__primary">
-          <h2 className="card__title mdc-typography--headline6">{this.state.title}</h2>
-          <h3 className="card__subtitle mdc-typography--subtitle2">{this.state.subtitle}</h3>
-        </div>
-        <div className="card__secondary mdc-typography--body2">
-          {this.state.description}
+          <h3 className="card__subtitle mdc-typography--subtitle2">{this.state.title}</h3>
         </div>
       </div>
   )};

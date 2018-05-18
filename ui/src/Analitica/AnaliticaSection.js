@@ -17,8 +17,13 @@ export default class AnaliticaSection extends React.Component {
   render() {
     var rows = [];
     for (var i = 0; i<3; i++) {
-      rows.push(<Room key={i} href={i}/>);
+      rows.push(
+        <div key={i} href={i} className="room-section-wrapper">
+          <h1>Room: <span className="room-name">123</span></h1>
+          <Room />
+        </div>
+      );
     }
-    return (<div>{rows}</div>);
+    return (<div className="analitica-section-wrapper">{rows}</div>);
   };
 }

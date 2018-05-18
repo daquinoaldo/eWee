@@ -43,7 +43,6 @@ export default class App extends React.Component {
             </AnimatedSwitch>
           </div>
         </Router>
-        <Foot />
       </div>
     )
   };
