@@ -156,7 +156,7 @@ function getConnectionPromise (peripheral, timeout) {
  */
 function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
-    peripheral.discoverServices([], (error, services) => error ? reject('error') : resolve(services));
+    peripheral.discoverServices(null, (error, services) => error ? reject('error') : resolve(services));
     setTimeout(() => reject('discoverServices: max time elapsed'), timeout);
   });
 }
