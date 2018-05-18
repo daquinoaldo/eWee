@@ -59,7 +59,7 @@ async function masterLogic (peripheral) {
     await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
     console.log(peripheral.cname + ' (connected)');
   } catch (e) {
-    console.log(SEPARET + e + SEPARET);
+    console.log(SEPARET + "Connection error: " + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     peripheral.disconnect();
     return false;
@@ -70,12 +70,20 @@ async function masterLogic (peripheral) {
   connectedIDs[peripheral.id] = 'connected';
 
   // Trying to discover services
-  let services;
+  let services = [];
   try {
-    services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT);
-    console.log('1) ' + peripheral.cname + ': got services');
+    await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
+      .then(res => services = res)
+      .catch(e => {
+        console.log(SEPARET + "Service discovery error: " + e + SEPARET);
+        connectedIDs[peripheral.id] = null;
+        peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
+        return false;
+      });
+    if(services !== []) console.log(peripheral.cname + ': got services: ' + services);
+    else console.log(peripheral.cname + ': has not services');
   } catch (e) {
-    console.log(SEPARET + e + SEPARET);
+    console.log(SEPARET + "Service discovery error: " + e + SEPARET);
     connectedIDs[peripheral.id] = null;
     peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
     return false;
@@ -87,10 +95,12 @@ async function masterLogic (peripheral) {
     // 0000xxxx-0000-1000-8000-00805F9B34F (128bit representation of 16bit UUID)
     const serviceUUID_16 = services[i].uuid.toString().substring(4, 8);
     if (serviceUUID_16 === ENVIR_SENSING) { sensingService = services[i]; break; }
+    else console.log(serviceUUID_16);
   }
-  // If we haven't our service, let's disconnect and no reconncet anymore
+  // If we haven't our service, let's disconnect and no reconnect anymore
   if(sensingService == null) {
     connectedIDs[peripheral.id] = 'notAnEsp32'; // the device isn't an esp32
+    console.log("Not an ESP32, disconnect.");
     peripheral.disconnect();
     return false;
   }
@@ -146,7 +156,7 @@ function getConnectionPromise (peripheral, timeout) {
  */
 function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
-    peripheral.discoverServices([], (error, services) => error ? reject('error') : resolve(services));
+    peripheral.discoverServices(null, (error, services) => error ? reject('error') : resolve(services));
     setTimeout(() => reject('discoverServices: max time elapsed'), timeout);
   });
 }

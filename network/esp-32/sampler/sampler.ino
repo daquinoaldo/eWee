@@ -21,14 +21,17 @@
 #define DOOR_UUID            (BLEUUID((uint16_t)0x0000)).toString() //TODO: ???
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
-#define BHUT_UUID            (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
+#define GAS_UUID             (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
 
+// Do NOT use pin 2
 #define PIR_PIN -1
 #define DHT_PIN 18
-#define RS_PIN 2
-#define TEMT_PIN 23
-#define MQ135_PIN 19
-#define MQ3_PIN 5
+#define RS_PIN 4
+#define TEMT_PIN -1//23
+#define MQ135_PIN -1//19
+#define MQ3_PIN -1//5
+
+#define DEVICE_NAME "corridor"
 
 // ----- ----- GLOBALS ----- ----- //
 BleSamplerManager aus;
@@ -43,7 +46,7 @@ void setup() {
   // Setting up ble device UUID
   char uuid[5];
   rndStr(uuid, 5);
-  std::string samplerUUID = "sampler_" + std::string(uuid);
+  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);//std::string(uuid);
 
   // BLE device initialization
   BLEDevice::init(samplerUUID);
@@ -56,7 +59,7 @@ void setup() {
   if(RS_PIN > 0) aus.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
   if(TEMT_PIN > 0) aus.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
   if(MQ135_PIN > 0) aus.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ3_PIN > 0) aus.NewCharacteristic(BHUT_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ3_PIN > 0) aus.NewCharacteristic(GAS_UUID, BLECharacteristic::PROPERTY_READ);
   // Starting the server
   aus.ServiceStart();
 
@@ -74,7 +77,7 @@ void loop() {
   if(RS_PIN > 0) aus.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
   if(TEMT_PIN > 0) aus.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
   if(MQ135_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
-  if(MQ3_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ3()));
+  if(MQ3_PIN > 0) aus.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
   delay(1000);
 }
 

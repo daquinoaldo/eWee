@@ -99,7 +99,7 @@ float SensorManager::getMQ135() {
 }
 
 /*
- * Get bhutan presence in the house
+ * Get gas presence in the house
  * @return ?
  */
 float SensorManager::getMQ3() {
