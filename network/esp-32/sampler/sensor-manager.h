@@ -63,7 +63,7 @@ class SensorManager {
     float getMQ135();
 
     /*
-     * Get bhutan presence in the house
+     * Get gas presence in the house
      * @return ?
      */
     float getMQ3();

@@ -21,7 +21,7 @@
 #define DOOR_UUID            (BLEUUID((uint16_t)0x0000)).toString() //TODO: ???
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
-#define BHUT_UUID            (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
+#define GAS_UUID             (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
 
 // Do NOT use pin 2
 #define PIR_PIN -1
@@ -57,7 +57,7 @@ void setup() {
   if(RS_PIN > 0) aus.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
   if(TEMT_PIN > 0) aus.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
   if(MQ135_PIN > 0) aus.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ3_PIN > 0) aus.NewCharacteristic(BHUT_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ3_PIN > 0) aus.NewCharacteristic(GAS_UUID, BLECharacteristic::PROPERTY_READ);
   // Starting the server
   aus.ServiceStart();
 
