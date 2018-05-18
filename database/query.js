@@ -51,14 +51,6 @@ class Query {
    *     UPDATES     *
    *******************/
 
-  // TODO: Low level function, NOT TESTED
-  static updateRoom(id, newName, things) {
-    const set = {};
-    if (name) set.name = name;
-    if (things) set.things = things;
-    return Db.update(collections.rooms, id, {$set: set});
-  }
-
   /**
    * Bind a device to a room
    * @param deviceID
@@ -67,7 +59,7 @@ class Query {
    */
   static bind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
-      Db.update(collections.rooms, roomID, {$addToSet: {things: deviceID}}).then(res => {
+      Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
       });
@@ -86,7 +78,7 @@ class Query {
    */
   static deleteRoom(id) {
     return new Promise((resolve, reject) => {
-      Db.delete(collections.rooms, id).then(res => {
+      Db.delete(collections.rooms, id.toLowerCase()).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
       });
@@ -101,7 +93,7 @@ class Query {
    */
   static unbind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
-      Db.update(collections.rooms, roomID, {$pull: {things: deviceID}}).then(res => {
+      Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
       });
@@ -122,7 +114,7 @@ class Query {
   static getLastMeasure(sensorID, attribute) {
     return new Promise((resolve, reject) => {
       const query = {};
-      if (sensorID) query.id = sensorID;
+      if (sensorID) query.id = sensorID.toLowerCase();
       if (attribute) query[attribute] = { $exists: true };
       Db.query(collections.measures, query).sort({"timestamp": -1}).next()
         .then(measure => resolve(attribute ? measure[attribute] : measure))
