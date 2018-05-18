@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#git reset --hard
+git reset --hard
 rm -rf database/mongo/*
 rm -f database/mongo/*
 git pull
