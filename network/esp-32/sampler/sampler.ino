@@ -23,12 +23,13 @@
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
 #define BHUT_UUID            (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
 
+// Do NOT use pin 2
 #define PIR_PIN -1
 #define DHT_PIN 18
-#define RS_PIN 2
-#define TEMT_PIN 23
-#define MQ135_PIN 19
-#define MQ3_PIN 5
+#define RS_PIN 4
+#define TEMT_PIN -1//23
+#define MQ135_PIN -1//19
+#define MQ3_PIN -1//5
 
 // ----- ----- GLOBALS ----- ----- //
 BleSamplerManager aus;
