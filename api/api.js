@@ -7,7 +7,6 @@ const port = process.env.PORT || 3000;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 /*
  * https://stackoverflow.com/questions/18310394/no-access-control-allow-origin-node-apache-port-issue
  * Corsair is needed to set the correct headers and allow third party
@@ -15,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.use(cors());
 
-/*
+/* TODO: rimuovere?
 app.listen(port, "0.0.0.0");
 app.get('/:some_data', function (req, res) {
     console.log('Got a GET request for '+req.params.some_data);
@@ -26,7 +25,6 @@ app.get('/:some_data', function (req, res) {
 
 
 const Query = require('../database/query.js').Query;
-const query = new Query();
 Query.init()
   .then(() => {
     app.listen(port, "0.0.0.0");
@@ -34,9 +32,41 @@ Query.init()
   });
 
 
+
 /* ********************************
  ********** GET REQUESTS **********
  **********************************/
+
+// Get the status of the house
+//TODO: attributes
+app.get('/home', (req, res) => {
+  Query.getRoomDetails()
+    .then(list => res.send(list))
+    .catch(err => res.status(404).send(err))
+});
+
+// Get a specific attribute of the status of the house
+//TODO: all
+app.get('/home/:attribute', (req, res) => {
+  Query.getRoomStatus(req.params.id, req.params.attribute)
+    .then(attr => res.send(attr.toString()))
+    .catch(err => res.status(404).send(err))
+});
+
+
+// Get the status of a specific room
+app.get('/room/:id', (req, res) => {
+  Query.getRoom(req.params.id)
+    .then(room => res.send(room))
+    .catch(err => res.status(404).send(err))
+});
+
+// Get a specific attribute of the status of a specific room
+app.get('/room/:id/:attribute', (req, res) => {
+  Query.getRoomStatus(req.params.id, req.params.attribute)
+    .then(attr => res.send(attr.toString()))
+    .catch(err => res.status(404).send(err))
+});
 
 
 // Get last measure from a specific sensor
@@ -53,11 +83,6 @@ app.get('/sensor/:id/:attribute', (req, res) => {
     .catch(err => res.status(404).send(err))
 });
 
-//TODO: la query deve prendere dalla collections status
-app.get('/home/:attribute', (req, res) => {
-  Query.getLastMeasure(null, req.params.attribute)
-    .then(measure => res.send(measure[req.params.attribute].toString()))
-});
 
 
 /* *********************************
@@ -66,7 +91,7 @@ app.get('/home/:attribute', (req, res) => {
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
 app.post('/home/room/',  (req, res) => {
-  query.createRoom(req.body.name)
+  Query.createRoom(req.body.name)
     .then(id => res.send(id))
     .catch(err => res.status(403).send(err))
 });
@@ -81,6 +106,7 @@ app.post('/room/:roomID/device/:deviceID', (req, res) => {
       res.status(500).send("Unknown error.");
     })
 });
+
 
 
 /* ***********************************
@@ -107,16 +133,10 @@ app.delete('/room/:roomID/device/:deviceID', (req, res) => {
 /*GET
 - sensor/<id>
 - sensor/<id>/<attribute>
-room/<id>
-room/<id>/<attribute>
-home
-home/<attribute>
-
-home/rooms
-home/sensors
-home/actuators
-room/<id>/sensors
-room/<id>/actuators
+- room/<id>
+- room/<id>/<attribute>
+- home
+- home/<attribute>
 
 POST
 actuator/<id>/<attribute=value>

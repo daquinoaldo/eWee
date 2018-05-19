@@ -38,7 +38,7 @@ class Query {
    * @param things, an array of devices in the room, can be null
    * @returns Promise<any> resolved with the id of the inserted room
    */
-  createRoom(name, things) {
+  static createRoom(name, things) {
     return new Promise((resolve, reject) => {
       if (!name) reject("Error: the room must have a name.");
       things = (things && typeof things === typeof []) ? things : [];
@@ -123,21 +123,76 @@ class Query {
   }
 
   /**
-   * Return the last measure available in the database
+   * Return the status of a room
    * @param roomID
    * @param attribute, optional, specify the attribute that you want to know
    * @returns Promise<any> promise
    */
   static getRoomStatus(roomID, attribute) {
     return new Promise((resolve, reject) => {
-      const query = {};
       if (!roomID) reject("You must specify the room id.");
-      query._id = roomID;
+      const query = {
+        _id: roomID
+      };
       if (attribute) query[attribute] = { $exists: true };
       Db.query(collections.status, query).sort({"timestamp": -1}).next()
-        .then(measure => resolve(attribute ? measure[attribute] : measure))
+        .then(status => resolve(attribute ? status[attribute] : status))
         .catch(() => reject("Room with id "+roomID+" doesn't exist."))
     })
+  }
+
+  /**
+   * Return the details of all the rooms (or of a specific room)
+   * @param roomID, option, the specific room
+   * @returns Promise<any> promise
+   */
+  static getRoomDetails(roomID) {
+    return new Promise((resolve, reject) => {
+      if (!roomID) return Query.getRoomsList();
+      Db.query(collections.rooms, {_id: roomID}).next()
+        .then(room => resolve(room))
+        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+    });
+  }
+
+  /**
+   * Return both status and details of a room in one single object
+   * @param roomID
+   * @returns Promise<any> promise
+   */
+  static getRoom(roomID) {
+    const room = {};
+    return new Promise(async (resolve, reject) => {
+      const promises = [];
+      promises.push(
+        Query.getRoomStatus(roomID)
+          .then(status => {
+            for (const key in status)
+              room[key] = status[key];
+          })
+      );
+
+      promises.push(
+        Query.getRoomDetails(roomID)
+          .then(details => {
+            for (const key in details)
+              room[key] = details[key];
+          })
+      );
+      await Promise.all(promises).then(resolve).catch(err => reject(err));
+    });
+  }
+
+  /**
+   * Return the list of all the rooms in the house and theirs sensors
+   * @returns Promise<any>
+   */
+  static getRoomsList() {
+    return new Promise((resolve, reject) => {
+      Db.query(collections.rooms, {}).toArray()
+        .then(list => resolve(list))
+        .catch(() => reject("Unknown error."))
+    });
   }
 
 }
