@@ -8,13 +8,15 @@ const Query = require('../../database/query.js').Query;
 
 // ----- ----- COSTANTS ----- ----- //
 const ENVIR_SENSING = '181a'; // Our main service
-const CONNECTION_TIMEOUT = 2000;
+const CONNECTION_TIMEOUT = 5000;
 const SEPARET = '\n/// ///// ///// /// \n';
 
 
 // ----- ----- GLOBALS ----- ----- //
 const connectedIDs = {}; // Devices seen
 const pendingActions = {}; // Actuators to be set
+
+setInterval(() => {console.log(connectedIDs), noble.startScanning()}, 2000);
 
 
 // ----- ----- SETUP AND START ----- ----- //
@@ -34,12 +36,14 @@ async function setup() {
    * Manages the device discovery
    */
   noble.on('discover', (peripheral) => {
-    let devId = peripheral.id;  //TODO: not used
-    let devName = peripheral.advertisement.localName; // Ble advertisement name (sampler_xxxxx)
-    if (!connectedIDs[peripheral.id] && devName && devName.substring(0, 7)==='sampler') {
+    console.log('Found:' + peripheral.id);
+    if (!connectedIDs[peripheral.id] && isSampler(peripheral)) {
       connectedIDs[peripheral.id] = 'known'; // Updating the known device table
       masterLogic(peripheral);
     } // The device is a sample
+    else {
+      console.log('Problems with: ' + peripheral.id);
+    }
   });
 }
 setup();
@@ -47,20 +51,18 @@ setup();
 
 // ----- ----- MAIN LOGIC ----- ----- //
 async function masterLogic (peripheral) {
-  peripheral.cname = peripheral.advertisement.localName;
-
   peripheral.once('disconnect', () => {
-    console.log(peripheral.cname + ' (disconnected)');
+    console.log(peripheral.id + ' (disconnected)');
     // connectedIDs[peripheral.id] = null;
   });
 
   // Trying to connect
   try {
     await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
-    console.log(peripheral.cname + ' (connected)');
+    console.log(peripheral.id + ' (connected)');
   } catch (e) {
-    console.log(SEPARET + "Connection error: " + e + SEPARET);
-    connectedIDs[peripheral.id] = null;
+    console.log(SEPARET + '(' + peripheral.id + ')' + "Service discovery error: " + e + SEPARET);
+    delete connectedIDs[peripheral.id];
     peripheral.disconnect();
     return false;
   } // Connection error
@@ -72,19 +74,11 @@ async function masterLogic (peripheral) {
   // Trying to discover services
   let services = [];
   try {
-    await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
-      .then(res => services = res)
-      .catch(e => {
-        console.log(SEPARET + "Service discovery error: " + e + SEPARET);
-        connectedIDs[peripheral.id] = null;
-        peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
-        return false;
-      });
-    if(services !== []) console.log(peripheral.cname + ': got services: ' + services);
-    else console.log(peripheral.cname + ': has not services');
+    services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
+    if(services.length==0) throw "No services found";
   } catch (e) {
-    console.log(SEPARET + "Service discovery error: " + e + SEPARET);
-    connectedIDs[peripheral.id] = null;
+    console.log(e);
+    delete connectedIDs[peripheral.id];
     peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
     return false;
   } // Handling error
@@ -109,10 +103,10 @@ async function masterLogic (peripheral) {
   let characteristicTable;
   try {
     characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
-    console.log('2) ' + peripheral.cname + ': got char table');
+    console.log('2) ' + peripheral.id + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
-    connectedIDs[peripheral.id] = null;
+    delete connectedIDs[peripheral.id];
     peripheral.disconnect();
     return false;
   }
@@ -125,10 +119,10 @@ async function masterLogic (peripheral) {
       console.log(sample);
       Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
-      setTimeout(sampleCycle, 1000);
+      setTimeout(sampleCycle, 5000);
     } catch (e) {
       console.log(SEPARET + e + SEPARET);
-      connectedIDs[peripheral.id] = null;
+      delete connectedIDs[peripheral.id];
       peripheral.disconnect();
     } // Stop if some error occurs
   }
@@ -145,7 +139,7 @@ async function masterLogic (peripheral) {
 function getConnectionPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
     peripheral.connect((error) => error ? reject(error) : resolve('connected'));
-    setTimeout(() => reject('connect: max time elapsed'), timeout);
+    setTimeout(() => reject('(' + peripheral.id + ') ' + 'Connection error: time elapsed '), timeout);
   });
 }
 
@@ -157,7 +151,7 @@ function getConnectionPromise (peripheral, timeout) {
 function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
     peripheral.discoverServices(null, (error, services) => error ? reject('error') : resolve(services));
-    setTimeout(() => reject('discoverServices: max time elapsed'), timeout);
+    setTimeout(() => reject('(' + peripheral.id + ') ' + 'Service discovery error: time elapsed '), timeout);
   });
 }
 
@@ -169,7 +163,7 @@ function getServiceDiscoveryPromise (peripheral, timeout) {
 function getCharacteristicPromise (service, timeout) {
   return new Promise(function (resolve, reject) {
    service.discoverCharacteristics([], (error, characteristics) => error ? reject(error) : resolve(characteristics));
-   setTimeout(() => reject('discoverCharacteristics: max time elapsed'), timeout);
+   setTimeout(() => reject('Discover characteristic error: time elapsed '), timeout);
  });
 }
 
@@ -274,4 +268,10 @@ function translator (obj) {
     if (property) newObj[property] = obj[uuid];
   }
   return newObj;
+}
+
+function isSampler (peripheral) {
+  let devname = peripheral.advertisement.localName;
+  if (devname==null || devname.length<7) return false;
+  return (devname.substring(0, 7)==='sampler')
 }
