@@ -16,7 +16,10 @@ const SEPARET = '\n/// ///// ///// /// \n';
 const connectedIDs = {}; // Devices seen
 const pendingActions = {}; // Actuators to be set
 
-setInterval(() => {console.log(connectedIDs), noble.startScanning()}, 2000);
+/*
+ * It seems that noble stop scanning from time to time
+ */
+setInterval(() => noble.startScanning(), 10000);
 
 
 // ----- ----- SETUP AND START ----- ----- //
@@ -41,9 +44,6 @@ async function setup() {
       connectedIDs[peripheral.id] = 'known'; // Updating the known device table
       masterLogic(peripheral);
     } // The device is a sample
-    else {
-      console.log('Problems with: ' + peripheral.id);
-    }
   });
 }
 setup();
@@ -51,11 +51,6 @@ setup();
 
 // ----- ----- MAIN LOGIC ----- ----- //
 async function masterLogic (peripheral) {
-  peripheral.once('disconnect', () => {
-    console.log(peripheral.id + ' (disconnected)');
-    // connectedIDs[peripheral.id] = null;
-  });
-
   // Trying to connect
   try {
     await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
@@ -180,7 +175,7 @@ function getReadPromise (characteristic, timeout) {
     characteristic.read((error, data) => {
       if (error) reject(error); // Ooops, something went wrong
       // Let's return a good formatted data structure
-      let asciiData = data.toString('ascii'); //TODO: credo che ascii vada tolto
+      let asciiData = data.toString('ascii');
       let uuid_16 = characteristic.uuid.toString().substring(4, 8);
       resolve({'uuid_16': uuid_16, 'data': asciiData});
     });
