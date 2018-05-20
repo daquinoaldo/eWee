@@ -36,10 +36,10 @@ export default class Head extends React.Component {
           <h1>ESTIA<span>v0.1</span></h1>
           <nav ref={this.tab_bar} id="my-mdc-tab-bar" className="mdc-tab-bar nav-correction">
             <Link to="/analitica">
-              <span className="mdc-tab mdc-tab--active" href="#one" onClick={() => this.sectionChange('analitica')}>Analitica</span>
+              <span className="mdc-tab mdc-tab--active" onClick={() => this.sectionChange('analitica')}>Analitica</span>
             </Link>
             <Link to="/management">
-              <span className="mdc-tab" href="#two" onClick={() => this.sectionChange('management')}>Management</span>
+              <span className="mdc-tab" onClick={() => this.sectionChange('management')}>Management</span>
             </Link>
             <span className="mdc-tab-bar__indicator"></span>
           </nav>

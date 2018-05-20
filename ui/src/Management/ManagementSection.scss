@@ -1,4 +1,14 @@
 .management-wrapper {
   height: 100%;
+  margin: 32px;
   position: absolute;
+}
+
+.sensor-flex-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.sensor-flex-item {
+  margin: 10px;
 }
