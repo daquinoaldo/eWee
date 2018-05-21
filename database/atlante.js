@@ -4,7 +4,6 @@
  */
 
 const Query = require('./query.js').Query;
-const query = new Query();
 const Db = require('./database.js').Database;
 const collections = require('./database.js').collections;
 const db = new Db();
@@ -57,7 +56,7 @@ function prepareRooms(roomsNumber, sensorsInRoom) {
       things.push(device.id);
       devices.push(device);
     }
-    promises.push(query.createRoom("room"+i, things).then(id => rooms.push(id)));
+    promises.push(Query.createRoom("room"+i, things).then(id => rooms.push(id)));
   }
   return Promise.all(promises);
 }
@@ -68,7 +67,7 @@ function getSample(device) {
   lastDate = new Date(lastDate.getTime() + randInt(30, 60) * 100);  // Add from 30 to 60 seconds
   const obj = {
     id: device.id,
-    timestamp: lastDate.toLocaleString()
+    timestamp: lastDate
   };
   if (device.temp) obj['temp'] = randInt(15, 40);
   if (device.humidity) obj['humidity'] = randInt(30, 100);
@@ -99,7 +98,7 @@ function addDefaultData(roomName, deviceMAC) {
     door: 1
   };
   devices.push(device);
-  return query.createRoom(roomName, [device.id]).then(id => {
+  return Query.createRoom(roomName, [device.id]).then(id => {
     rooms.push(id);
     return Query.insertMeasure(getSample(device));
   })
@@ -110,7 +109,7 @@ function setFakeStatus() {
   for (let i = 0; i < rooms.length - 1; i++) {
     const obj = {
       room: rooms[i],
-      timestamp: lastDate.toLocaleString(),
+      timestamp: lastDate,
       occupied: !!+randInt(0, 1),
       temp: randInt(15, 40),
       humidity: randInt(30, 100),
