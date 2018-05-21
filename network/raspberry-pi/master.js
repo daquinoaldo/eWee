@@ -15,6 +15,11 @@ const SEPARET = '\n/// ///// ///// /// \n';
 // ----- ----- GLOBALS ----- ----- //
 const connectedIDs = {}; // Devices seen
 const pendingActions = {}; // Actuators to be set
+// const pendingActions = {
+//   '30:ae:a4:75:1f:e6': {
+//     '2a1f': 'written'
+//   }
+// }
 
 /*
  * It seems that noble stop scanning from time to time
@@ -39,9 +44,9 @@ async function setup() {
    * Manages the device discovery
    */
   noble.on('discover', (peripheral) => {
-    console.log('Found:' + peripheral.id);
-    if (!connectedIDs[peripheral.id] && isSampler(peripheral)) {
-      connectedIDs[peripheral.id] = 'known'; // Updating the known device table
+    console.log('Found:' + peripheral.address);
+    if (!connectedIDs[peripheral.address] && isSampler(peripheral)) {
+      connectedIDs[peripheral.address] = 'known'; // Updating the known device table
       masterLogic(peripheral);
     } // The device is a sample
   });
@@ -54,17 +59,17 @@ async function masterLogic (peripheral) {
   // Trying to connect
   try {
     await getConnectionPromise(peripheral, CONNECTION_TIMEOUT);
-    console.log(peripheral.id + ' (connected)');
+    console.log(peripheral.address + ' (connected)');
   } catch (e) {
-    console.log(SEPARET + '(' + peripheral.id + ')' + "Service discovery error: " + e + SEPARET);
-    delete connectedIDs[peripheral.id];
+    console.log(SEPARET + '(' + peripheral.address + ')' + "Service discovery error: " + e + SEPARET);
+    delete connectedIDs[peripheral.address];
     peripheral.disconnect();
     return false;
   } // Connection error
 
   // We are now connected
   noble.startScanning();
-  connectedIDs[peripheral.id] = 'connected';
+  connectedIDs[peripheral.address] = 'connected';
 
   // Trying to discover services
   let services = [];
@@ -73,7 +78,7 @@ async function masterLogic (peripheral) {
     if(services.length==0) throw "No services found";
   } catch (e) {
     console.log(e);
-    delete connectedIDs[peripheral.id];
+    delete connectedIDs[peripheral.address];
     peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
     return false;
   } // Handling error
@@ -88,7 +93,7 @@ async function masterLogic (peripheral) {
   }
   // If we haven't our service, let's disconnect and no reconnect anymore
   if(sensingService == null) {
-    connectedIDs[peripheral.id] = 'notAnEsp32'; // the device isn't an esp32
+    connectedIDs[peripheral.address] = 'notAnEsp32'; // the device isn't an esp32
     console.log("Not an ESP32, disconnect.");
     peripheral.disconnect();
     return false;
@@ -98,10 +103,10 @@ async function masterLogic (peripheral) {
   let characteristicTable;
   try {
     characteristicTable = await getCharacteristicPromise(sensingService, CONNECTION_TIMEOUT);
-    console.log('2) ' + peripheral.id + ': got char table');
+    console.log('2) ' + peripheral.address + ': got char table');
   } catch (e) {
     console.log(SEPARET + e + SEPARET);
-    delete connectedIDs[peripheral.id];
+    delete connectedIDs[peripheral.address];
     peripheral.disconnect();
     return false;
   }
@@ -117,7 +122,7 @@ async function masterLogic (peripheral) {
       setTimeout(sampleCycle, 5000);
     } catch (e) {
       console.log(SEPARET + e + SEPARET);
-      delete connectedIDs[peripheral.id];
+      delete connectedIDs[peripheral.address];
       peripheral.disconnect();
     } // Stop if some error occurs
   }
@@ -134,7 +139,7 @@ async function masterLogic (peripheral) {
 function getConnectionPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
     peripheral.connect((error) => error ? reject(error) : resolve('connected'));
-    setTimeout(() => reject('(' + peripheral.id + ') ' + 'Connection error: time elapsed '), timeout);
+    setTimeout(() => reject('(' + peripheral.address + ') ' + 'Connection error: time elapsed '), timeout);
   });
 }
 
@@ -146,7 +151,7 @@ function getConnectionPromise (peripheral, timeout) {
 function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
     peripheral.discoverServices(null, (error, services) => error ? reject('error') : resolve(services));
-    setTimeout(() => reject('(' + peripheral.id + ') ' + 'Service discovery error: time elapsed '), timeout);
+    setTimeout(() => reject('(' + peripheral.address + ') ' + 'Service discovery error: time elapsed '), timeout);
   });
 }
 
@@ -189,8 +194,9 @@ function getReadPromise (characteristic, timeout) {
  * @return: True if the characteristic has been properly wrote, false otherwise
  */
 function getWritePromise (characteristic, data, timeout) {
+  let buf = Buffer.from(data, 'utf8');
   return new Promise(function (resolve, reject) {
-    characteristic.write(data, true, (error) => error ? reject(false) : resolve(true));
+    characteristic.write(buf, true, (error) => error ? reject(false) : resolve(true));
     setTimeout(() => reject('read: max time elapsed'), timeout);
   });
 }
@@ -207,6 +213,7 @@ function getWritePromise (characteristic, data, timeout) {
 function getSamplePromise (peripheral, characteristicTable, timeout) {
   // Getting all pending actions
   let todo = pendingActions[peripheral.address];
+  console.log(peripheral.address);
   return new Promise(async function (resolve, reject) {
     // Adding basic info
     const time = moment();
@@ -218,9 +225,10 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       try {
-        const uuid_16 = characteristic.uuid.toString().substring(4, 8); //TODO: uuid_16 never used
-        if (todo != null && todo.uuid_16 != null) {
-          await getWritePromise(characteristic, todo.uuid_16, timeout);
+        const uuid_16 = characteristic.uuid.toString().substring(4, 8);
+        if (todo != null && todo[uuid_16] != null) {
+          await getWritePromise(characteristic, todo[uuid_16], timeout);
+          delete todo[uuid_16];
         } // There are some actions to be taken
         // Now is the time to read the value
         const res = await getReadPromise(characteristic, timeout);

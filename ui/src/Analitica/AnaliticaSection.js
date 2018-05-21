@@ -14,7 +14,7 @@ export default class AnaliticaSection extends React.Component {
     this.setState({ rooms: [] });
   }
 
-  render() {
+  roomsHtml = () => {
     var rows = [];
     for (var i = 0; i<3; i++) {
       rows.push(
@@ -24,6 +24,13 @@ export default class AnaliticaSection extends React.Component {
         </div>
       );
     }
-    return (<div className="analitica-section-wrapper">{rows}</div>);
-  };
+    return rows;
+  }
+
+  render() {
+    return (
+      <div className="analitica-section-wrapper">
+        {this.roomsHtml()}
+      </div>
+    )};
 }

@@ -1,0 +1,17 @@
+@import "@material/chips/mdc-chips";
+
+.sensor-chip-icon {
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.25s;
+  z-index: 9;
+  color: $mdc-theme-primary !important;
+}
+
+.sensor-chip-visible {
+  opacity: 0.5 !important;
+}
+
+.inner-radio {
+	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI0IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc3Qwe2ZpbGw6bm9uZTt9PC9zdHlsZT48ZyBpZD0iQm91bmRpbmdfQm94ZXMiPjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0wLDBoMjR2MjRIMFYweiIvPjwvZz48ZyBpZD0iUm91bmRlZCI+PGc+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNSIvPjwvZz48L2c+PC9zdmc+);
+}
