@@ -14,6 +14,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.use(cors());
 
+
+/*
+app.listen(port, "0.0.0.0");
+app.get('/:some_data', function (req, res) {
+  console.log('Got a GET request for '+req.params.some_data);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify({ a: 1 }));
+});*/
+
 const Query = require('../database/query.js').Query;
 Query.init()
   .then(() => {

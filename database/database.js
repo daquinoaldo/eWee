@@ -48,6 +48,10 @@ class Database {
     return mongoDB.collection(collection).find(query);
   }
 
+  static queryWithOptions(collection, query, options) {
+    return mongoDB.collection(collection).find(query, options);
+  }
+
   static queryDistinct(collection, key, query) {
     return mongoDB.collection(collection).distinct(key, query);
   }
