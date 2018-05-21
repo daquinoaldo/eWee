@@ -28,7 +28,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!measure || typeof measure !== typeof {}) reject("Error: you must specify the object to be inserted.");
       if (!measure.id) reject("Error: the object must have the field id containing the MAC address of the device.");
-      if (measure.timestamp) reject("Error: the object must have the field timestamp.");
+      if (!measure.timestamp) reject("Error: the object must have the field timestamp.");
       Db.queryLast(collections.rooms, {things: measure.id}).then(room => {
         measure.room = room ? room._id : null;
         Db.insert(collections.measures, measure).then(() => resolve("ok"));
@@ -46,7 +46,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!action || typeof action !== typeof {}) reject("Error: you must specify the object to be inserted.");
       if (!action.id) reject("Error: the object must have the field id containing the MAC address of the device.");
-      if (action.timestamp) reject("Error: the object must have the field timestamp.");
+      if (!action.timestamp) reject("Error: the object must have the field timestamp.");
       Db.queryLast(collections.rooms, {things: action.id}).then(room => {
         action.room = room ? room._id : null;
         Db.insert(collections.measures, action).then(() => resolve("ok"));
@@ -64,7 +64,7 @@ class Query {
   static setKey(actuatorID, key, value) {
     const action = {
       id: actuatorID,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
       agent: "user"
     };
     action[key] = value;

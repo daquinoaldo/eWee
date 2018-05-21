@@ -1,7 +1,7 @@
 {
   "name": "atlante",
   "version": "1.0.0",
-  "description": "",
+  "description": "Atlante rise the world fill the database with (fake) measurment to test the system.",
   "main": "atlante.js",
   "scripts": {
     "start": "node atlante.js",
