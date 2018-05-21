@@ -14,12 +14,13 @@ const SEPARET = '\n/// ///// ///// /// \n';
 
 // ----- ----- GLOBALS ----- ----- //
 const connectedIDs = {}; // Devices seen
-const pendingActions = {}; // Actuators to be set
-// const pendingActions = {
-//   '30:ae:a4:75:1f:e6': {
-//     '2a1f': 'written'
-//   }
-// }
+const pendingActions = []; // Actuators to be set
+// const pendingActions = [
+//   { 'mac': '30:ae:a4:75:1f:e6',
+//    '2a1f': 'written' },
+//   { 'mac': '30:ae:a4:75:1f:e6',
+//    '2a1f': 'notWritten' }
+// ]
 
 /*
  * It seems that noble stop scanning from time to time
@@ -226,11 +227,6 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
     for (let characteristic of characteristicTable) {
       try {
         const uuid_16 = characteristic.uuid.toString().substring(4, 8);
-        if (todo != null && todo[uuid_16] != null) {
-          await getWritePromise(characteristic, todo[uuid_16], timeout);
-          delete todo[uuid_16];
-        } // There are some actions to be taken
-        // Now is the time to read the value
         const res = await getReadPromise(characteristic, timeout);
         peripheralData[res.uuid_16] = res.data; // Updating sample data
       } catch (e) {
@@ -238,6 +234,52 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
       }
     }
     resolve(peripheralData);
+  });
+}
+
+/*
+ * Promises to execute all pending actions wrt a given peripheral
+ * @return: true if no error occurres, the error otherwise
+ */
+function getExecutionPromise (peripheral, characteristicTable, errorsArray, timeout) {
+  // Ensuring the error array is empty before starting
+  errorsArray.splice(0, errorsArray.length);
+
+  return new Promise(async function (resolve, reject) {
+    // Finding actions to execute
+    todoIndex = pendingActions.find((el) => return el.mac==mac);
+    // Iterating till there is something to do
+    while (todo != NULL) {
+      todo = pendingActions[todoIndex];
+      // Getting the characteristic
+      let characteristic = characteristicTable.find( (el) => {
+        let uuid_16 = el.uuid.toString().substring(4, 8);
+        return (uuis_16==todo.uuid_16);
+      });
+
+      if (characteristic!=null) {
+        let buf = Buffer.from(data, 'utf8');
+        characteristic.write(buf, true, (error) => {
+          if (!error) delete pendingActions[todoIndex];
+          else console.log(SEPARET + error + SEPARET);
+        });
+        try {
+          // @note: the order in which the actions are executed may be important
+          await getWritePromise(characteristic, todo.value, timeout);
+          delete pendingActions[todoIndex];
+        } catch (e) {
+          errorsArray.push({error: e, action: todo});
+        }
+      } // if the characteristic exist, then need to set the actuator
+      else {
+        delete pendingActions[todoIndex];
+      } // Otherwise we can delete the pending action
+
+      // Preparing for next iteration
+      todoIndex = pendingActions.find((el) => return el.mac==mac);
+    }
+    if (errors.length>0) reject(false);
+    resolve(true);
   });
 }
 
@@ -258,6 +300,12 @@ function handleDisconnection (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
   if (error) console.log(error);
+}
+
+
+// ----- ----- ACTUATORS ----- ----- //
+function actionsOf (mac) {
+  pendingActions.find((el) => return el.mac==mac);
 }
 
 
