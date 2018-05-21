@@ -98,7 +98,7 @@ def smart_loop():
             status = update_room_status(room)
             check_and_enforce_policy(room, status)
 
-def sigusr1_handler():
+def sigusr1_handler(signum, frame):
     # handle SIGUSR1 signal for forced loop iteration
     pass
 
