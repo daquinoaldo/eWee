@@ -19,17 +19,56 @@ class Query {
    *******************/
 
   /**
-   * Insert an obj in the database and return a promise
-   * @param obj of type {id: <device_id>, timestamp: <timestamp>, temp: <int, in celsius>, humidity: <int in 0..100>,
+   * Insert a measure in the database and return a promise
+   * @param measure of type {id: <device_id>, timestamp: <timestamp>, temp: <int, in celsius>, humidity: <int in 0..100>,
        * light: <int in 0..100>, pir: <movement (boolean)>, door: <movement (boolean)>}
    * @returns Promise<any>
    */
-  static insertMeasure(obj) {
-    //TODO: add the room id
-    if (!obj || typeof obj !== typeof {}) return new Promise((resolve, reject) => {
-      reject("Error: you must specify the object to be inserted.");
+  static insertMeasure(measure) {
+    return new Promise((resolve, reject) => {
+      if (!measure || typeof measure !== typeof {}) reject("Error: you must specify the object to be inserted.");
+      if (!measure.id) reject("Error: the object must have the field id containing the MAC address of the device.");
+      if (measure.timestamp) reject("Error: the object must have the field timestamp.");
+      Db.queryLast(collections.rooms, {things: measure.id}).then(room => {
+        measure.room = room ? room._id : null;
+        Db.insert(collections.measures, measure).then(() => resolve("ok"));
+      });
     });
-    return Db.insert(collections.measures, obj);
+  }
+
+  /**
+   * Insert an action in the database and return a promise
+   * @param action of type {id: <device_id>, timestamp: <timestamp>, temp: <int, in celsius>, humidity: <int in 0..100>,
+       * light: <int in 0..100>, pir: <movement (boolean)>, door: <movement (boolean)>}
+   * @returns Promise<any>
+   */
+  static insertAction(action) {
+    return new Promise((resolve, reject) => {
+      if (!action || typeof action !== typeof {}) reject("Error: you must specify the object to be inserted.");
+      if (!action.id) reject("Error: the object must have the field id containing the MAC address of the device.");
+      if (action.timestamp) reject("Error: the object must have the field timestamp.");
+      Db.queryLast(collections.rooms, {things: action.id}).then(room => {
+        action.room = room ? room._id : null;
+        Db.insert(collections.measures, action).then(() => resolve("ok"));
+      });
+    });
+  }
+
+  /**
+   * Insert an action in the database and return a promise
+   * @param actuatorID, the ID o the device that should do the action
+   * @param key that you want to assign, e.g. "status"
+   * @param value that you want to assign to that key, e.g. "on"
+   * @returns Promise<any>
+   */
+  static setKey(actuatorID, key, value) {
+    const action = {
+      id: actuatorID,
+      timestamp: new Date().toISOString(),
+      agent: "user"
+    };
+    action[key] = value;
+    return Query.insertAction(action);
   }
 
   /**
@@ -61,7 +100,12 @@ class Query {
     return new Promise((resolve, reject) => {
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
-        resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+        // delete all measures that this sensor made when were not in a room.
+        // This is because we use measures with room null to discover unbound devices.
+        Db.deleteWithQuery(collections.measures, {id: deviceID, room: null}).then(res => {
+          if (!res.result.ok) reject("Unknown error.");
+          resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+        });
       });
     });
   }
@@ -116,7 +160,7 @@ class Query {
       const query = {};
       if (sensorID) query.id = sensorID.toLowerCase();
       if (attribute) query[attribute] = { $exists: true };
-      Db.query(collections.measures, query).sort({"timestamp": -1}).next()
+      Db.queryLast(collections.measures, query)
         .then(measure => resolve(attribute ? measure[attribute] : measure))
         .catch(() => reject("Sensor with id "+sensorID+" doesn't exist."))
     })
@@ -135,7 +179,7 @@ class Query {
         _id: roomID
       };
       if (attribute) query[attribute] = { $exists: true };
-      Db.query(collections.status, query).sort({"timestamp": -1}).next()
+      Db.queryLast(collections.status, query)
         .then(status => resolve(attribute ? status[attribute] : status))
         .catch(() => reject("Room with id "+roomID+" doesn't exist."))
     })
@@ -149,7 +193,7 @@ class Query {
   static getRoomDetails(roomID) {
     return new Promise((resolve, reject) => {
       if (!roomID) return Query.getRoomsList();
-      Db.query(collections.rooms, {_id: roomID}).next()
+      Db.queryLast(collections.rooms, {_id: roomID})
         .then(room => resolve(room))
         .catch(() => reject("Room with id "+roomID+" doesn't exist."))
     });
@@ -161,8 +205,8 @@ class Query {
    * @returns Promise<any> promise
    */
   static getRoom(roomID) {
-    const room = {};
     return new Promise(async (resolve, reject) => {
+      const room = {};
       const promises = [];
       promises.push(
         Query.getRoomStatus(roomID)
@@ -179,7 +223,7 @@ class Query {
               room[key] = details[key];
           })
       );
-      await Promise.all(promises).then(resolve).catch(err => reject(err));
+      await Promise.all(promises).then(() => resolve(room)).catch(err => reject(err));
     });
   }
 
@@ -192,6 +236,116 @@ class Query {
       Db.query(collections.rooms, {}).toArray()
         .then(list => resolve(list))
         .catch(() => reject("Unknown error."))
+    });
+  }
+
+  /**
+   * Return the devices list
+   * @returns Promise<any> promise
+   */
+  static getDevicesList(unboundOnly) {
+    return new Promise((resolve, reject) => {
+      const query = {};
+      if (unboundOnly) query.room = null;
+      Db.queryDistinct(collections.measures, "id", query).toArray()
+        .then(list => resolve(list))
+        .catch(() => reject("Unknown error."))
+    });
+  }
+
+  /**
+   * Return the unbound devices list
+   * @returns Promise<any> promise
+   */
+  static getUnboundDevices() {
+    return Query.getDevicesList(true);
+  }
+
+  /**
+   * Return the details of the house
+   * @returns Promise<any> promise
+   */
+  static getHomeDetails() {
+    return new Promise(async (resolve, reject) => {
+      const home = {};
+      const promises = [];
+      promises.push(
+        Query.getRoomsList().then(list => home.rooms = list)
+      );
+      promises.push(
+        Query.getUnboundDevices().then(unboundDevices => home.unboundDevices = unboundDevices)
+      );
+      await Promise.all(promises).then(() => resolve(home)).catch(err => reject(err));
+    });
+  }
+
+  /**
+   * Return the status of the house
+   * @param attribute, optional, specify the attribute that you want to know
+   * @returns Promise<any> promise
+   */
+  static getHomeStatus(attribute) {
+    return new Promise((resolve, reject) => {
+      const query = {};
+      Db.query(collections.status, query).toArray()
+        .then(statuses => {
+          const home = {
+            timestamp: -1,
+            occupied: false,
+            temp: 0,
+            humidity: 0,
+            light: 0
+          };
+          let [cTemp, cHumidity, cLight] = 0;
+          for (status in statuses) {
+            home.timestamp = max(home.timestamp, status.timestamp);
+            if (status.occupied) home.occupied = true;
+            if (status.temp) {
+              home.temp += status.temp;
+              cTemp++;
+            }
+            if (status.humidity) {
+              home.humidity += status.humidity;
+              cHumidity++;
+            }
+            if (status.light) {
+              home.light += status.light;
+              cLight++;
+            }
+          }
+          home.temp /= cTemp;
+          home.humidity /= cHumidity;
+          home.light /= cLight;
+          resolve(attribute ? home[attribute] : home)
+        })
+        .catch(() => reject("Unknown error."))
+    })
+  }
+
+  /**
+   * Return both status and details of the house
+   * @returns Promise<any> promise
+   */
+  static getHome() {
+    return new Promise(async (resolve, reject) => {
+      const home = {};
+      const promises = [];
+      promises.push(
+        Query.getHomeStatus()
+          .then(status => {
+            for (const key in status)
+              home[key] = status[key];
+          })
+      );
+
+      promises.push(
+        Query.getHomeDetails()
+          .then(details => {
+            for (const key in details)
+              home[key] = details[key];
+          })
+      );
+      await Promise.all(promises).then(() => resolve(home)).catch(err => reject(err));
     });
   }
 
