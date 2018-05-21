@@ -37,6 +37,12 @@ class BleSamplerManager
      */
     bool SetCharacteristic(std::string uuid, std::string value);
     /*
+     * Get the characteristic's value with uuid==tuuid
+     * @param tuuid: the target characteristic uuid
+     * @param tValue: the new value
+     */
+    std::string GetCharacteristic(std::string tuuid);
+    /*
      * Starts a new server containing the given service with the given characteristics
      */
     void ServiceStart();

@@ -1,5 +1,5 @@
 #include <string>
-#include <time.h> 
+#include <time.h>
 
 #include "ble-sampler.h"
 
@@ -22,27 +22,32 @@
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
 #define GAS_UUID             (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
+#define BLINKING_UUID        (BLEUUID((uint16_t)0x0003)).toString() //TODO: ???
 
 // Do NOT use pin 2
 #define PIR_PIN -1
-#define DHT_PIN 18
-#define RS_PIN 4
+#define DHT_PIN -1 // 18
+#define RS_PIN  -1 // 4
 #define TEMT_PIN -1//23
 #define MQ135_PIN -1//19
 #define MQ3_PIN -1//5
 
+#define LED_BUILTIN 2
+
 #define DEVICE_NAME "corridor"
 
+
 // ----- ----- GLOBALS ----- ----- //
-BleSamplerManager aus;
+BleSamplerManager ble;
 SensorManager sensors;
+bool isInternalBlinking = false;
 
 
 // ----- ----- SETUP ----- ----- //
 void setup() {
   Serial.begin(115200);
   srand (time(NULL));
-  
+
   // Setting up ble device UUID
   char uuid[5];
   rndStr(uuid, 5);
@@ -51,35 +56,67 @@ void setup() {
   // BLE device initialization
   BLEDevice::init(samplerUUID);
   // Setting up a new sensing service
-  aus.ServiceSetup(SENSING_SERVICE_UUID);
+  ble.ServiceSetup(SENSING_SERVICE_UUID);
   // Creating new characteristic
-  if(PIR_PIN > 0) aus.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN > 0) aus.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN > 0) aus.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
-  if(RS_PIN > 0) aus.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(TEMT_PIN > 0) aus.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ135_PIN > 0) aus.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ3_PIN > 0) aus.NewCharacteristic(GAS_UUID, BLECharacteristic::PROPERTY_READ);
+  if(PIR_PIN > 0) ble.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
+  if(DHT_PIN > 0) ble.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
+  if(DHT_PIN > 0) ble.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
+  if(RS_PIN > 0) ble.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
+  if(TEMT_PIN > 0) ble.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ135_PIN > 0) ble.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
+  if(MQ3_PIN > 0) ble.NewCharacteristic(GAS_UUID, BLECharacteristic::PROPERTY_READ);
+  ble.NewCharacteristic(BLINKING_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
   // Starting the server
-  aus.ServiceStart();
+  ble.ServiceStart();
 
   // Setup the sensors
-  sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN, MQ3_PIN);
+  // sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN, MQ3_PIN);
+  // Setup builtin led
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 
 // ----- ----- MAIN LOOP ----- ----- //
 void loop() {
   // Get sensing data and update the characteristics
-  if(PIR_PIN > 0) aus.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
-  if(DHT_PIN > 0) aus.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
-  if(DHT_PIN > 0) aus.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
-  if(RS_PIN > 0) aus.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
-  if(TEMT_PIN > 0) aus.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
-  if(MQ135_PIN > 0) aus.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
-  if(MQ3_PIN > 0) aus.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
+  if(PIR_PIN > 0) ble.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
+  if(DHT_PIN > 0) ble.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
+  if(DHT_PIN > 0) ble.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
+  if(RS_PIN > 0)  ble.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
+  if(TEMT_PIN > 0) ble.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
+  if(MQ135_PIN > 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
+  if(MQ3_PIN > 0) ble.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
+
+  // Blinking logic
+  std::string blinking = ble.GetCharacteristic(BLINKING_UUID);
+  if (blinking.compare("off") != 0) {
+    blinkInternal();
+    ble.SetCharacteristic(BLINKING_UUID, "off");
+  }
   delay(1000);
 }
+
+
+// ----- ----- BLINKING TASK ----- ----- //
+void blinkInternal() {
+  // We're already blinking
+  if (isInternalBlinking) return;
+  // If not blinking, then start new rtos task
+  isInternalBlinking = true;
+  xTaskCreate(blinktask, "TaskOne", 10000, NULL,  1, NULL);
+}
+
+void blinktask(void* args) {
+  for(int i=0; i<3; i++) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
+  }
+  isInternalBlinking = false;
+  vTaskDelete( NULL );
+}
+
 
 
 // ----- ----- MISCELLANEOUS ----- ----- //

@@ -51,3 +51,9 @@ bool BleSamplerManager::SetCharacteristic(std::string tuuid, std::string tValue)
   return true; 
 }
 
+std::string BleSamplerManager::GetCharacteristic(std::string tuuid)
+{
+  if (mCharacteristicTable.find(tuuid) == mCharacteristicTable.end()) return NULL;
+  return (mCharacteristicTable[tuuid]->getValue());
+}
+
