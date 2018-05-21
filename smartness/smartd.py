@@ -62,24 +62,33 @@ def check_and_enforce_policy(room_id, status):
     if policy is None or status['occupied'] is None:
         return
     policy_to_enforce = policy['occupied'] if status['occupied'] else policy['empty']
+    policy_status = {'temp': None, 'light': None, 'carbon': None}
     if status['temp'] is not None:
         if status['temp'] < policy_to_enforce['temp']['min']:
             post_new_action(room_id, 'cooling', False)
             post_new_action(room_id, 'heating', True)
+            policy_status['temp'] = False
         elif status['temp'] > policy_to_enforce['temp']['max']:
             post_new_action(room_id, 'cooling', True)
             post_new_action(room_id, 'heating', False)
+            policy_status['temp'] = False
         else:
             post_new_action(room_id, 'cooling', False)
             post_new_action(room_id, 'heating', False)
+            policy_status['temp'] = True
     if status['occupied'] == True:
         if status['light'] is not None:
             post_new_action(room_id, 'illumination', status['light'] < policy_to_enforce['light'])
+            policy_status['light'] = (status['light'] > policy_to_enforce['light'])
         if status['carbon'] is not None:
             post_new_action(room_id, 'fan', status['carbon'] > policy_to_enforce['carbon'])
+            policy_status['carbon'] = (status['carbon'] < policy_to_enforce['carbon'])
     elif status['occupied'] == False:
         post_new_action(room_id, 'illumination', False)
         post_new_action(room_id, 'fan', False)
+        policy_status['light'] = True
+        policy_status['carbon'] = True
+    db.status.update_one({'room': room_id}, {'$set': {'policy': policy_status}})
 
 def smart_loop():
     # business logic here
