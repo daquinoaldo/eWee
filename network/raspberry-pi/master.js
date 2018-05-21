@@ -16,11 +16,10 @@ const SEPARET = '\n/// ///// ///// /// \n';
 const connectedIDs = {}; // Devices seen
 const pendingActions = []; // Actuators to be set
 // const pendingActions = [
-//   { 'mac': '30:ae:a4:75:1f:e6',
-//    '2a1f': 'written' },
-//   { 'mac': '30:ae:a4:75:1f:e6',
-//    '2a1f': 'notWritten' }
-// ]
+//   { 'mac': '30:ae:a4:1c:c2:ee',
+//     'uuid_16': '0003',
+//     'value': 'true'},
+// ];
 
 /*
  * It seems that noble stop scanning from time to time
@@ -78,9 +77,9 @@ async function masterLogic (peripheral) {
     services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
     if(services.length==0) throw "No services found";
   } catch (e) {
-    console.log(e);
+    console.log(SEPARET + e + SEPARET);
     delete connectedIDs[peripheral.address];
-    peripheral.disconnect((e) => console.log('Error while disconnecting'+e));
+    peripheral.disconnect((e) => console.log('Error while disconnecting: '+e));
     return false;
   } // Handling error
 
@@ -115,10 +114,11 @@ async function masterLogic (peripheral) {
   async function sampleCycle () {
     // Trying to retrieving data
     try {
+      await getExecutionPromise(peripheral, characteristicTable, [], CONNECTION_TIMEOUT);
       const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
-      Query.insertMeasure(translator(sample));
+      // Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 5000);
     } catch (e) {
@@ -197,7 +197,7 @@ function getReadPromise (characteristic, timeout) {
 function getWritePromise (characteristic, data, timeout) {
   let buf = Buffer.from(data, 'utf8');
   return new Promise(function (resolve, reject) {
-    characteristic.write(buf, true, (error) => error ? reject(false) : resolve(true));
+    characteristic.write(buf, true, (error) => error ? reject(error) : resolve(true));
     setTimeout(() => reject('read: max time elapsed'), timeout);
   });
 }
@@ -214,14 +214,12 @@ function getWritePromise (characteristic, data, timeout) {
 function getSamplePromise (peripheral, characteristicTable, timeout) {
   // Getting all pending actions
   let todo = pendingActions[peripheral.address];
-  console.log(peripheral.address);
   return new Promise(async function (resolve, reject) {
     // Adding basic info
-    const time = moment();
-    const time_format = time.format('YYYY-MM-DD/HH:mm:ss');
+    const time = new Date(new Date().toUTCString());
     let peripheralData = {
       'device': peripheral.address,
-      'timestamp': time_format
+      'timestamp': time
     };
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
@@ -247,38 +245,35 @@ function getExecutionPromise (peripheral, characteristicTable, errorsArray, time
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
-    todoIndex = pendingActions.find((el) => return el.mac==mac);
+    todo = pendingActions.find((el) => { return el.mac==peripheral.address });
     // Iterating till there is something to do
-    while (todo != NULL) {
-      todo = pendingActions[todoIndex];
+    while (todo != null) {
       // Getting the characteristic
       let characteristic = characteristicTable.find( (el) => {
         let uuid_16 = el.uuid.toString().substring(4, 8);
-        return (uuis_16==todo.uuid_16);
+        return (uuid_16==todo.uuid_16);
       });
 
       if (characteristic!=null) {
-        let buf = Buffer.from(data, 'utf8');
-        characteristic.write(buf, true, (error) => {
-          if (!error) delete pendingActions[todoIndex];
-          else console.log(SEPARET + error + SEPARET);
-        });
         try {
           // @note: the order in which the actions are executed may be important
           await getWritePromise(characteristic, todo.value, timeout);
-          delete pendingActions[todoIndex];
+          pendingActions = pendingActions.splice(pendingActions.indexOf(todo), 1);
         } catch (e) {
           errorsArray.push({error: e, action: todo});
         }
       } // if the characteristic exist, then need to set the actuator
       else {
-        delete pendingActions[todoIndex];
+        pendingActions = pendingActions.splice(pendingActions.indexOf(todo), 1);
       } // Otherwise we can delete the pending action
 
       // Preparing for next iteration
-      todoIndex = pendingActions.find((el) => return el.mac==mac);
+      todo = pendingActions.find((el) => {
+        console.log(pendingActions);
+        return el.mac==peripheral.address
+      });
     }
-    if (errors.length>0) reject(false);
+    if (errorsArray.length>0) reject('Some errors occurred');
     resolve(true);
   });
 }
@@ -300,12 +295,6 @@ function handleDisconnection (peripheral, error) {
   let devName = peripheral.advertisement.localName;
   console.log('Disconnected from ' + devName);
   if (error) console.log(error);
-}
-
-
-// ----- ----- ACTUATORS ----- ----- //
-function actionsOf (mac) {
-  pendingActions.find((el) => return el.mac==mac);
 }
 
 
