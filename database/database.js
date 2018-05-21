@@ -48,12 +48,24 @@ class Database {
     return mongoDB.collection(collection).find(query);
   }
 
+  static queryDistinct(collection, key, query) {
+    return mongoDB.collection(collection).distinct(key, query);
+  }
+
+  static queryLast(collection, query) {
+    return Database.query(collection, query).sort({"timestamp": -1}).next();
+  }
+
   static update(collection, id, update) {
     return mongoDB.collection(collection).updateOne({_id: ObjectID(id)}, update);
   }
 
+  static deleteWithQuery(collection, query) {
+    return mongoDB.collection(collection).deleteOne(query);
+  }
+
   static delete(collection, id) {
-    return mongoDB.collection(collection).deleteOne({_id: ObjectID(id)});
+    return Database.deleteWithQuery(collection, {_id: ObjectID(id)});
   }
 
   // Used only for tests

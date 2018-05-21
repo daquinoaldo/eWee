@@ -14,16 +14,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.use(cors());
 
-/* TODO: rimuovere?
-app.listen(port, "0.0.0.0");
-app.get('/:some_data', function (req, res) {
-    console.log('Got a GET request for '+req.params.some_data);
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify({ a: 1 }));
-})
-*/
-
-
 const Query = require('../database/query.js').Query;
 Query.init()
   .then(() => {
@@ -32,23 +22,48 @@ Query.init()
   });
 
 
+/* LIST OF APIs
+GET
+sensors (and rooms and devices)
+- home
+- home/<attribute>
+- room/<id>
+- room/<id>/<attribute>
+- sensor/<id>
+- sensor/<id>/<attribute>
+
+POST
+actuators
+- actuator/<id>/<attribute=value>
+room/<id>/<attribute=value>
+home/<attribute=value>
+
+rooms and binding:
+- home/room/<name=value>
+- room/<id>/device/<id=value>
+
+DELETE
+rooms and unbinding:
+- home/room/<id>
+- room/<id>/device/<id>
+*/
+
+
 
 /* ********************************
  ********** GET REQUESTS **********
  **********************************/
 
 // Get the status of the house
-//TODO: attributes
 app.get('/home', (req, res) => {
-  Query.getRoomDetails()
-    .then(list => res.send(list))
+  Query.getHome()
+    .then(home => res.send(home))
     .catch(err => res.status(404).send(err))
 });
 
 // Get a specific attribute of the status of the house
-//TODO: all
 app.get('/home/:attribute', (req, res) => {
-  Query.getRoomStatus(req.params.id, req.params.attribute)
+  Query.getHomeStatus(req.params.attribute)
     .then(attr => res.send(attr.toString()))
     .catch(err => res.status(404).send(err))
 });
@@ -89,6 +104,14 @@ app.get('/sensor/:id/:attribute', (req, res) => {
  ********** POST REQUESTS **********
  ***********************************/
 
+// Create new action for an actuator, setting an its attribute.
+// Pass the value that you want to assign to the attribute in the body as a JSON obj: {"value": "the_attribute_value"}
+app.post('/actuator/:id/:attribute',  (req, res) => {
+  Query.setKey(req.params.id, req.params.attribute, req.body.value)
+    .then(res => res.send(res))
+    .catch(err => res.status(403).send(err))
+});
+
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
 app.post('/home/room/',  (req, res) => {
   Query.createRoom(req.body.name)
@@ -97,7 +120,6 @@ app.post('/home/room/',  (req, res) => {
 });
 
 // Bind a sensor to a room, no body required
-//TODO: should I verify that there is a sensors in the network with this mac that streams data?
 app.post('/room/:roomID/device/:deviceID', (req, res) => {
   Query.bind(req.params.deviceID, req.params.roomID)
     .then((ok) => res.send(ok))
@@ -129,24 +151,3 @@ app.delete('/room/:roomID/device/:deviceID', (req, res) => {
       res.status(500).send("Unknown error.");
     })
 });
-
-/*GET
-- sensor/<id>
-- sensor/<id>/<attribute>
-- room/<id>
-- room/<id>/<attribute>
-- home
-- home/<attribute>
-
-POST
-actuator/<id>/<attribute=value>
-room/<id>/<attribute=value>
-home/<attribute=value>
-
-- home/room/<name=value>
-- room/<id>/device/<id=value>
-
-DELETE
-- home/room/<id>
-- room/<id>/device/<id>
-*/

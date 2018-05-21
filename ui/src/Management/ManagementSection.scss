@@ -7,8 +7,14 @@
 .sensor-flex-wrapper {
   display: flex;
   justify-content: center;
+  padding-bottom: 21px;
 }
 
 .sensor-flex-item {
   margin: 10px;
+}
+
+.h1-blue {
+  color: #1565c0;
+  font-size: 1em;
 }
