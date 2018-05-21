@@ -22,6 +22,33 @@ Query.init()
   });
 
 
+/* LIST OF APIs
+GET
+sensors (and rooms and devices)
+- home
+- home/<attribute>
+- room/<id>
+- room/<id>/<attribute>
+- sensor/<id>
+- sensor/<id>/<attribute>
+
+POST
+actuators
+- actuator/<id>/<attribute=value>
+room/<id>/<attribute=value>
+home/<attribute=value>
+
+rooms and binding:
+- home/room/<name=value>
+- room/<id>/device/<id=value>
+
+DELETE
+rooms and unbinding:
+- home/room/<id>
+- room/<id>/device/<id>
+*/
+
+
 
 /* ********************************
  ********** GET REQUESTS **********
@@ -124,24 +151,3 @@ app.delete('/room/:roomID/device/:deviceID', (req, res) => {
       res.status(500).send("Unknown error.");
     })
 });
-
-/*GET
-- sensor/<id>
-- sensor/<id>/<attribute>
-- room/<id>
-- room/<id>/<attribute>
-- home
-- home/<attribute>
-
-POST
-- actuator/<id>/<attribute=value>
-room/<id>/<attribute=value>
-home/<attribute=value>
-
-- home/room/<name=value>
-- room/<id>/device/<id=value>
-
-DELETE
-- home/room/<id>
-- room/<id>/device/<id>
-*/
