@@ -12,7 +12,7 @@ export default class ManagementSection extends React.Component {
     var s = [];
     for (var i = 0; i<sensors.length; i++) {
       s.push(
-        <div className="sensor-flex-item">
+        <div className="sensor-flex-item" key={i}>
           <SensorChip uuid={sensors[i]}/>
         </div>
       );
@@ -20,12 +20,18 @@ export default class ManagementSection extends React.Component {
     return s;
   }
 
+  roomsHtml = () => {
+    
+  }
+
   render() {
     return (
       <div className="management-wrapper">
+        <h1>Available <span className="h1-blue">Sensors</span></h1>
         <div className="sensor-flex-wrapper">
           {this.sensorsHtml()}
         </div>
+        <h1>Available <span className="h1-blue">rooms</span></h1>
       </div>
   )};
 }
