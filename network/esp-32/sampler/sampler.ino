@@ -26,9 +26,9 @@
 
 // Do NOT use pin 2
 #define PIR_PIN -1
-#define DHT_PIN -1 // 18
+#define DHT_PIN 18
 #define RS_PIN  -1 // 4
-#define TEMT_PIN -1//23
+#define TEMT_PIN -1 // 23
 #define MQ135_PIN -1//19
 #define MQ3_PIN -1//5
 
@@ -79,6 +79,7 @@ void setup() {
 // ----- ----- MAIN LOOP ----- ----- //
 void loop() {
   // Get sensing data and update the characteristics
+  /*
   if(PIR_PIN > 0) ble.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
   if(DHT_PIN > 0) ble.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
   if(DHT_PIN > 0) ble.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
@@ -86,7 +87,11 @@ void loop() {
   if(TEMT_PIN > 0) ble.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
   if(MQ135_PIN > 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
   if(MQ3_PIN > 0) ble.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
-
+  */
+  
+  ble.SetCharacteristic(TEMP_UUID, float2string(random(20, 30)));
+  ble.SetCharacteristic(HUMID_UUID, float2string(random(50, 70)));
+  
   // Blinking logic
   std::string blinking = ble.GetCharacteristic(BLINKING_UUID);
   if (blinking.compare("off") != 0) {
