@@ -26,7 +26,7 @@ export default class ChartCard extends React.Component {
     this.cleanEnvir();
 
     canvasCtx = this.canvas.current.getContext('2d');
-    this.chart = utils.createChart(canvasCtx, 10, {min:15, max:35});
+    this.chart = utils.createChart(canvasCtx, 10, {min:15, max:45});
     this._mount = true;
   }
 
@@ -40,11 +40,9 @@ export default class ChartCard extends React.Component {
    */
   updateGraph = (v) => {
     if(!this._mount) return;
-    console.log('Value read ' + v + ' (updating with fake data)');
-    let newValue = 20+Math.floor(Math.random(10) * 10);
     // Updating the chart
     this.chart.data.datasets[0].data.shift();
-    this.chart.data.datasets[0].data.push(newValue);
+    this.chart.data.datasets[0].data.push(v);
     this.chart.update();
   }
 

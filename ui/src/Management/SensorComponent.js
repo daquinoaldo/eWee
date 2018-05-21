@@ -3,6 +3,8 @@ import React from 'react';
 import {MDCChipSet} from '@material/chips';
 import {MDCRipple} from '@material/ripple';
 
+const url = 'https://api.p1.aldodaquino.com'
+
 export default class SensorChip extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +20,21 @@ export default class SensorChip extends React.Component {
     MDCRipple.attachTo(this.sensorChip.current);
   }
 
+  sendPost = () => {
+    let postValue = (url + '/actuator/' + this.state.uuid);
+    postValue += '/0003';
+    var options = { method: 'POST',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+     body: JSON.stringify({'value': 'on'})
+    };
+    fetch(postValue, options).then((res) => console.log(res));
+  }
+
   blink = () => {
+    this.sendPost();
+    const target = url + '/' + this.state.uuid
     for (let i=0; i<6; i++) {
       setTimeout(() => {
         this.setState({ blinking:  !this.state.blinking })
@@ -29,7 +45,6 @@ export default class SensorChip extends React.Component {
   render() {
     const basicClass = 'inner-radio material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon';
     const checkedClass = basicClass + (this.state.blinking ? ' sensor-chip-visible' : '');
-    console.log(checkedClass);
     return (
       <div ref={this.sensorChip} className="mdc-chip">
         <div className={checkedClass} onClick={this.blink}></div>
