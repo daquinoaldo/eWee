@@ -141,7 +141,7 @@ async function main () {
   await init();
   await prepareRooms();
   await fillMeasures();
-  await addDefaultData();
+  //await addDefaultData();
   await setFakeStatus();
   //await printDb();
   process.exit()

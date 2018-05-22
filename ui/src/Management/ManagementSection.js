@@ -3,25 +3,41 @@ import React from 'react';
 import {MDCRipple} from '@material/ripple';
 
 import SensorChip from './SensorComponent';
+import RoomManagement from './RoomManagementComponent';
 
-var sensors = ['abc', '123', '456', '678']
+const url = 'https://api.p1.aldodaquino.com'
 
 export default class ManagementSection extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      unboundDevices: []
+    }
+  }
+
+  componentDidMount() {
+    fetch(url+'/home')
+    .then(response => response.json())
+    .then(json => {
+      this.setState({ unboundDevices: json.unboundDevices });
+    });
+  }
 
   sensorsHtml = () => {
-    var s = [];
-    for (var i = 0; i<sensors.length; i++) {
-      s.push(
+    const shtml = [];
+    const unbounded = this.state.unboundDevices;
+    for (var i = 0; i<unbounded.length; i++) {
+      shtml.push(
         <div className="sensor-flex-item" key={i}>
-          <SensorChip uuid={sensors[i]}/>
+          <SensorChip uuid={unbounded[i]}/>
         </div>
       );
     }
-    return s;
+    return shtml;
   }
 
   roomsHtml = () => {
-    
+
   }
 
   render() {
@@ -32,6 +48,7 @@ export default class ManagementSection extends React.Component {
           {this.sensorsHtml()}
         </div>
         <h1>Available <span className="h1-blue">rooms</span></h1>
+        <RoomManagement roomname="Cucina"/>
       </div>
   )};
 }

@@ -1,6 +1,7 @@
 const collections = require('./database.js').collections;
 const Db = require('./database.js').Database;
 const db = new Db();
+const ObjectID = require('mongodb').ObjectID;
 
 class Query {
   constructor() { }
@@ -12,6 +13,7 @@ class Query {
   static init() {
     return db.connect();
   }
+
 
 
   /*******************
@@ -29,6 +31,7 @@ class Query {
       if (!measure || typeof measure !== typeof {}) reject("Error: you must specify the object to be inserted.");
       if (!measure.id) reject("Error: the object must have the field id containing the MAC address of the device.");
       if (!measure.timestamp) reject("Error: the object must have the field timestamp.");
+      measure.id = measure.id.toLowerCase();
       Db.queryLast(collections.rooms, {things: measure.id}).then(room => {
         measure.room = room ? room._id : null;
         Db.insert(collections.measures, measure).then(() => resolve("ok"));
@@ -176,7 +179,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room id.");
       const query = {
-        _id: roomID
+        room: roomID
       };
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
@@ -193,7 +196,7 @@ class Query {
   static getRoomDetails(roomID) {
     return new Promise((resolve, reject) => {
       if (!roomID) return Query.getRoomsList();
-      Db.queryLast(collections.rooms, {_id: roomID})
+      Db.queryLast(collections.rooms, {_id: ObjectID(roomID)})
         .then(room => resolve(room))
         .catch(() => reject("Room with id "+roomID+" doesn't exist."))
     });
@@ -212,7 +215,7 @@ class Query {
         Query.getRoomStatus(roomID)
           .then(status => {
             for (const key in status)
-              room[key] = status[key];
+              if(key !== "room") room[key] = status[key];
           })
       );
 
@@ -231,10 +234,15 @@ class Query {
    * Return the list of all the rooms in the house and theirs sensors
    * @returns Promise<any>
    */
-  static getRoomsList() {
+  static getRoomsList(excludeSensorsList) {
     return new Promise((resolve, reject) => {
-      Db.query(collections.rooms, {}).toArray()
-        .then(list => resolve(list))
+      const options = {};
+      if (excludeSensorsList) options.fields = {things: 0};
+      Db.queryWithOptions(collections.rooms, {}, options).toArray()
+        .then(list => {
+          resolve(list)
+          //delete myObject.regex;
+        })
         .catch(() => reject("Unknown error."))
     });
   }
@@ -247,7 +255,7 @@ class Query {
     return new Promise((resolve, reject) => {
       const query = {};
       if (unboundOnly) query.room = null;
-      Db.queryDistinct(collections.measures, "id", query).toArray()
+      Db.queryDistinct(collections.measures, "id", query)
         .then(list => resolve(list))
         .catch(() => reject("Unknown error."))
     });
@@ -270,7 +278,7 @@ class Query {
       const home = {};
       const promises = [];
       promises.push(
-        Query.getRoomsList().then(list => home.rooms = list)
+        Query.getRoomsList(true).then(list => home.rooms = list)
       );
       promises.push(
         Query.getUnboundDevices().then(unboundDevices => home.unboundDevices = unboundDevices)
@@ -296,9 +304,13 @@ class Query {
             humidity: 0,
             light: 0
           };
-          let [cTemp, cHumidity, cLight] = 0;
-          for (status in statuses) {
-            home.timestamp = max(home.timestamp, status.timestamp);
+          //let [cTemp, cHumidity, cLight] = [0, 0, 0];
+          let cTemp = 0;
+          let cHumidity = 0;
+          let cLight = 0;
+          for (let i = 0; i < statuses.length; i++) {
+            const status = statuses[i];
+            home.timestamp = Math.max(home.timestamp, status.timestamp);  //TODO
             if (status.occupied) home.occupied = true;
             if (status.temp) {
               home.temp += status.temp;

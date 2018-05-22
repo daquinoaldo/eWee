@@ -14,6 +14,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.use(cors());
 
+
+/*
+app.listen(port, "0.0.0.0");
+app.get('/:some_data', function (req, res) {
+  console.log('Got a GET request for '+req.params.some_data);
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify({ a: 1 }));
+});*/
+
 const Query = require('../database/query.js').Query;
 Query.init()
   .then(() => {
@@ -110,6 +119,7 @@ app.post('/actuator/:id/:attribute',  (req, res) => {
   Query.setKey(req.params.id, req.params.attribute, req.body.value)
     .then(res => res.send(res))
     .catch(err => res.status(403).send(err))
+    //TODO: check that the actuator exists
 });
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}

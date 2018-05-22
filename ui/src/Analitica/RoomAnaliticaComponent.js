@@ -5,31 +5,33 @@ import ValueCard from './ValueCardComponent';
 
 import * as api from './apiInterface.js';
 
-var tempt = {title: 'Temperature', subtitle: 'room 123', description:'abc'}
-var humidity = {title: 'Humidity', subtitle: 'room 123', description:'abc'}
-var light = {title: 'Light', subtitle: 'room 123', description:'abc'}
-var pir = {title: 'PIR', subtitle: 'room 123', description:'abc'}
-var door = {title: 'Door', subtitle: 'room 123', description:'abc'}
+var tempt = {title: 'Temperature'}
+var humidity = {title: 'Humidity'}
+var light = {title: 'Light'}
+var occupied = {title: 'Occupied'}
 
 export default class AnaliticaSection extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      url: props.url
+    }
+
     this.temperature = React.createRef();
     this.humidity = React.createRef();
     this.light = React.createRef();
-    this.pir = React.createRef();
-    this.door = React.createRef();
+    this.occupied = React.createRef();
   }
 
   componentDidMount() {
-    // clearInterval(this.updateTimer);
-    // this.updateTimer = api.startFullDataPulse(
-    //   this.temperature.current.updateGraph,
-    //   this.humidity.current.updateValue,
-    //   this.light.current.updateValue,
-    //   this.pir.current.updateValue,
-    //   this.door.current.updateValue
-    // );
+    clearInterval(this.updateTimer);
+    this.updateTimer = api.startFullDataPulse(
+      this.state.url,
+      this.temperature.current.updateGraph,
+      this.humidity.current.updateValue,
+      this.light.current.updateValue,
+      this.occupied.current.updateValue
+    );
   }
 
   render() {
@@ -46,10 +48,7 @@ export default class AnaliticaSection extends React.Component {
             <ValueCard ref={this.light} descriptor={light} />
           </div>
           <div className="flex-item">
-            <ValueCard ref={this.pir} descriptor={pir} />
-          </div>
-          <div className="flex-item">
-            <ValueCard ref={this.door} descriptor={door} />
+            <ValueCard ref={this.occupied} descriptor={occupied} />
           </div>
         </div>
       </div>
