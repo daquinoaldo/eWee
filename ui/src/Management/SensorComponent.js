@@ -10,7 +10,8 @@ export default class SensorChip extends React.Component {
     super(props);
     this.state = {
       uuid: props.uuid,
-      blinking: false
+      blinking: false,
+      remove: (this.props.remove ? this.props.remove: false),
     }
     this.sensorChip = React.createRef();
   }
@@ -32,7 +33,13 @@ export default class SensorChip extends React.Component {
     fetch(postValue, options).then((res) => console.log(res));
   }
 
+  componentWillReceiveProps = (props) => {
+    this.setState({remove: props.remove});
+  }
+
   blink = () => {
+    if (this.state.remove) return;
+
     this.sendPost();
     const target = url + '/' + this.state.uuid
     for (let i=0; i<6; i++) {
@@ -43,13 +50,15 @@ export default class SensorChip extends React.Component {
   }
 
   render() {
+    const currentIcon = this.state.remove ? 'clear' : 'radio_button_unchecked'
     const basicClass = 'inner-radio material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon';
     const checkedClass = basicClass + (this.state.blinking ? ' sensor-chip-visible' : '');
     return (
       <div ref={this.sensorChip} className="mdc-chip">
         <div className={checkedClass} onClick={this.blink}></div>
-        <i className="material-icons mdc-chip__icon mdc-chip__icon--leading">radio_button_unchecked</i>
+        <i className="material-icons mdc-chip__icon mdc-chip__icon--leading">{currentIcon}</i>
         <div className="mdc-chip__text">{this.state.uuid}</div>
+
       </div>
   )};
 }
