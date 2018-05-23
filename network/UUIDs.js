@@ -1,11 +1,11 @@
 const UUIDs = {
-  "temp": "0x2A1F",
-  "humidity": "0x2A1F",
-  "light": "0x2A77",
-  "pir": "0x2AC5",
-  "door": "0x0000",
-  "carbon": "0x0001",
-  "gas": "0x0002"
+  "temp": "2A1F",
+  "humidity": "2A1F",
+  "light": "2A77",
+  "pir": "2AC5",
+  "door": "0000",
+  "carbon": "0001",
+  "gas": "0002"
 };
 
 /**
@@ -15,7 +15,7 @@ const UUIDs = {
  */
 function UUIDToProperty(uuid) {
   for (const key in UUIDs)
-    if(UUIDs[key] === uuid) return key;
+    if(UUIDs[key].toLowerCase() === uuid.toLowerCase()) return key;
   return null;
 }
 
@@ -25,7 +25,7 @@ function UUIDToProperty(uuid) {
  * @returns string, the UUID, or null if the property is not in the list
  */
 function propertyToUUID(property) {
-  return UUIDs[property] ? UUIDs[property] : null;
+  return UUIDs[property] ? UUIDs[property].toLowerCase() : null;
 }
 
 module.exports = {
