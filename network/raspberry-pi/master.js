@@ -23,18 +23,6 @@ let lastActionTimestamp = new Date();
 // ];
 
 
-setInterval(() => Query.getActions(lastActionTimestamp).then(actions => {
-  console.log(JSON.stringify(actions));
-  for (let i = 0; i < actions.length; i++)
-    pendingActions.push(reverseTranslator(actions[i]))
-  if (actions.length && actions[actions.length-1].timestamp) lastActionTimestamp = actions[actions.length-1].timestamp;
-}), 1000);
-/*
- * It seems that noble stop scanning from time to time
- */
-setInterval(() => noble.startScanning(), 10000);
-
-
 // ----- ----- SETUP AND START ----- ----- //
 async function setup() {
   await Query.init();
@@ -58,6 +46,17 @@ async function setup() {
       masterLogic(peripheral);
     } // The device is a sample
   });
+
+  setInterval(() => Query.getActions(lastActionTimestamp).then(actions => {
+    console.log(JSON.stringify(actions));
+    for (let i = 0; i < actions.length; i++)
+      pendingActions.push(reverseTranslator(actions[i]))
+    if (actions.length && actions[actions.length-1].timestamp) lastActionTimestamp = actions[actions.length-1].timestamp;
+  }), 10000);
+  /*
+   * It seems that noble stop scanning from time to time
+   */
+  setInterval(() => noble.startScanning(), 10000);
 }
 setup();
 
@@ -221,7 +220,6 @@ function getWritePromise (characteristic, data, timeout) {
  */
 function getSamplePromise (peripheral, characteristicTable, timeout) {
   // Getting all pending actions
-  let todo = pendingActions[peripheral.address];
   return new Promise(async function (resolve, reject) {
     // Adding basic info
     const time = new Date(new Date().toUTCString());
@@ -245,7 +243,7 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
 
 /*
  * Promises to execute all pending actions wrt a given peripheral
- * @return: true if no error occurres, the error otherwise
+ * @return: true if no error occurs, the error otherwise
  */
 function getExecutionPromise (peripheral, characteristicTable, errorsArray, timeout) {
   // Ensuring the error array is empty before starting
@@ -253,7 +251,7 @@ function getExecutionPromise (peripheral, characteristicTable, errorsArray, time
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
-    todo = pendingActions.find((el) => { return el.device === peripheral.address });
+    let todo = pendingActions.find((el) => { return el.device === peripheral.address });
     // Iterating till there is something to do
     while (todo != null) {
       // Getting the characteristic
