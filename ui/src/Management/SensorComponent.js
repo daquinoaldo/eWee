@@ -22,12 +22,15 @@ export default class SensorChip extends React.Component {
 
   sendPost = () => {
     let postValue = (url + '/actuator/' + this.state.uuid);
-    postValue += '/0003';
+    postValue += '/blink/';
     var options = { method: 'POST',
-     headers: new Headers(),
-     mode: 'cors',
-     cache: 'default',
-     body: JSON.stringify({'value': 'on'})
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+      mode: 'cors',
+      cache: 'default',
+      body: JSON.stringify({'value': 'on'})
     };
     fetch(postValue, options).then((res) => console.log(res));
   }
@@ -47,7 +50,10 @@ export default class SensorChip extends React.Component {
   unbindPost = () => {
     let targetUrl = (url + '/home/device/' + this.state.uuid);
     var options = { method: 'DELETE',
-     headers: new Headers(),
+      headers: new Headers({
+       'Content-Type': 'application/json',
+       Accept: 'application/json',
+      }),
      mode: 'cors',
      cache: 'default',
     };
