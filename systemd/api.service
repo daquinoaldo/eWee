@@ -1,11 +1,11 @@
 [Unit]
 Description=Rest APIs
-Requires=mongod.service
-After=mongod.service
+Requires=mongodb.service
+After=mongodb.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node /opt/MCPS/api/api.js
+ExecStart=/usr/local/bin/node /opt/MCPS/api/api.js
 WorkingDirectory=/opt/MCPS/api
 Restart=always
 RestartSec=1

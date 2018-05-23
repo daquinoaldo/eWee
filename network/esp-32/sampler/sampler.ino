@@ -10,10 +10,11 @@
 
 #include "sensor-manager.h"
 
+
 // ----- ----- SAMPLER UUIDs ----- ----- //
 #define SENSING_SERVICE_UUID (BLEUUID((uint16_t)0x181A)).toString()
-#define LAST_MOD_UUID        (BLEUUID((uint16_t)0x2AC2)).toString()
-#define MASTER_ID_UUID       (BLEUUID((uint16_t)0x2AC3)).toString()
+//#define LAST_MOD_UUID        (BLEUUID((uint16_t)0x2AC2)).toString()
+//#define MASTER_ID_UUID       (BLEUUID((uint16_t)0x2AC3)).toString()
 // Sensors
 #define MOVEMENT_UUID        (BLEUUID((uint16_t)0x2AC5)).toString() //TODO: Object Action Control Point?
 #define TEMP_UUID            (BLEUUID((uint16_t)0x2A1F)).toString() //Temperature Celsius
@@ -21,20 +22,20 @@
 #define DOOR_UUID            (BLEUUID((uint16_t)0x0000)).toString() //TODO: ???
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
-#define GAS_UUID             (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
 #define BLINKING_UUID        (BLEUUID((uint16_t)0x0003)).toString() //TODO: ???
-
-// Do NOT use pin 2
-#define PIR_PIN -1
-#define DHT_PIN 18
-#define RS_PIN  -1 // 4
-#define TEMT_PIN -1 // 23
-#define MQ135_PIN -1//19
-#define MQ3_PIN -1//5
 
 #define LED_BUILTIN 2
 
-#define DEVICE_NAME "corridor"
+
+// ----- ----- PIN CONFIGURATIONS ----- ----- //
+// Do NOT use pin 2
+#define PIR_PIN 27
+//#define DHT_PIN 14
+#define RS_PIN 13
+//#define TEMT6000_PIN ADC1_CHANNEL_0
+//#define MQ135_PIN -1
+
+#define DEVICE_NAME "kitchen"
 
 
 // ----- ----- GLOBALS ----- ----- //
@@ -44,6 +45,25 @@ bool isInternalBlinking = false;
 
 
 // ----- ----- SETUP ----- ----- //
+#ifndef PIR_PIN
+#define PIR_PIN -1
+#endif
+#ifndef DHT_PIN
+#define DHT_PIN -1
+#endif
+#ifndef RS_PIN
+#define RS_PIN -1
+#endif
+#ifndef TEMT6000_PIN
+#define TEMT_PIN nullptr
+#else
+adc1_channel_t temt_p = TEMT6000_PIN;
+#define TEMT_PIN &temt_p
+#endif
+#ifndef MQ135_PIN
+#define MQ135_PIN -1
+#endif
+
 void setup() {
   Serial.begin(115200);
   srand (time(NULL));
@@ -58,19 +78,18 @@ void setup() {
   // Setting up a new sensing service
   ble.ServiceSetup(SENSING_SERVICE_UUID);
   // Creating new characteristic
-  if(PIR_PIN > 0) ble.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN > 0) ble.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
-  if(DHT_PIN > 0) ble.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
-  if(RS_PIN > 0) ble.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(TEMT_PIN > 0) ble.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ135_PIN > 0) ble.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
-  if(MQ3_PIN > 0) ble.NewCharacteristic(GAS_UUID, BLECharacteristic::PROPERTY_READ);
+  if (PIR_PIN >= 0) ble.NewCharacteristic(MOVEMENT_UUID, BLECharacteristic::PROPERTY_READ);
+  if (DHT_PIN >= 0) ble.NewCharacteristic(TEMP_UUID, BLECharacteristic::PROPERTY_READ);
+  if (DHT_PIN >= 0) ble.NewCharacteristic(HUMID_UUID, BLECharacteristic::PROPERTY_READ);
+  if (RS_PIN >= 0) ble.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
+  if (TEMT_PIN != nullptr) ble.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
+  if (MQ135_PIN >= 0) ble.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
   ble.NewCharacteristic(BLINKING_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
   // Starting the server
   ble.ServiceStart();
 
   // Setup the sensors
-  // sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN, MQ3_PIN);
+  sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN);
   // Setup builtin led
   pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -79,18 +98,18 @@ void setup() {
 // ----- ----- MAIN LOOP ----- ----- //
 void loop() {
   // Get sensing data and update the characteristics
-  /*
-  if(PIR_PIN > 0) ble.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
-  if(DHT_PIN > 0) ble.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
-  if(DHT_PIN > 0) ble.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
-  if(RS_PIN > 0)  ble.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
-  if(TEMT_PIN > 0) ble.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
-  if(MQ135_PIN > 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
-  if(MQ3_PIN > 0) ble.SetCharacteristic(GAS_UUID, float2string(sensors.getMQ3()));
-  */
-  
-  ble.SetCharacteristic(TEMP_UUID, float2string(random(20, 30)));
-  ble.SetCharacteristic(HUMID_UUID, float2string(random(50, 70)));
+  if (PIR_PIN >= 0) ble.SetCharacteristic(MOVEMENT_UUID, int2string(sensors.getPIR()));
+  if (DHT_PIN >= 0) ble.SetCharacteristic(TEMP_UUID, float2string(sensors.getTemperature()));
+  if (DHT_PIN >= 0) ble.SetCharacteristic(HUMID_UUID, float2string(sensors.getHumidity()));
+  if (RS_PIN >= 0) ble.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
+  if (TEMT_PIN != nullptr) ble.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
+  if (MQ135_PIN >= 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
+
+  // Blink if motion detected:
+  if (PIR_PIN >= 0 && !isInternalBlinking) {
+    if (sensors.getPIR() > 0) digitalWrite(LED_BUILTIN, HIGH);
+    else digitalWrite(LED_BUILTIN, LOW);
+  }
   
   // Blinking logic
   std::string blinking = ble.GetCharacteristic(BLINKING_UUID);

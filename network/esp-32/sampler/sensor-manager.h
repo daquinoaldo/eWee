@@ -2,15 +2,15 @@
 #define sensor_manager_H
 
 #include "DHTesp.h"
+#include <driver/adc.h>
 
 class SensorManager {
   private:
     int PIR_PIN;
     int DHT_PIN;
     int RS_PIN;
-    int TEMT_PIN;
+    adc1_channel_t* TEMT_PIN;
     int MQ135_PIN;
-    int MQ3_PIN;
     
   public:
     /*
@@ -22,7 +22,7 @@ class SensorManager {
      * Setup
      * to be called in the setup function of the Arduino sketch
      */
-    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, int TEMT_PIN, int MQ135_PIN, int MQ3_PIN);
+    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN);
 
     /*
      * Get movement information from PIR
@@ -61,12 +61,6 @@ class SensorManager {
      * @return ?
      */
     float getMQ135();
-
-    /*
-     * Get gas presence in the house
-     * @return ?
-     */
-    float getMQ3();
 };
 
 #endif

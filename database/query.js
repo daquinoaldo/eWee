@@ -52,7 +52,7 @@ class Query {
       if (!action.timestamp) reject("Error: the object must have the field timestamp.");
       Db.queryLast(collections.rooms, {things: action.id}).then(room => {
         action.room = room ? room._id : null;
-        Db.insert(collections.measures, action).then(() => resolve("ok"));
+        Db.insert(collections.actions, action).then(() => resolve("ok"));
       });
     });
   }
@@ -94,6 +94,23 @@ class Query {
    *******************/
 
   /**
+   * Rename a room
+   * @param id of the room
+   * @param newName of the room
+   * @returns {*}
+   */
+  static updateRoom(id, newName) {
+    return new Promise((resolve, reject) => {
+      if (!id) reject("You must specify the id of the room.");
+      if (!name) reject("You must specify the name of the room.");
+      Db.update(collections.rooms, id, {$set: {name: newName}}).then(res => {
+        if (!res.result.ok) reject("Unknown error.");
+          resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
+  }
+
+  /**
    * Bind a device to a room
    * @param deviceID
    * @param roomID
@@ -101,6 +118,8 @@ class Query {
    */
   static bind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      if (!roomID) reject("You must specify the id of the room.");
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         // delete all measures that this sensor made when were not in a room.
@@ -125,6 +144,7 @@ class Query {
    */
   static deleteRoom(id) {
     return new Promise((resolve, reject) => {
+      if (!id) reject("You must specify the id of the room.");
       Db.delete(collections.rooms, id.toLowerCase()).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
@@ -140,6 +160,8 @@ class Query {
    */
   static unbind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      if (!roomID) reject("You must specify the id of the room.");
       Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
@@ -165,7 +187,10 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.measures, query)
         .then(measure => resolve(attribute ? measure[attribute] : measure))
-        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Sensor with id "+sensorID+" doesn't exist.")
+        })
     })
   }
 
@@ -184,7 +209,10 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
         .then(status => resolve(attribute ? status[attribute] : status))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     })
   }
 
@@ -198,7 +226,10 @@ class Query {
       if (!roomID) return Query.getRoomsList();
       Db.queryLast(collections.rooms, {_id: ObjectID(roomID)})
         .then(room => resolve(room))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     });
   }
 
@@ -243,7 +274,10 @@ class Query {
           resolve(list)
           //delete myObject.regex;
         })
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     });
   }
 
@@ -257,7 +291,10 @@ class Query {
       if (unboundOnly) query.room = null;
       Db.queryDistinct(collections.measures, "id", query)
         .then(list => resolve(list))
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     });
   }
 
@@ -330,7 +367,10 @@ class Query {
           home.light /= cLight;
           resolve(attribute ? home[attribute] : home)
         })
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     })
   }
 
