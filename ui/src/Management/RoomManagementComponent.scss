@@ -7,6 +7,10 @@
   width: 350px;
 }
 
+.remove-button {
+  @include mdc-button-ink-color($mdc-theme-important);
+}
+
 .highlight-value {
   color: #1565c0;
 }
