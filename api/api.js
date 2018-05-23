@@ -57,6 +57,10 @@ rooms and unbinding:
 - room/<id>/device/<id>
 */
 
+//TODO:
+// GET /policy/:roomID → JSON con policy database
+// POST /policy/:roomID →
+
 
 
 /* ********************************
