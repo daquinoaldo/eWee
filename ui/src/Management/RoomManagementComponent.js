@@ -56,10 +56,13 @@ export default class RoomManagement extends React.Component {
 
     let postValue = (url + '/home/room/' + this.state.roomid);
     var options = { method: 'POST',
-     headers: new Headers(),
-     mode: 'cors',
-     cache: 'default',
-     body: JSON.stringify({'name': this.mdcTextfield.value})
+      headers: new Headers({
+       'Content-Type': 'application/json',
+       Accept: 'application/json',
+      }),
+      mode: 'cors',
+      cache: 'default',
+      body: JSON.stringify({'name': actualValue})
     };
     fetch(postValue, options).then((res) => console.log(res));
   }
@@ -67,9 +70,12 @@ export default class RoomManagement extends React.Component {
   remove = () => {
     let postValue = (url + '/home/room/' + this.state.roomid);
     var options = { method: 'DELETE',
-     headers: new Headers(),
-     mode: 'cors',
-     cache: 'default'
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+      mode: 'cors',
+      cache: 'default'
     };
     fetch(postValue, options).then((res) => console.log(res));
   }

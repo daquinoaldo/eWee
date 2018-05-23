@@ -50,7 +50,10 @@ export default class SensorChip extends React.Component {
   unbindPost = () => {
     let targetUrl = (url + '/home/device/' + this.state.uuid);
     var options = { method: 'DELETE',
-     headers: new Headers(),
+      headers: new Headers({
+       'Content-Type': 'application/json',
+       Accept: 'application/json',
+      }),
      mode: 'cors',
      cache: 'default',
     };

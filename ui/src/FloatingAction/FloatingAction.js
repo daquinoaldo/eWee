@@ -19,10 +19,13 @@ export default class FloatingAction extends React.Component {
   newRoom = () => {
     let postValue = (url + '/home/room');
     var options = { method: 'POST',
-     headers: new Headers(),
-     mode: 'cors',
-     cache: 'default',
-     body: JSON.stringify({'name': 'new room'})
+      headers: new Headers({
+       'Content-Type': 'application/json',
+       Accept: 'application/json',
+      }),
+      mode: 'cors',
+      cache: 'default',
+      body: JSON.stringify({'name': 'new room'})
     };
     fetch(postValue, options).then((res) => console.log(res));
   }
