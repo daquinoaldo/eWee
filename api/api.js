@@ -129,6 +129,13 @@ app.post('/home/room/',  (req, res) => {
     .catch(err => res.status(403).send(err))
 });
 
+// Rename a room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
+app.post('/home/room/:id',  (req, res) => {
+  Query.updateRoom(req.params.id, req.body.name)
+    .then(id => res.send(id))
+    .catch(err => res.status(403).send(err))
+});
+
 // Bind a sensor to a room, no body required
 app.post('/room/:roomID/device/:deviceID', (req, res) => {
   Query.bind(req.params.deviceID, req.params.roomID)
