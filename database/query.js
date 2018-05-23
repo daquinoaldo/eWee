@@ -182,19 +182,19 @@ class Query {
       if (!deviceID) reject("You must specify the id of the device.");
       let n = 0;
       const promises = [];
-      Query.getRoomsList().then(list => {
-        if (!list) reject("There are no rooms in the house, so the device cannot be bound.");
+      Query.getRoomsList().then(async list => {
+        if (!list || !list.length) reject("There are no rooms in the house, so the device cannot be bound.");
         for (let i = 0; i < list.length; i++) {
           const roomID = list[i]._id;
           promises.push(
-            Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
+            Db.update(collections.rooms, roomID, {$pull: {things: deviceID.toLowerCase()}}).then(res => {
               if (!res.result.ok) reject("Unknown error.");
               n += +res.result.n; // cast the number of updated docs to int (+) and then to boolean (!!)
             })
           );
         }
+        await Promise.all(promises).then(() => resolve(!!+n)).catch(err => reject(err));
       });
-      Promise.all(promises).then(() => resolve(!!+n));
     });
   }
 

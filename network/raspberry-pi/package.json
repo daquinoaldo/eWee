@@ -8,10 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "noble": "github:sandeepmistry/noble"
-  },
   "dependencies": {
-    "moment": "^2.22.1"
+    "moment": "^2.22.1",
+    "noble": "github:sandeepmistry/noble"
   }
 }
