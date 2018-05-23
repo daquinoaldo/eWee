@@ -9,13 +9,15 @@ import random
 # configuration and parameters
 GENERATION_LOOP_INTERVAL = 30 #seconds
 GENERATION_TIMESPAN = datetime.timedelta(minutes=30)
+PIR_THRESHOLD = 0.8
 
 # max deviations from trends (absoltue values)
 NOISE = {
     'temp': 0.5,
     'humidity': 10,
     'light': 40,
-    'carbon': 50
+    'carbon': 50,
+    'pir': 0.1
 }
 
 # generation configuration
@@ -38,7 +40,8 @@ GENCONF = {
     'Bathroom': {
         'temp': (15, 20),
         'humidity': (40, 60),
-        'light': (500, 800)
+        'light': (500, 800),
+        'pir': (0, 1)
     },
     'LivingRoom': {
         'temp': (15, 20),
@@ -47,7 +50,8 @@ GENCONF = {
         'carbon': (400, 900)
     },
     'None1': {
-        'light': (500, 800)
+        'light': (500, 800),
+        'pir': (0.8, 0)
     },
     'None2': {
         'temp': (15, 20),
@@ -88,8 +92,11 @@ def next_generation(start_time):
             value = (1 - interval_position) * interval[0] + interval_position * interval[1]
             # +/- random noise
             value += random.triangular(-NOISE[sensor], NOISE[sensor])
-            # round to .n decimal digits
-            value = round(value, 1)
+            if sensor != 'pir':
+                # round to .n decimal digits
+                value = round(value, 1)
+            else:
+                value = (value > PIR_THRESHOLD)
             # insert measure into db
             db.measures.insert_one({'id': SENSORS[room], 'room': room_ids.get(room), 'timestamp': now, sensor: value})
 
