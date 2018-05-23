@@ -102,7 +102,7 @@ class Query {
   static updateRoom(id, newName) {
     return new Promise((resolve, reject) => {
       if (!id) reject("You must specify the id of the room.");
-      if (!name) reject("You must specify the name of the room.");
+      if (!newName) reject("You must specify the name of the room.");
       Db.update(collections.rooms, id, {$set: {name: newName}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
           resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
