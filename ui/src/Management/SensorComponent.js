@@ -36,7 +36,6 @@ export default class SensorChip extends React.Component {
     let stop = false;
     let i = 0;
     let blink = () => {
-      console.log(i);
       if (this.state.icon == 'clear') { return null; };
       const newmod = (this.state.icon == 'blinking' ? 'standard' : 'blinking');
       this.setState({ icon: newmod });

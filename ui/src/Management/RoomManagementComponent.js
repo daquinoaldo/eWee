@@ -6,9 +6,9 @@ import {MDCTextField} from '@material/textfield';
 import {MDCRipple} from '@material/ripple';
 import {MDCIconToggle} from '@material/icon-toggle';
 
-var available = ["abc", "cde", "eee"];
 
 const url = 'https://api.p1.aldodaquino.com'
+
 
 export default class RoomManagement extends React.Component {
   constructor(props) {
@@ -46,8 +46,22 @@ export default class RoomManagement extends React.Component {
   }
 
   save = () => {
-    console.log(this.mdcTextfield.value);
+    let actualValue = this.mdcTextfield.value;
+    if (actualValue=='' || actualValue==this.state.roomname) {
+      this.editMode();
+      return;
+    };
+
     this.setState({roomname: this.mdcTextfield.value}, () => this.editMode());
+
+    let postValue = (url + '/home/room/' + this.state.roomid);
+    var options = { method: 'POST',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+     body: JSON.stringify({'name': this.mdcTextfield.value})
+    };
+    fetch(postValue, options).then((res) => console.log(res));
   }
 
   remove = () => {
@@ -55,7 +69,7 @@ export default class RoomManagement extends React.Component {
   }
 
   updateStatus = () => {
-    fetch(url+'/room/'+this.state.roomid)
+    fetch(url+'/room/'+this.state.roomid.toString())
     .then(response => response.json())
     .then(json => {
       this.setState({ availableSensors: json.things });
@@ -68,7 +82,7 @@ export default class RoomManagement extends React.Component {
     const chipIcon = this.state.editmode ? 'clear' : 'default';
     for (var i = 0; i < bounded.length; i++) {
       shtml.push(
-        <div className="sensor-flex-item" key={'sensor_'+i}>
+        <div className="flex-item" key={'sensor_'+i}>
           <SensorChip uuid={bounded[i]} icon={chipIcon} />
         </div>
       );
@@ -78,7 +92,7 @@ export default class RoomManagement extends React.Component {
 
   newBindChip = () => {
     return (
-      <div className="sensor-flex-item">
+      <div className="flex-item">
         <AddSensorChip roomid={this.state.roomid} />
       </div>
     );
