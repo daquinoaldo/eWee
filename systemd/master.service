@@ -5,7 +5,7 @@ After=mongodb.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node /opt/MCPS/network/raspberry-pi/master.js
+ExecStart=/usr/local/bin/node /opt/MCPS/network/raspberry-pi/master.js
 WorkingDirectory=/opt/MCPS/network/raspberry-pi
 Restart=always
 RestartSec=1
