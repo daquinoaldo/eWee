@@ -17,6 +17,10 @@ export default class ValueCard extends React.Component {
     this._mount = true;
   }
 
+  componentWillUnmount() {
+    this._mount = false;
+  }
+
   updateValue = (v) => {
     if (!this._mount) return;
     this.setState({ data: v });

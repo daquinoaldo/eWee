@@ -3,8 +3,8 @@ import React from 'react';
 import {MDCRipple} from '@material/ripple';
 
 import SensorChip from './SensorComponent';
+import RoomManagement from './RoomManagementComponent';
 
-var sensors = ['abc', '123', '456', '678']
 const url = 'https://api.p1.aldodaquino.com'
 
 export default class ManagementSection extends React.Component {
@@ -48,6 +48,7 @@ export default class ManagementSection extends React.Component {
           {this.sensorsHtml()}
         </div>
         <h1>Available <span className="h1-blue">rooms</span></h1>
+        <RoomManagement roomname="Cucina"/>
       </div>
   )};
 }

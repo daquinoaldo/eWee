@@ -1,0 +1,19 @@
+[Unit]
+Description=MCPS Raspberry master
+Requires=mongodb.service
+After=mongodb.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/MCPS/network/raspberry-pi/master.js
+WorkingDirectory=/opt/MCPS/network/raspberry-pi
+Restart=always
+RestartSec=1
+TimeoutStartSec=10
+TimeoutStopSec=1
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mcps-raspberry-master
+
+[Install]
+WantedBy=multi-user.target

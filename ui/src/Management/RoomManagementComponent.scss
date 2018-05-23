@@ -1,0 +1,44 @@
+@import "@material/card/mdc-card";
+@import "@material/textfield/mdc-text-field";
+@import "@material/button/mdc-button";
+@import "@material/icon-toggle/mdc-icon-toggle";
+
+.value-card-wrapper {
+  width: 350px;
+}
+
+.highlight-value {
+  color: #1565c0;
+}
+
+.sensor-flex-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  padding-bottom: 21px;
+}
+
+.management-button-wrap {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.room-management-wrapper {
+  padding-bottom: 21px;
+}
+
+.save-button {
+  @include mdc-button-filled-accessible($mdc-theme-primary);
+}
+
+// ----- ----- MODS ----- ----- //
+.mdc-text-field--disabled .mdc-text-field__input {
+  border-bottom: 1px solid;
+}
+
+.mdc-text-field--upgraded:not(.mdc-text-field--fullwidth):not(.mdc-text-field--box) {
+  display: inline-flex;
+  position: relative;
+  align-items: flex-end;
+  box-sizing: border-box;
+  margin-top: 0px;
+}

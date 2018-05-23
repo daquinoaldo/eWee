@@ -1,0 +1,19 @@
+[Unit]
+Description=Rest APIs
+Requires=mongodb.service
+After=mongodb.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/MCPS/api/api.js
+WorkingDirectory=/opt/MCPS/api
+Restart=always
+RestartSec=1
+TimeoutStartSec=10
+TimeoutStopSec=1
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mcps-rest-api
+
+[Install]
+WantedBy=multi-user.target
