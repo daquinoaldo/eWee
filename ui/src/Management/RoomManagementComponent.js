@@ -19,17 +19,30 @@ export default class RoomManagement extends React.Component {
     this.saveButton = React.createRef();
     this.editButton = React.createRef();
     this.sensorList = React.createRef();
+    this.deleteButton = React.createRef();
   }
 
   componentDidMount() {
+    this.iconToggle = new MDCIconToggle(this.editButton.current);
+    this.mdcTextfield = new MDCTextField(this.textfield.current);
+
     new MDCRipple(this.saveButton.current);
-
-    new MDCIconToggle(this.editButton.current);
     new MDCRipple(this.editButton.current);
+    new MDCRipple(this.deleteButton.current);
 
-    var mdcTextfield = new MDCTextField(this.textfield.current);
-    mdcTextfield.disabled = true;
-    this.setState({ availableSensors: available, textfield: mdcTextfield });
+    this.mdcTextfield.disabled = true;
+    this.saveButton.current.disabled = true;
+    this.deleteButton.current.disabled = true;
+    this.setState({ availableSensors: available });
+  }
+
+  save = () => {
+    console.log(this.mdcTextfield.value);
+    this.setState({roomname: this.mdcTextfield.value}, () => this.editMode());
+  }
+
+  remove = () => {
+
   }
 
   sensorsHtml = () => {
@@ -49,8 +62,11 @@ export default class RoomManagement extends React.Component {
   editMode = () => {
     let cmode = this.state.editmode;
     this.setState({editmode: !cmode});
-    this.state.textfield.disabled = cmode;
+    this.mdcTextfield.disabled = cmode;
     this.saveButton.current.disabled = cmode;
+    this.deleteButton.current.disabled = cmode;
+    this.iconToggle.on = !cmode;
+    if (!this.editmode) this.mdcTextfield.value = '';
   }
 
   render() {
@@ -69,15 +85,16 @@ export default class RoomManagement extends React.Component {
           </div>
           <div className="mdc-card__actions">
             <div className="mdc-card__action-buttons">
-              <button ref={this.saveButton} className="mdc-button mdc-card__action mdc-card__action--button">Save</button>
+              <button ref={this.saveButton} className="mdc-button mdc-card__action mdc-card__action--button" onClick={this.save}>Save</button>
+              <button ref={this.deleteButton} className="remove-button mdc-button mdc-card__action mdc-card__action--button" onClick={this.remove}>Remove</button>
             </div>
             <div className="mdc-card__action-icons">
-          <i ref={this.editButton} className="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon" role="button" aria-pressed="false"
-           aria-label="Add to favorites" tabIndex="0"
-           role="button"
-           data-toggle-on='{"label": "Remove from favorites", "content": "close"}'
-           data-toggle-off='{"label": "Add to favorites", "content": "edit"}'
-           onClick={this.editMode} />
+              <i ref={this.editButton} className="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon" role="button" aria-pressed="false"
+               aria-label="Edit" tabIndex="0"
+               role="button"
+               data-toggle-on='{"label": "Remove from favorites", "content": "close"}'
+               data-toggle-off='{"label": "Add to favorites", "content": "edit"}'
+               onClick={this.editMode} />
             </div>
           </div>
         </div>

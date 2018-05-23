@@ -14,6 +14,17 @@ export default class FloatingAction extends React.Component {
     MDCRipple.attachTo(this.actionButton.current);
   }
 
+  newRoom = () => {
+    let postValue = (url + '/home/room');
+    var options = { method: 'POST',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+     body: JSON.stringify({'name': 'new room'})
+    };
+    fetch(postValue, options).then((res) => console.log(res));
+  }
+
   collapse = () => {
     this.setState({
       isHidden: 'scale-to-zero'
@@ -29,7 +40,7 @@ export default class FloatingAction extends React.Component {
   render() {
     const wrapperClasses = "white-margin absolute-center " + this.state.isHidden;
     return (
-      <div className={wrapperClasses}>
+      <div className={wrapperClasses} onClick={this.newRoom}>
         <button ref={this.actionButton} className="mybutton mdc-fab material-icons" aria-label="Favorite">
           <span className="mdc-fab__icon">
             add
