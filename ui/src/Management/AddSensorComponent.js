@@ -3,7 +3,6 @@ import React from 'react';
 import {MDCChipSet} from '@material/chips';
 import {MDCRipple} from '@material/ripple';
 
-const url = 'https://api.p1.aldodaquino.com'
 
 export default class AddSensorChip extends React.Component {
   constructor(props) {

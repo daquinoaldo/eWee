@@ -1,7 +1,7 @@
 import React from 'react';
 import {MDCRipple} from '@material/ripple';
 
-const url = 'https://api.p1.aldodaquino.com'
+import * as api from '../remoteApi.js';
 
 export default class FloatingAction extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ export default class FloatingAction extends React.Component {
   }
 
   newRoom = () => {
-    let postValue = (url + '/home/room');
+    let postValue = (api.url + '/home/room');
     var options = { method: 'POST',
       headers: new Headers({
        'Content-Type': 'application/json',

@@ -3,7 +3,7 @@ import React from 'react';
 import {MDCChipSet} from '@material/chips';
 import {MDCRipple} from '@material/ripple';
 
-const url = 'https://api.p1.aldodaquino.com'
+import * as api from '../remoteApi.js';
 
 export default class SensorChip extends React.Component {
   constructor(props) {
@@ -21,7 +21,7 @@ export default class SensorChip extends React.Component {
   }
 
   sendPost = () => {
-    let postValue = (url + '/actuator/' + this.state.uuid);
+    let postValue = (api.url + '/actuator/' + this.state.uuid);
     postValue += '/blink/';
     var options = { method: 'POST',
       headers: new Headers({
@@ -48,7 +48,7 @@ export default class SensorChip extends React.Component {
   }
 
   unbindPost = () => {
-    let targetUrl = (url + '/home/device/' + this.state.uuid);
+    let targetUrl = (api.url + '/home/device/' + this.state.uuid);
     var options = { method: 'DELETE',
       headers: new Headers({
        'Content-Type': 'application/json',
