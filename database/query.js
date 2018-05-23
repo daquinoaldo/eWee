@@ -94,6 +94,23 @@ class Query {
    *******************/
 
   /**
+   * Rename a room
+   * @param id of the room
+   * @param newName of the room
+   * @returns {*}
+   */
+  static updateRoom(id, newName) {
+    return new Promise((resolve, reject) => {
+      if (!id) reject("You must specify the id of the room.");
+      if (!name) reject("You must specify the name of the room.");
+      Db.update(collections.rooms, id, {$set: {name: newName}}).then(res => {
+        if (!res.result.ok) reject("Unknown error.");
+          resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
+  }
+
+  /**
    * Bind a device to a room
    * @param deviceID
    * @param roomID
@@ -101,6 +118,8 @@ class Query {
    */
   static bind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      if (!roomID) reject("You must specify the id of the room.");
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         // delete all measures that this sensor made when were not in a room.
@@ -125,6 +144,7 @@ class Query {
    */
   static deleteRoom(id) {
     return new Promise((resolve, reject) => {
+      if (!id) reject("You must specify the id of the room.");
       Db.delete(collections.rooms, id.toLowerCase()).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
@@ -140,6 +160,8 @@ class Query {
    */
   static unbind(deviceID, roomID) {
     return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      if (!roomID) reject("You must specify the id of the room.");
       Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)

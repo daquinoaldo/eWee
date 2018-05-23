@@ -14,7 +14,7 @@ const SEPARET = '\n/// ///// ///// /// \n';
 
 // ----- ----- GLOBALS ----- ----- //
 const connectedIDs = {}; // Devices seen
-const pendingActions = []; // Actuators to be set
+let pendingActions = []; // Actuators to be set
 // const pendingActions = [
 //   { 'mac': '30:ae:a4:1c:c2:ee',
 //     'uuid_16': '0003',
