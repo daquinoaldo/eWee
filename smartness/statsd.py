@@ -62,7 +62,10 @@ def update_hourly_averages():
         }}
     ])
     db.statistics.remove({})
-    db.statistics.insert_many(stats)
+    try:
+        db.statistics.insert_many(stats)
+    except pymongo.errors.InvalidOperation:
+        pass
 
 def sigusr1_handler(signum, frame):
     # handle SIGUSR1 signal for forced loop iteration
