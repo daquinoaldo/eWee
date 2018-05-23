@@ -10,8 +10,7 @@ export default class SensorChip extends React.Component {
     super(props);
     this.state = {
       uuid: props.uuid,
-      blinking: false,
-      remove: (this.props.remove ? this.props.remove: false),
+      icon: (this.props.icon ? this.props.icon : 'default'),
     }
     this.sensorChip = React.createRef();
   }
@@ -34,7 +33,7 @@ export default class SensorChip extends React.Component {
   }
 
   componentWillReceiveProps = (props) => {
-    this.setState({remove: props.remove});
+    this.setState({icon: props.icon});
   }
 
   blink = () => {
@@ -42,23 +41,33 @@ export default class SensorChip extends React.Component {
 
     this.sendPost();
     const target = url + '/' + this.state.uuid
+    let stop = false;
     for (let i=0; i<6; i++) {
       setTimeout(() => {
-        this.setState({ blinking:  !this.state.blinking })
+        if (this.state.icon == 'clear' || stop) { stop=true; return; };
+        const newmod = (this.state.icon == 'blinking' ? 'standard' : 'blinking');
+        this.setState({ icon: newmod })
       }, i*500);
     }
   }
 
   render() {
-    const currentIcon = this.state.remove ? 'clear' : 'radio_button_unchecked'
-    const basicClass = 'inner-radio material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon';
-    const checkedClass = basicClass + (this.state.blinking ? ' sensor-chip-visible' : '');
+    const iconClass = 'material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon '
+    const blink_visibility = (this.state.icon == 'blinking' ? 'sensor-icon-show' : 'sensor-icon-hide')
+    const unchecked_visibility = (this.state.icon == 'clear'  ? 'sensor-icon-hide' : 'sensor-icon-show')
+    const clear_visibility = (this.state.icon == 'clear' ? 'sensor-icon-show' : 'sensor-icon-hide')
+
+    const blinkingIconClass = 'inner-radio ' + iconClass + blink_visibility;
+    const clearIconClass = iconClass + clear_visibility;
+    const defaultClass = iconClass + unchecked_visibility;
     return (
       <div ref={this.sensorChip} className="mdc-chip">
-        <div className={checkedClass} onClick={this.blink}></div>
-        <i className="material-icons mdc-chip__icon mdc-chip__icon--leading">{currentIcon}</i>
+        <div className="sensor-chip-wrapper">
+          <div className={blinkingIconClass}></div>
+          <i className={clearIconClass}>clear</i>
+          <i className={defaultClass} onClick={this.blink}>radio_button_unchecked</i>
+        </div>
         <div className="mdc-chip__text">{this.state.uuid}</div>
-
       </div>
   )};
 }
