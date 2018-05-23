@@ -52,7 +52,7 @@ class Query {
       if (!action.timestamp) reject("Error: the object must have the field timestamp.");
       Db.queryLast(collections.rooms, {things: action.id}).then(room => {
         action.room = room ? room._id : null;
-        Db.insert(collections.measures, action).then(() => resolve("ok"));
+        Db.insert(collections.actions, action).then(() => resolve("ok"));
       });
     });
   }
@@ -187,7 +187,10 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.measures, query)
         .then(measure => resolve(attribute ? measure[attribute] : measure))
-        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Sensor with id "+sensorID+" doesn't exist.")
+        })
     })
   }
 
@@ -206,7 +209,10 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
         .then(status => resolve(attribute ? status[attribute] : status))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     })
   }
 
@@ -220,7 +226,10 @@ class Query {
       if (!roomID) return Query.getRoomsList();
       Db.queryLast(collections.rooms, {_id: ObjectID(roomID)})
         .then(room => resolve(room))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     });
   }
 
@@ -265,7 +274,10 @@ class Query {
           resolve(list)
           //delete myObject.regex;
         })
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     });
   }
 
@@ -279,7 +291,10 @@ class Query {
       if (unboundOnly) query.room = null;
       Db.queryDistinct(collections.measures, "id", query)
         .then(list => resolve(list))
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     });
   }
 
@@ -352,7 +367,10 @@ class Query {
           home.light /= cLight;
           resolve(attribute ? home[attribute] : home)
         })
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     })
   }
 
