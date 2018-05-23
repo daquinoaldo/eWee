@@ -32,22 +32,40 @@ export default class SensorChip extends React.Component {
     fetch(postValue, options).then((res) => console.log(res));
   }
 
+  iconBlink = () => {
+    let stop = false;
+    let i = 0;
+    let blink = () => {
+      console.log(i);
+      if (this.state.icon == 'clear') { return null; };
+      const newmod = (this.state.icon == 'blinking' ? 'standard' : 'blinking');
+      this.setState({ icon: newmod });
+      if (i < 5) { i++; setTimeout(blink, 500); }
+    };
+    blink();
+  }
+
+  unbindPost = () => {
+    let targetUrl = (url + '/home/device/' + this.state.uuid);
+    var options = { method: 'DELETE',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+    };
+    fetch(targetUrl, options).then((res) => console.log(res));
+  }
+
   componentWillReceiveProps = (props) => {
     this.setState({icon: props.icon});
   }
 
   blink = () => {
-    if (this.state.remove) return;
-
-    this.sendPost();
-    const target = url + '/' + this.state.uuid
-    let stop = false;
-    for (let i=0; i<6; i++) {
-      setTimeout(() => {
-        if (this.state.icon == 'clear' || stop) { stop=true; return; };
-        const newmod = (this.state.icon == 'blinking' ? 'standard' : 'blinking');
-        this.setState({ icon: newmod })
-      }, i*500);
+    if (this.state.icon == 'clear') {
+      this.unbindPost();
+    }
+    else {
+      this.sendPost();
+      this.iconBlink();
     }
   }
 

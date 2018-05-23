@@ -6,8 +6,8 @@ export function startFullDataPulse( url,
     .then(response => response.json())
     .then(json => {
       temptPush(json.temp);
-      humPush(json.humidity);
-      lightPush(json.light + 'lm');
+      humPush(json.humidity ? json.humidity + '%' : 'no data');
+      lightPush(json.light ? json.light + 'lx' : 'no data');
       occupiedPush(json.occupied ? 'yes' : 'no');
     });
   }, 1000);

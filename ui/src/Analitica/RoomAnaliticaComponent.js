@@ -24,7 +24,6 @@ export default class AnaliticaSection extends React.Component {
   }
 
   componentDidMount() {
-    clearInterval(this.updateTimer);
     this.updateTimer = api.startFullDataPulse(
       this.state.url,
       this.temperature.current.updateGraph,
@@ -32,6 +31,10 @@ export default class AnaliticaSection extends React.Component {
       this.light.current.updateValue,
       this.occupied.current.updateValue
     );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.updateTimer);
   }
 
   render() {
