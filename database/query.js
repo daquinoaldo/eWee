@@ -204,7 +204,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room id.");
       const query = {
-        room: roomID
+        room: ObjectID(roomID)
       };
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
