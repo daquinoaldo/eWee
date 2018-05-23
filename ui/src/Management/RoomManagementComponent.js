@@ -35,10 +35,11 @@ export default class RoomManagement extends React.Component {
   sensorsHtml = () => {
     const shtml = [];
     const bounded = this.state.availableSensors;
+    const chipIcon = this.state.editmode ? 'clear' : 'default';
     for (var i = 0; i<bounded.length; i++) {
       shtml.push(
         <div className="sensor-flex-item" key={'sensor_'+i}>
-          <SensorChip uuid={bounded[i]} remove={this.state.editmode} />
+          <SensorChip uuid={bounded[i]} icon={chipIcon} />
         </div>
       );
     }
@@ -53,7 +54,6 @@ export default class RoomManagement extends React.Component {
   }
 
   render() {
-    console.log(this.state.editmode);
     const textfieldvalue = this.state.editmode ? 'Room name' : this.state.roomname
     return (
       <div className="room-management-wrapper">
