@@ -65,14 +65,20 @@ export default class RoomManagement extends React.Component {
   }
 
   remove = () => {
-    console.log('remove');
+    let postValue = (url + '/home/room/' + this.state.roomid);
+    var options = { method: 'DELETE',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default'
+    };
+    fetch(postValue, options).then((res) => console.log(res));
   }
 
   updateStatus = () => {
-    fetch(url+'/room/'+this.state.roomid.toString())
+    fetch(url+'/room/'+this.state.roomid)
     .then(response => response.json())
     .then(json => {
-      this.setState({ availableSensors: json.things });
+      this.setState({ availableSensors: json.things ? json.things : [] });
     });
   }
 

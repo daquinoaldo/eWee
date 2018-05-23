@@ -20,6 +20,7 @@ export default class ManagementSection extends React.Component {
     fetch(url+'/home')
     .then(response => response.json())
     .then(json => {
+      console.log(json);
       this.setState({ unboundDevices: json.unboundDevices });
     });
     fetch(url+'/home')
