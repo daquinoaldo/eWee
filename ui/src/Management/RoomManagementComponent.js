@@ -1,11 +1,14 @@
 import React from 'react';
 
 import SensorChip from './SensorComponent';
+import AddSensorChip from './AddSensorComponent';
 import {MDCTextField} from '@material/textfield';
 import {MDCRipple} from '@material/ripple';
 import {MDCIconToggle} from '@material/icon-toggle';
 
 var available = ["abc", "cde", "eee"];
+
+const url = 'https://api.p1.aldodaquino.com'
 
 export default class RoomManagement extends React.Component {
   constructor(props) {
@@ -13,6 +16,7 @@ export default class RoomManagement extends React.Component {
     this.state = {
       editmode: false,
       roomname: props.roomname,
+      roomid: props.roomid,
       availableSensors: []
     }
     this.textfield = React.createRef();
@@ -33,7 +37,12 @@ export default class RoomManagement extends React.Component {
     this.mdcTextfield.disabled = true;
     this.saveButton.current.disabled = true;
     this.deleteButton.current.disabled = true;
-    this.setState({ availableSensors: available });
+
+    this.updateTimer = setInterval(this.updateStatus, 1000);
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.updateTimer)
   }
 
   save = () => {
@@ -42,14 +51,22 @@ export default class RoomManagement extends React.Component {
   }
 
   remove = () => {
+    console.log('remove');
+  }
 
+  updateStatus = () => {
+    fetch(url+'/room/'+this.state.roomid)
+    .then(response => response.json())
+    .then(json => {
+      this.setState({ availableSensors: json.things });
+    });
   }
 
   sensorsHtml = () => {
     const shtml = [];
     const bounded = this.state.availableSensors;
     const chipIcon = this.state.editmode ? 'clear' : 'default';
-    for (var i = 0; i<bounded.length; i++) {
+    for (var i = 0; i < bounded.length; i++) {
       shtml.push(
         <div className="sensor-flex-item" key={'sensor_'+i}>
           <SensorChip uuid={bounded[i]} icon={chipIcon} />
@@ -59,18 +76,31 @@ export default class RoomManagement extends React.Component {
     return shtml;
   }
 
+  newBindChip = () => {
+    return (
+      <div className="sensor-flex-item">
+        <AddSensorChip roomid={this.state.roomid} />
+      </div>
+    );
+  }
+
   editMode = () => {
-    let cmode = this.state.editmode;
-    this.setState({editmode: !cmode});
-    this.mdcTextfield.disabled = cmode;
-    this.saveButton.current.disabled = cmode;
-    this.deleteButton.current.disabled = cmode;
-    this.iconToggle.on = !cmode;
-    if (!this.editmode) this.mdcTextfield.value = '';
+    let isEditing = !this.state.editmode;
+    this.setState({editmode: isEditing});
+
+    this.mdcTextfield.disabled = !isEditing;
+    this.saveButton.current.disabled = !isEditing;
+    this.deleteButton.current.disabled = !isEditing;
+    this.iconToggle.on = isEditing;
+    if (!isEditing) this.mdcTextfield.value = '';
   }
 
   render() {
     const textfieldvalue = this.state.editmode ? 'Room name' : this.state.roomname
+    let pluschip = (<div></div>);
+    if (this.state.editmode) {
+      pluschip = this.newBindChip();
+    }
     return (
       <div className="room-management-wrapper">
         <div className="mdc-card value-card-wrapper">
@@ -82,6 +112,7 @@ export default class RoomManagement extends React.Component {
           </div>
           <div ref={this.sensorList} className="sensor-flex-wrapper">
             {this.sensorsHtml()}
+            {pluschip}
           </div>
           <div className="mdc-card__actions">
             <div className="mdc-card__action-buttons">

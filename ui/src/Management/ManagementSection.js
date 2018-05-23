@@ -48,7 +48,7 @@ export default class ManagementSection extends React.Component {
           {this.sensorsHtml()}
         </div>
         <h1>Available <span className="h1-blue">rooms</span></h1>
-        <RoomManagement roomname="Cucina"/>
+        <RoomManagement roomname="Cucina" roomid="5b057e3dee462b19d975d8cd"/>
       </div>
   )};
 }
