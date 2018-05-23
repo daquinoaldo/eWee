@@ -12,7 +12,6 @@ import { AnimatedSwitch } from 'react-router-transition';
 
 import './app.scss';
 
-const url = 'https://api.p1.aldodaquino.com'
 
 export default class App extends React.Component {
   constructor(props) {

@@ -5,7 +5,7 @@ import {MDCRipple} from '@material/ripple';
 import SensorChip from './SensorComponent';
 import RoomManagement from './RoomManagementComponent';
 
-const url = 'https://api.p1.aldodaquino.com'
+import * as api from '../remoteApi.js';
 
 export default class ManagementSection extends React.Component {
   constructor(props) {
@@ -17,13 +17,13 @@ export default class ManagementSection extends React.Component {
   }
 
   componentDidMount() {
-    fetch(url+'/home')
+    fetch(api.url+'/home')
     .then(response => response.json())
     .then(json => {
       console.log(json);
       this.setState({ unboundDevices: json.unboundDevices });
     });
-    fetch(url+'/home')
+    fetch(api.url+'/home')
       .then(response => response.json())
       .then(json => {
         this.setState({ rooms: json.rooms });

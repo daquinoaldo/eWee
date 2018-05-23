@@ -6,9 +6,7 @@ import {MDCTextField} from '@material/textfield';
 import {MDCRipple} from '@material/ripple';
 import {MDCIconToggle} from '@material/icon-toggle';
 
-
-const url = 'https://api.p1.aldodaquino.com'
-
+import * as api from '../remoteApi.js';
 
 export default class RoomManagement extends React.Component {
   constructor(props) {
@@ -54,7 +52,7 @@ export default class RoomManagement extends React.Component {
 
     this.setState({roomname: this.mdcTextfield.value}, () => this.editMode());
 
-    let postValue = (url + '/home/room/' + this.state.roomid);
+    let postValue = (api.url + '/home/room/' + this.state.roomid);
     var options = { method: 'POST',
       headers: new Headers({
        'Content-Type': 'application/json',
@@ -68,7 +66,7 @@ export default class RoomManagement extends React.Component {
   }
 
   remove = () => {
-    let postValue = (url + '/home/room/' + this.state.roomid);
+    let postValue = (api.url + '/home/room/' + this.state.roomid);
     var options = { method: 'DELETE',
       headers: new Headers({
         'Content-Type': 'application/json',
@@ -81,7 +79,7 @@ export default class RoomManagement extends React.Component {
   }
 
   updateStatus = () => {
-    fetch(url+'/room/'+this.state.roomid)
+    fetch(api.url+'/room/'+this.state.roomid)
     .then(response => response.json())
     .then(json => {
       this.setState({ availableSensors: json.things ? json.things : [] });
