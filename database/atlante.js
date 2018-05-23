@@ -26,7 +26,7 @@ function probability(a, b) {
 
 /* DEVICES CREATION */
 function randMAC(){
-  const hexDigits = "0123456789ABCDEF";
+  const hexDigits = "0123456789abcdef";
   let macAddress = "";
   for (let i = 0; i < 6; i++) {
     macAddress+=hexDigits.charAt(randInt(0, 15));
