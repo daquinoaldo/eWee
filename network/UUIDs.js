@@ -5,7 +5,7 @@ const UUIDs = {
   "pir": "2AC5",
   "door": "0000",
   "carbon": "0001",
-  "gas": "0002"
+  "blink": "0003"
 };
 
 /**
