@@ -52,7 +52,7 @@ class Query {
       if (!action.timestamp) reject("Error: the object must have the field timestamp.");
       Db.queryLast(collections.rooms, {things: action.id}).then(room => {
         action.room = room ? room._id : null;
-        Db.insert(collections.measures, action).then(() => resolve("ok"));
+        Db.insert(collections.actions, action).then(() => resolve("ok"));
       });
     });
   }
@@ -117,9 +117,10 @@ class Query {
    * @returns Promise<any> with true if everything is gone ok
    */
   static bind(deviceID, roomID) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!deviceID) reject("You must specify the id of the device.");
       if (!roomID) reject("You must specify the id of the room.");
+      await Db.unbind(deviceID);
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         // delete all measures that this sensor made when were not in a room.
@@ -158,13 +159,41 @@ class Query {
    * @param roomID
    * @returns Promise<any> with true if everything is gone ok
    */
-  static unbind(deviceID, roomID) {
+  static unbindFromRoom(deviceID, roomID) {
     return new Promise((resolve, reject) => {
       if (!deviceID) reject("You must specify the id of the device.");
       if (!roomID) reject("You must specify the id of the room.");
       Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
+      });
+    });
+  }
+
+  /**
+   * Unbind a device from a room
+   * @param deviceID
+   * @param roomID, optional, if you know the room
+   * @returns Promise<any> with true if everything is gone ok
+   */
+  static unbind(deviceID, roomID) {
+    if (roomID) return Query.unbindFromRoom(deviceID, roomID);
+    return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      let n = 0;
+      const promises = [];
+      Query.getRoomsList().then(async list => {
+        if (!list || !list.length) reject("There are no rooms in the house, so the device cannot be bound.");
+        for (let i = 0; i < list.length; i++) {
+          const roomID = list[i]._id;
+          promises.push(
+            Db.update(collections.rooms, roomID, {$pull: {things: deviceID.toLowerCase()}}).then(res => {
+              if (!res.result.ok) reject("Unknown error.");
+              n += +res.result.n; // cast the number of updated docs to int (+) and then to boolean (!!)
+            })
+          );
+        }
+        await Promise.all(promises).then(() => resolve(!!+n)).catch(err => reject(err));
       });
     });
   }
@@ -187,7 +216,10 @@ class Query {
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.measures, query)
         .then(measure => resolve(attribute ? measure[attribute] : measure))
-        .catch(() => reject("Sensor with id "+sensorID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Sensor with id "+sensorID+" doesn't exist.")
+        })
     })
   }
 
@@ -201,12 +233,15 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room id.");
       const query = {
-        room: roomID
+        room: ObjectID(roomID)
       };
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
         .then(status => resolve(attribute ? status[attribute] : status))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     })
   }
 
@@ -220,7 +255,10 @@ class Query {
       if (!roomID) return Query.getRoomsList();
       Db.queryLast(collections.rooms, {_id: ObjectID(roomID)})
         .then(room => resolve(room))
-        .catch(() => reject("Room with id "+roomID+" doesn't exist."))
+        .catch(err => {
+          console.error(err);
+          reject("Room with id "+roomID+" doesn't exist.")
+        })
     });
   }
 
@@ -261,11 +299,11 @@ class Query {
       const options = {};
       if (excludeSensorsList) options.fields = {things: 0};
       Db.queryWithOptions(collections.rooms, {}, options).toArray()
-        .then(list => {
-          resolve(list)
-          //delete myObject.regex;
+        .then(list => resolve(list))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
         })
-        .catch(() => reject("Unknown error."))
     });
   }
 
@@ -279,7 +317,10 @@ class Query {
       if (unboundOnly) query.room = null;
       Db.queryDistinct(collections.measures, "id", query)
         .then(list => resolve(list))
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     });
   }
 
@@ -352,7 +393,10 @@ class Query {
           home.light /= cLight;
           resolve(attribute ? home[attribute] : home)
         })
-        .catch(() => reject("Unknown error."))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
     })
   }
 
@@ -381,6 +425,26 @@ class Query {
       );
       await Promise.all(promises).then(() => resolve(home)).catch(err => reject(err));
     });
+  }
+
+  /**
+   * Return a list of actions inserted after a given timestamp
+   * @param timestamp
+   * @returns Promise<any>
+   */
+  static getActions(timestamp) {
+    return new Promise((resolve, reject) => {
+      if(!timestamp) reject("You must specify a timestamp");
+      const query = {
+        timestamp: { $gte: timestamp }
+      };
+      Db.query(collections.actions, query).sort({"timestamp": 1}).toArray()
+        .then(actions => resolve(actions))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
+    })
   }
 
 }

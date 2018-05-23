@@ -11,7 +11,8 @@ export default class ManagementSection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      unboundDevices: []
+      unboundDevices: [],
+      rooms: []
     }
   }
 
@@ -21,14 +22,19 @@ export default class ManagementSection extends React.Component {
     .then(json => {
       this.setState({ unboundDevices: json.unboundDevices });
     });
+    fetch(url+'/home')
+      .then(response => response.json())
+      .then(json => {
+        this.setState({ rooms: json.rooms });
+    });
   }
 
   sensorsHtml = () => {
     const shtml = [];
     const unbounded = this.state.unboundDevices;
-    for (var i = 0; i<unbounded.length; i++) {
+    for (var i = 0; i < unbounded.length; i++) {
       shtml.push(
-        <div className="sensor-flex-item" key={i}>
+        <div className="flex-item" key={i}>
           <SensorChip uuid={unbounded[i]}/>
         </div>
       );
@@ -37,7 +43,16 @@ export default class ManagementSection extends React.Component {
   }
 
   roomsHtml = () => {
-
+    const shtml = [];
+    for (var i = 0; i < this.state.rooms.length; i++) {
+      const actualRoom = this.state.rooms[i];
+      shtml.push(
+        <div className="flex-item" key={i}>
+          <RoomManagement roomname={actualRoom.name} roomid={actualRoom._id}/>
+        </div>
+      );
+    }
+    return shtml;
   }
 
   render() {
@@ -48,7 +63,9 @@ export default class ManagementSection extends React.Component {
           {this.sensorsHtml()}
         </div>
         <h1>Available <span className="h1-blue">rooms</span></h1>
-        <RoomManagement roomname="Cucina"/>
+        <div className="room-management-wrapper">
+          {this.roomsHtml()}
+        </div>
       </div>
   )};
 }

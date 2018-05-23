@@ -14,13 +14,21 @@ const SEPARET = '\n/// ///// ///// /// \n';
 
 // ----- ----- GLOBALS ----- ----- //
 const connectedIDs = {}; // Devices seen
-let pendingActions = []; // Actuators to be set
+let pendingActions = []; // Actuators to be set //TODO: check that actions are removed
+let lastActionTimestamp = new Date();
 // const pendingActions = [
 //   { 'mac': '30:ae:a4:1c:c2:ee',
 //     'uuid_16': '0003',
 //     'value': 'true'},
 // ];
 
+
+setInterval(() => Query.getActions(lastActionTimestamp).then(actions => {
+  console.log(JSON.stringify(actions));
+  for (let i = 0; i < actions.length; i++)
+    pendingActions.push(reverseTranslator(actions[i]))
+  if (actions.length && actions[actions.length-1].timestamp) lastActionTimestamp = actions[actions.length-1].timestamp;
+}), 1000);
 /*
  * It seems that noble stop scanning from time to time
  */
@@ -118,7 +126,7 @@ async function masterLogic (peripheral) {
       const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
-      // Query.insertMeasure(translator(sample));
+      Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 5000);
     } catch (e) {
@@ -245,13 +253,13 @@ function getExecutionPromise (peripheral, characteristicTable, errorsArray, time
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
-    todo = pendingActions.find((el) => { return el.mac==peripheral.address });
+    todo = pendingActions.find((el) => { return el.device === peripheral.address });
     // Iterating till there is something to do
     while (todo != null) {
       // Getting the characteristic
       let characteristic = characteristicTable.find( (el) => {
         let uuid_16 = el.uuid.toString().substring(4, 8);
-        return (uuid_16==todo.uuid_16);
+        return (uuid_16 == todo.uuid_16);
       });
 
       if (characteristic!=null) {
@@ -270,7 +278,7 @@ function getExecutionPromise (peripheral, characteristicTable, errorsArray, time
       // Preparing for next iteration
       todo = pendingActions.find((el) => {
         console.log(pendingActions);
-        return el.mac==peripheral.address
+        return el.device === peripheral.address;
       });
     }
     if (errorsArray.length>0) reject('Some errors occurred');
@@ -306,6 +314,17 @@ function translator (obj) {
   for (const uuid in obj) {
     const property = UUID.UUIDToProperty(uuid);
     if (property) newObj[property] = obj[uuid];
+  }
+  return newObj;
+}
+
+function reverseTranslator (obj) {
+  const newObj = {};
+  newObj.device = obj.id;
+  newObj.timestamp = obj.timestamp;
+  for (const property in obj) {
+    const uuid = UUID.propertyToUUID(property);
+    if (uuid) newObj[uuid] = obj[property];
   }
   return newObj;
 }

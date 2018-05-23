@@ -1,6 +1,8 @@
 import React from 'react';
 import {MDCRipple} from '@material/ripple';
 
+const url = 'https://api.p1.aldodaquino.com'
+
 export default class FloatingAction extends React.Component {
   constructor(props) {
     super(props);
@@ -12,6 +14,17 @@ export default class FloatingAction extends React.Component {
 
   componentDidMount() {
     MDCRipple.attachTo(this.actionButton.current);
+  }
+
+  newRoom = () => {
+    let postValue = (url + '/home/room');
+    var options = { method: 'POST',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+     body: JSON.stringify({'name': 'new room'})
+    };
+    fetch(postValue, options).then((res) => console.log(res));
   }
 
   collapse = () => {
@@ -29,7 +42,7 @@ export default class FloatingAction extends React.Component {
   render() {
     const wrapperClasses = "white-margin absolute-center " + this.state.isHidden;
     return (
-      <div className={wrapperClasses}>
+      <div className={wrapperClasses} onClick={this.newRoom}>
         <button ref={this.actionButton} className="mybutton mdc-fab material-icons" aria-label="Favorite">
           <span className="mdc-fab__icon">
             add

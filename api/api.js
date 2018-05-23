@@ -117,9 +117,9 @@ app.get('/sensor/:id/:attribute', (req, res) => {
 // Pass the value that you want to assign to the attribute in the body as a JSON obj: {"value": "the_attribute_value"}
 app.post('/actuator/:id/:attribute',  (req, res) => {
   Query.setKey(req.params.id, req.params.attribute, req.body.value)
-    .then(res => res.send(res))
+    .then(ok => res.send(ok))
     .catch(err => res.status(403).send(err))
-    //TODO: check that the actuator exists
+    //TODO: check that the actuator exists?
 });
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
@@ -162,6 +162,16 @@ app.delete('/home/room/:id', (req, res) => {
 // Unbind a sensor from a room, no body required
 app.delete('/room/:roomID/device/:deviceID', (req, res) => {
   Query.unbind(req.params.deviceID, req.params.roomID)
+    .then((ok) => res.send(ok))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("Unknown error.");
+    })
+});
+
+// Unbind a sensor from a room, no body required
+app.delete('/home/device/:deviceID', (req, res) => {
+  Query.unbind(req.params.deviceID)
     .then((ok) => res.send(ok))
     .catch(err => {
       console.error(err);

@@ -3,6 +3,7 @@
 $mdc-theme-primary:    #4caf50;
 $mdc-theme-secondary:  #fdd835;
 $mdc-theme-background: #fff;
+$mdc-theme-important: #ef5350;
 
 @import "./MaterialButton/MaterialButton.scss";
 @import "./FloatingAction/FloatingAction.scss";
@@ -15,6 +16,7 @@ $mdc-theme-background: #fff;
 @import "./Analitica/AnaliticaSection.scss";
 @import "./Analitica/RoomAnaliticaComponent.scss";
 @import "./Management/SensorComponent.scss";
+@import "./Management/AddSensorComponent.scss";
 @import "./Management/RoomManagementComponent.scss";
 
 .body-wrapper {

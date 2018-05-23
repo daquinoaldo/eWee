@@ -1,11 +1,14 @@
 import React from 'react';
 
 import SensorChip from './SensorComponent';
+import AddSensorChip from './AddSensorComponent';
 import {MDCTextField} from '@material/textfield';
 import {MDCRipple} from '@material/ripple';
 import {MDCIconToggle} from '@material/icon-toggle';
 
-var available = ["abc", "cde", "eee"];
+
+const url = 'https://api.p1.aldodaquino.com'
+
 
 export default class RoomManagement extends React.Component {
   constructor(props) {
@@ -13,32 +16,73 @@ export default class RoomManagement extends React.Component {
     this.state = {
       editmode: false,
       roomname: props.roomname,
+      roomid: props.roomid,
       availableSensors: []
     }
     this.textfield = React.createRef();
     this.saveButton = React.createRef();
     this.editButton = React.createRef();
     this.sensorList = React.createRef();
+    this.deleteButton = React.createRef();
   }
 
   componentDidMount() {
+    this.iconToggle = new MDCIconToggle(this.editButton.current);
+    this.mdcTextfield = new MDCTextField(this.textfield.current);
+
     new MDCRipple(this.saveButton.current);
-
-    new MDCIconToggle(this.editButton.current);
     new MDCRipple(this.editButton.current);
+    new MDCRipple(this.deleteButton.current);
 
-    var mdcTextfield = new MDCTextField(this.textfield.current);
-    mdcTextfield.disabled = true;
-    this.setState({ availableSensors: available, textfield: mdcTextfield });
+    this.mdcTextfield.disabled = true;
+    this.saveButton.current.disabled = true;
+    this.deleteButton.current.disabled = true;
+
+    this.updateTimer = setInterval(this.updateStatus, 1000);
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.updateTimer)
+  }
+
+  save = () => {
+    let actualValue = this.mdcTextfield.value;
+    if (actualValue=='' || actualValue==this.state.roomname) {
+      this.editMode();
+      return;
+    };
+
+    this.setState({roomname: this.mdcTextfield.value}, () => this.editMode());
+
+    let postValue = (url + '/home/room/' + this.state.roomid);
+    var options = { method: 'POST',
+     headers: new Headers(),
+     mode: 'cors',
+     cache: 'default',
+     body: JSON.stringify({'name': this.mdcTextfield.value})
+    };
+    fetch(postValue, options).then((res) => console.log(res));
+  }
+
+  remove = () => {
+    console.log('remove');
+  }
+
+  updateStatus = () => {
+    fetch(url+'/room/'+this.state.roomid.toString())
+    .then(response => response.json())
+    .then(json => {
+      this.setState({ availableSensors: json.things });
+    });
   }
 
   sensorsHtml = () => {
     const shtml = [];
     const bounded = this.state.availableSensors;
     const chipIcon = this.state.editmode ? 'clear' : 'default';
-    for (var i = 0; i<bounded.length; i++) {
+    for (var i = 0; i < bounded.length; i++) {
       shtml.push(
-        <div className="sensor-flex-item" key={'sensor_'+i}>
+        <div className="flex-item" key={'sensor_'+i}>
           <SensorChip uuid={bounded[i]} icon={chipIcon} />
         </div>
       );
@@ -46,15 +90,31 @@ export default class RoomManagement extends React.Component {
     return shtml;
   }
 
+  newBindChip = () => {
+    return (
+      <div className="flex-item">
+        <AddSensorChip roomid={this.state.roomid} />
+      </div>
+    );
+  }
+
   editMode = () => {
-    let cmode = this.state.editmode;
-    this.setState({editmode: !cmode});
-    this.state.textfield.disabled = cmode;
-    this.saveButton.current.disabled = cmode;
+    let isEditing = !this.state.editmode;
+    this.setState({editmode: isEditing});
+
+    this.mdcTextfield.disabled = !isEditing;
+    this.saveButton.current.disabled = !isEditing;
+    this.deleteButton.current.disabled = !isEditing;
+    this.iconToggle.on = isEditing;
+    if (!isEditing) this.mdcTextfield.value = '';
   }
 
   render() {
     const textfieldvalue = this.state.editmode ? 'Room name' : this.state.roomname
+    let pluschip = (<div></div>);
+    if (this.state.editmode) {
+      pluschip = this.newBindChip();
+    }
     return (
       <div className="room-management-wrapper">
         <div className="mdc-card value-card-wrapper">
@@ -66,18 +126,20 @@ export default class RoomManagement extends React.Component {
           </div>
           <div ref={this.sensorList} className="sensor-flex-wrapper">
             {this.sensorsHtml()}
+            {pluschip}
           </div>
           <div className="mdc-card__actions">
             <div className="mdc-card__action-buttons">
-              <button ref={this.saveButton} className="mdc-button mdc-card__action mdc-card__action--button">Save</button>
+              <button ref={this.saveButton} className="mdc-button mdc-card__action mdc-card__action--button" onClick={this.save}>Save</button>
+              <button ref={this.deleteButton} className="remove-button mdc-button mdc-card__action mdc-card__action--button" onClick={this.remove}>Remove</button>
             </div>
             <div className="mdc-card__action-icons">
-          <i ref={this.editButton} className="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon" role="button" aria-pressed="false"
-           aria-label="Add to favorites" tabIndex="0"
-           role="button"
-           data-toggle-on='{"label": "Remove from favorites", "content": "close"}'
-           data-toggle-off='{"label": "Add to favorites", "content": "edit"}'
-           onClick={this.editMode} />
+              <i ref={this.editButton} className="mdc-icon-toggle material-icons mdc-card__action mdc-card__action--icon" role="button" aria-pressed="false"
+               aria-label="Edit" tabIndex="0"
+               role="button"
+               data-toggle-on='{"label": "Remove from favorites", "content": "close"}'
+               data-toggle-off='{"label": "Add to favorites", "content": "edit"}'
+               onClick={this.editMode} />
             </div>
           </div>
         </div>

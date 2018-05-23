@@ -6,6 +6,7 @@
 const Query = require('./query.js').Query;
 const Db = require('./database.js').Database;
 const collections = require('./database.js').collections;
+const ObjectID = require('mongodb').ObjectID;
 const db = new Db();
 
 /* LOCAL STRUCTS and VARIABLES */
@@ -25,7 +26,7 @@ function probability(a, b) {
 
 /* DEVICES CREATION */
 function randMAC(){
-  const hexDigits = "0123456789ABCDEF";
+  const hexDigits = "0123456789abcdef";
   let macAddress = "";
   for (let i = 0; i < 6; i++) {
     macAddress+=hexDigits.charAt(randInt(0, 15));
@@ -108,7 +109,7 @@ function setFakeStatus() {
   const promises = [];
   for (let i = 0; i < rooms.length - 1; i++) {
     const obj = {
-      room: rooms[i],
+      room: ObjectID(rooms[i]),
       timestamp: lastDate,
       occupied: !!+randInt(0, 1),
       temp: randInt(15, 40),

@@ -30,7 +30,7 @@
 // ----- ----- PIN CONFIGURATIONS ----- ----- //
 // Do NOT use pin 2
 #define PIR_PIN 27
-#//define DHT_PIN 14
+//#define DHT_PIN 14
 #define RS_PIN 13
 //#define TEMT6000_PIN ADC1_CHANNEL_0
 //#define MQ135_PIN -1
@@ -106,7 +106,7 @@ void loop() {
   if (MQ135_PIN >= 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
 
   // Blink if motion detected:
-  if (PIR_PIN >= 0) {
+  if (PIR_PIN >= 0 && !isInternalBlinking) {
     if (sensors.getPIR() > 0) digitalWrite(LED_BUILTIN, HIGH);
     else digitalWrite(LED_BUILTIN, LOW);
   }
