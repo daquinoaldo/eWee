@@ -117,9 +117,10 @@ class Query {
    * @returns Promise<any> with true if everything is gone ok
    */
   static bind(deviceID, roomID) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!deviceID) reject("You must specify the id of the device.");
       if (!roomID) reject("You must specify the id of the room.");
+      await Db.unbind(deviceID);
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         // delete all measures that this sensor made when were not in a room.
@@ -158,7 +159,7 @@ class Query {
    * @param roomID
    * @returns Promise<any> with true if everything is gone ok
    */
-  static unbind(deviceID, roomID) {
+  static unbindFromRoom(deviceID, roomID) {
     return new Promise((resolve, reject) => {
       if (!deviceID) reject("You must specify the id of the device.");
       if (!roomID) reject("You must specify the id of the room.");
@@ -166,6 +167,34 @@ class Query {
         if (!res.result.ok) reject("Unknown error.");
         resolve(!!+res.result.n); // cast the number of updated docs to int (+) and then to boolean (!!)
       });
+    });
+  }
+
+  /**
+   * Unbind a device from a room
+   * @param deviceID
+   * @param roomID, optional, if you know the room
+   * @returns Promise<any> with true if everything is gone ok
+   */
+  static unbind(deviceID, roomID) {
+    if (roomID) return Query.unbindFromRoom(deviceID, roomID);
+    return new Promise((resolve, reject) => {
+      if (!deviceID) reject("You must specify the id of the device.");
+      let n = 0;
+      const promises = [];
+      Query.getRoomsList().then(list => {
+        if (!list) reject("There are no rooms in the house, so the device cannot be bound.");
+        for (let i = 0; i < list.length; i++) {
+          const roomID = list[i]._id;
+          promises.push(
+            Db.update(collections.rooms, roomID.toLowerCase(), {$pull: {things: deviceID.toLowerCase()}}).then(res => {
+              if (!res.result.ok) reject("Unknown error.");
+              n += +res.result.n; // cast the number of updated docs to int (+) and then to boolean (!!)
+            })
+          );
+        }
+      });
+      Promise.all(promises).then(() => resolve(!!+n));
     });
   }
 
@@ -204,7 +233,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room id.");
       const query = {
-        room: roomID
+        room: ObjectID(roomID)
       };
       if (attribute) query[attribute] = { $exists: true };
       Db.queryLast(collections.status, query)
@@ -270,10 +299,7 @@ class Query {
       const options = {};
       if (excludeSensorsList) options.fields = {things: 0};
       Db.queryWithOptions(collections.rooms, {}, options).toArray()
-        .then(list => {
-          resolve(list)
-          //delete myObject.regex;
-        })
+        .then(list => resolve(list))
         .catch(err => {
           console.error(err);
           reject("Unknown error.")
@@ -399,6 +425,26 @@ class Query {
       );
       await Promise.all(promises).then(() => resolve(home)).catch(err => reject(err));
     });
+  }
+
+  /**
+   * Return a list of actions inserted after a given timestamp
+   * @param timestamp
+   * @returns Promise<any>
+   */
+  static getActions(timestamp) {
+    return new Promise((resolve, reject) => {
+      if(!timestamp) reject("You must specify a timestamp");
+      const query = {
+        timestamp: { $gte: timestamp }
+      };
+      Db.query(collections.actions, query).sort({"timestamp": 1}).toArray()
+        .then(actions => resolve(actions))
+        .catch(err => {
+          console.error(err);
+          reject("Unknown error.")
+        })
+    })
   }
 
 }

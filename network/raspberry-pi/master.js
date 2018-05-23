@@ -118,7 +118,7 @@ async function masterLogic (peripheral) {
       const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
-      // Query.insertMeasure(translator(sample));
+      Query.insertMeasure(translator(sample));
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 5000);
     } catch (e) {
