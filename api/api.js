@@ -168,3 +168,13 @@ app.delete('/room/:roomID/device/:deviceID', (req, res) => {
       res.status(500).send("Unknown error.");
     })
 });
+
+// Unbind a sensor from a room, no body required
+app.delete('/home/device/:deviceID', (req, res) => {
+  Query.unbind(req.params.deviceID)
+    .then((ok) => res.send(ok))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("Unknown error.");
+    })
+});
