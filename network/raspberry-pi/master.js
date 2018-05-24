@@ -23,6 +23,20 @@ let lastActionTimestamp = new Date();
 // ];
 
 
+<<<<<<< HEAD
+setInterval(() => Query.getActions(lastActionTimestamp).then(actions => {
+  for (let i = 0; i < actions.length; i++)
+    pendingActions.push(reverseTranslator(actions[i]))
+  if (actions.length && actions[actions.length-1].timestamp) lastActionTimestamp = actions[actions.length-1].timestamp;
+}), 1000);
+/*
+ * It seems that noble stop scanning from time to time
+ */
+setInterval(() => noble.startScanning(), 10000);
+
+
+=======
+>>>>>>> dd67f1ce295a21540882c160a43f2f330fc17778
 // ----- ----- SETUP AND START ----- ----- //
 async function setup() {
   await Query.init();
@@ -82,11 +96,10 @@ async function masterLogic (peripheral) {
   let services = [];
   try {
     services = await getServiceDiscoveryPromise(peripheral, CONNECTION_TIMEOUT)
-    if(services.length==0) throw "No services found";
   } catch (e) {
-    console.log(SEPARET + e + SEPARET);
+    console.error(e);
     delete connectedIDs[peripheral.address];
-    peripheral.disconnect((e) => console.log('Error while disconnecting: '+e));
+    peripheral.disconnect((e) => console.error('Error while disconnecting: '+e));
     return false;
   } // Handling error
 
@@ -121,7 +134,7 @@ async function masterLogic (peripheral) {
   async function sampleCycle () {
     // Trying to retrieving data
     try {
-      await getExecutionPromise(peripheral, characteristicTable, [], CONNECTION_TIMEOUT);
+      await getExecutionPromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       const sample = await getSamplePromise(peripheral, characteristicTable, CONNECTION_TIMEOUT);
       // Data retrieved correctly, we can use it
       console.log(sample);
@@ -129,7 +142,7 @@ async function masterLogic (peripheral) {
       // Ensuring to continue sampling
       setTimeout(sampleCycle, 5000);
     } catch (e) {
-      console.log(SEPARET + e + SEPARET);
+      console.error(SEPARET + e + SEPARET);
       delete connectedIDs[peripheral.address];
       peripheral.disconnect();
     } // Stop if some error occurs
@@ -158,7 +171,11 @@ function getConnectionPromise (peripheral, timeout) {
  */
 function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
-    peripheral.discoverServices(null, (error, services) => error ? reject('error') : resolve(services));
+    peripheral.discoverServices(null, (error, services) => {
+      if (error) reject(error);
+      else if (services.length==0) reject('No services found');
+      else resolve(services);
+    });
     setTimeout(() => reject('(' + peripheral.address + ') ' + 'Service discovery error: time elapsed '), timeout);
   });
 }
@@ -186,7 +203,8 @@ function getCharacteristicPromise (service, timeout) {
 function getReadPromise (characteristic, timeout) {
   return new Promise(function (resolve, reject) {
     characteristic.read((error, data) => {
-      if (error) reject(error); // Ooops, something went wrong
+      // @note: it may happen that no error occurres but data is undefined
+      if (error || !data) reject(error);
       // Let's return a good formatted data structure
       let asciiData = data.toString('ascii');
       let uuid_16 = characteristic.uuid.toString().substring(4, 8);
@@ -245,41 +263,47 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
  * Promises to execute all pending actions wrt a given peripheral
  * @return: true if no error occurs, the error otherwise
  */
-function getExecutionPromise (peripheral, characteristicTable, errorsArray, timeout) {
+function getExecutionPromise (peripheral, characteristicTable, timeout) {
+  let errorsArray = [];
   // Ensuring the error array is empty before starting
   errorsArray.splice(0, errorsArray.length);
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
+<<<<<<< HEAD
+    const todo = pendingActions.filter((el) => { return el.device === peripheral.address });
+=======
     let todo = pendingActions.find((el) => { return el.device === peripheral.address });
+>>>>>>> dd67f1ce295a21540882c160a43f2f330fc17778
     // Iterating till there is something to do
-    while (todo != null) {
+    for (let i=0; i < todo.length; i++) {
+      const actualAction = todo[i]
       // Getting the characteristic
+      let newValue = null;
       let characteristic = characteristicTable.find( (el) => {
         let uuid_16 = el.uuid.toString().substring(4, 8);
-        return (uuid_16 == todo.uuid_16);
+        if (actualAction[uuid_16]!=null) {
+          newValue = actualAction[uuid_16];
+          return true;
+        } // The characteristic and new value had been found
+        else return false;
       });
 
       if (characteristic!=null) {
         try {
           // @note: the order in which the actions are executed may be important
-          await getWritePromise(characteristic, todo.value, timeout);
-          pendingActions = pendingActions.splice(pendingActions.indexOf(todo), 1);
+          await getWritePromise(characteristic, newValue, timeout);
+          pendingActions.splice(pendingActions.indexOf(todo), 1);
         } catch (e) {
-          errorsArray.push({error: e, action: todo});
+          errorsArray.push(e + JSON.stringify(todo));
         }
       } // if the characteristic exist, then need to set the actuator
       else {
-        pendingActions = pendingActions.splice(pendingActions.indexOf(todo), 1);
+        errorsArray.push('Characteristic to trigger not found: ' + JSON.stringify(todo));
+        pendingActions.splice(pendingActions.indexOf(todo), 1);
       } // Otherwise we can delete the pending action
-
-      // Preparing for next iteration
-      todo = pendingActions.find((el) => {
-        console.log(pendingActions);
-        return el.device === peripheral.address;
-      });
     }
-    if (errorsArray.length>0) reject('Some errors occurred');
+    if (errorsArray.length>0) reject(errorsArray);
     resolve(true);
   });
 }
@@ -328,6 +352,9 @@ function reverseTranslator (obj) {
 }
 
 function isSampler (peripheral) {
+  // @note: it may happen that name is correct but the mac address in unknown
+  if (peripheral.address=='unknown') return false;
+
   let devname = peripheral.advertisement.localName;
   if (devname==null || devname.length<7) return false;
   return (devname.substring(0, 7)==='sampler')

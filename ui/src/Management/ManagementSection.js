@@ -16,20 +16,18 @@ export default class ManagementSection extends React.Component {
     }
   }
 
+
+  // ----- ----- LIFECYCLE HOOKS ----- ----- //
   componentDidMount() {
-    fetch(api.url+'/home')
-    .then(response => response.json())
-    .then(json => {
-      console.log(json);
-      this.setState({ unboundDevices: json.unboundDevices });
-    });
-    fetch(api.url+'/home')
-      .then(response => response.json())
-      .then(json => {
-        this.setState({ rooms: json.rooms });
-    });
+    api.get(api.url+'/home', (res, error) => {
+      if (!error)
+        this.setState({ unboundDevices: res.unboundDevices, rooms: res.rooms });
+      else console.error(error);
+    })
   }
 
+
+  // ----- ----- HTML RENDERERS ----- ----- //
   sensorsHtml = () => {
     const shtml = [];
     const unbounded = this.state.unboundDevices;

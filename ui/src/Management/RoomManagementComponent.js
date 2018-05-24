@@ -82,7 +82,10 @@ export default class RoomManagement extends React.Component {
     fetch(api.url+'/room/'+this.state.roomid)
     .then(response => response.json())
     .then(json => {
-      this.setState({ availableSensors: json.things ? json.things : [] });
+      try {
+        this.setState({ availableSensors: json.things ? json.things : [] });
+      }
+      catch (e) { console.log('abc') };
     });
   }
 

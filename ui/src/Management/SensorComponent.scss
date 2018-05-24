@@ -1,10 +1,18 @@
 @import "@material/chips/mdc-chips";
 
 .sensor-chip-icon {
-  transition: opacity 0.25s;
   z-index: 9;
   position: absolute;
   top: 5px;
+  transition: opacity 0.25s;
+}
+
+.transition-color-chip {
+  transition: background-color 0.25s;
+}
+
+.sensor-inactive {
+  @include mdc-chip-fill-color-accessible($mdc-theme-important_)
 }
 
 .sensor-chip-wrapper {
