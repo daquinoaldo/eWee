@@ -3,9 +3,9 @@
  * Fill up the database with some random fake data.
  */
 
-const Query = require('./query.js').Query;
-const Db = require('./database.js').Database;
-const collections = require('./database.js').collections;
+const Query = require('../../database/query.js').Query;
+const Db = require('../../database/database.js').Database;
+const collections = require('../../database/database.js').collections;
 const ObjectID = require('mongodb').ObjectID;
 const db = new Db();
 

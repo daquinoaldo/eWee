@@ -2,5 +2,5 @@
 *.iml
 .DS_Store
 
-node_modules
+../../database/node_modules
 mongo
