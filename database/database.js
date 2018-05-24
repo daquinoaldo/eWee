@@ -64,6 +64,10 @@ class Database {
     return mongoDB.collection(collection).updateOne({_id: ObjectID(id)}, update);
   }
 
+  static updateWithQuery(collection, query, update) {
+    return mongoDB.collection(collection).updateOne(query, update, {upsert: true});
+  }
+
   static deleteWithQuery(collection, query) {
     return mongoDB.collection(collection).deleteOne(query);
   }

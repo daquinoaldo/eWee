@@ -41,8 +41,7 @@ class Query {
 
   /**
    * Insert an action in the database and return a promise
-   * @param action of type {id: <device_id>, timestamp: <timestamp>, temp: <int, in celsius>, humidity: <int in 0..100>,
-       * light: <int in 0..100>, pir: <movement (boolean)>, door: <movement (boolean)>}
+   * @param action of type {id: <device_id>, timestamp: <timestamp>, key: <value>}
    * @returns Promise<any>
    */
   static insertAction(action) {
@@ -82,9 +81,22 @@ class Query {
    */
   static createRoom(name, things) {
     return new Promise((resolve, reject) => {
-      if (!name) reject("Error: the room must have a name.");
+      if (!name) reject("The room must have a name.");
       things = (things && typeof things === typeof []) ? things : [];
       Db.insert(collections.rooms, {name: name, things: things}).then(res => resolve(res.insertedId.toString()));
+    });
+  }
+
+  /**
+   * Specify a new policy for a room
+   * @param policy for the room
+   * @returns Promise<any> resolved with the id of the inserted room
+   */
+  static setPolicy(policy) {
+    return new Promise((resolve, reject) => {
+      if (!policy) reject("You must specify a policy.");
+      if (!policy.room) reject("Policy must refer to a room.");
+      Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(res => resolve(res.insertedId.toString()));
     });
   }
 
@@ -445,6 +457,23 @@ class Query {
           reject("Unknown error.")
         })
     })
+  }
+
+  /**
+   * Return the policy of all the rooms (or of a specific room)
+   * @param roomID, option, the specific room
+   * @returns Promise<any> promise
+   */
+  static getPolicy(roomID) {
+    return new Promise((resolve, reject) => {
+      if (!roomID) reject("You must specify the room.");
+      Db.query(collections.policy, {_id: ObjectID(roomID)})
+        .then(policy => resolve(policy))
+        .catch(err => {
+          console.error(err);
+          reject("A policy for the room "+roomID+" doesn't exist.")
+        })
+    });
   }
 
 }
