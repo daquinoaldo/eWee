@@ -1,12 +1,8 @@
 {
-  "name": "atlante",
+  "name": "database",
   "version": "1.0.0",
-  "description": "Atlante rise the world fill the database with (fake) measurment to test the system.",
+  "description": "Database module with queries",
   "main": "atlante.js",
-  "scripts": {
-    "start": "node atlante.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daquinoaldo/MCPS.git"
