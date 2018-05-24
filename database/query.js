@@ -132,7 +132,10 @@ class Query {
     return new Promise(async (resolve, reject) => {
       if (!deviceID) reject("You must specify the id of the device.");
       if (!roomID) reject("You must specify the id of the room.");
-      await Db.unbind(deviceID);
+      // successfully unbinds the device, or device not previously bounded
+      try {
+        await Query.unbind(deviceID);
+      } catch(err) { }
       Db.update(collections.rooms, roomID.toLowerCase(), {$addToSet: {things: deviceID.toLowerCase()}}).then(res => {
         if (!res.result.ok) reject("Unknown error.");
         // delete all measures that this sensor made when were not in a room.
