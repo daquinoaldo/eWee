@@ -3,6 +3,7 @@ import pymongo
 import datetime
 import time
 import random
+import os
 
 # NOTE: uncomment room generation in main to make also the room configuration in db
 
@@ -64,7 +65,7 @@ BINDINGS = {
 
 # database connection
 #NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
-client = pymongo.MongoClient()
+client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
 
 def get_room_of_device(device):

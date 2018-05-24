@@ -3,13 +3,14 @@ import pymongo
 import datetime
 import signal
 import time
+import os
 
 # configuration and parameters
 MAIN_LOOP_INTERVAL = datetime.timedelta(minutes=15)
 UNBOUND_STALE_MEASURES_TIME_DELTA = datetime.timedelta(hours=1)
 
 # database connection
-client = pymongo.MongoClient()
+client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
 
 def get_room_list():
