@@ -1,0 +1,7 @@
+[Unit]
+Description=MCPS system updater
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/MCPS/updater/updater.sh
+WorkingDirectory=/opt/MCPS/updater
