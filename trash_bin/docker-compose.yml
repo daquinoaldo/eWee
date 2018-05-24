@@ -1,12 +1,32 @@
-# Use root/example as user/password credentials
-version: '3.1'
-
+version: '2'
 services:
   mongo:
-    container_name: mongo
     image: mongo:2.4.14
-    restart: always
-    ports:
-      - '27017:27017'
+    stdin_open: true
     volumes:
-      - ./database/mongo:/data/db
+    - /home/daquinoaldo/MCPS/database/mongo:/data/db
+    tty: true
+    ports:
+    - 27017:27017/tcp
+    labels:
+      io.rancher.container.pull_image: always
+  atlante:
+    image: mcps/atlante
+    environment:
+      MONGO: mongo
+    stdin_open: true
+    tty: true
+    links:
+    - mongo:mongo
+    labels:
+      io.rancher.container.start_once: 'true'
+  API:
+    image: mcps/api
+    environment:
+      MONGO: mongo
+    stdin_open: true
+    tty: true
+    links:
+    - mongo:mongo
+    ports:
+    - 3000:3000/tcp
