@@ -33,7 +33,7 @@ Query.init()
 
 /* LIST OF APIs
 GET
-sensors (and rooms and devices)
+sensors (and rooms and devices):
 - home
 - home/<attribute>
 - room/<id>
@@ -41,8 +41,11 @@ sensors (and rooms and devices)
 - sensor/<id>
 - sensor/<id>/<attribute>
 
+policy:
+- policy/<room>
+
 POST
-actuators
+actuators:
 - actuator/<id>/<attribute=value>
 room/<id>/<attribute=value>
 home/<attribute=value>
@@ -51,15 +54,14 @@ rooms and binding:
 - home/room/<name=value>
 - room/<id>/device/<id=value>
 
+policy:
+- policy/<room>
+
 DELETE
 rooms and unbinding:
 - home/room/<id>
 - room/<id>/device/<id>
 */
-
-//TODO:
-// GET /policy/:roomID → JSON con policy database
-// POST /policy/:roomID →
 
 
 
@@ -111,6 +113,13 @@ app.get('/sensor/:id/:attribute', (req, res) => {
     .catch(err => res.status(404).send({error: err}))
 });
 
+// Get the policy from a specific room
+app.get('/policy/:room', (req, res) => {
+  Query.getPolicy(req.params.room)
+    .then(measure => res.send(measure))
+    .catch(err => res.status(404).send({error: err}))
+});
+
 
 
 /* *********************************
@@ -145,6 +154,13 @@ app.post('/room/:roomID/device/:deviceID', (req, res) => {
   Query.bind(req.params.deviceID, req.params.roomID)
     .then((ok) => res.send(ok))
     .catch(err => res.status(500).send({error: err}))
+});
+
+// Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
+app.post('/policy/:room/',  (req, res) => {
+  Query.setPolicy(req.params.room)
+    .then(id => res.send(id))
+    .catch(err => res.status(403).send({error: err}))
 });
 
 
