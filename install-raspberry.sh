@@ -3,7 +3,7 @@
 sudo apt-get update
 sudo apt-get upgrade -y
 # Install git and MongoDB
-sudo apt-get install -y git mongodb
+sudo apt-get install -y git mongodb python3-pymongo
 # Install NodeJS from binary (for RPi < 2B+)
 mkdir temp-download
 cd temp-download
