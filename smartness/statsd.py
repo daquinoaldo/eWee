@@ -6,6 +6,7 @@ import time
 
 # configuration and parameters
 MAIN_LOOP_INTERVAL = datetime.timedelta(minutes=15)
+UNBOUND_STALE_MEASURES_TIME_DELTA = datetime.timedelta(hours=1)
 
 # database connection
 client = pymongo.MongoClient()
@@ -67,6 +68,10 @@ def update_hourly_averages():
     except pymongo.errors.InvalidOperation:
         pass
 
+def cleanup_unbound_stale_measures():
+    scheduled_cleanup = datetime.datetime.utcnow() - UNBOUND_STALE_MEASURES_TIME_DELTA
+    db.measures.delete_many({'room': None, 'timestamp': {'$lt': scheduled_cleanup}})
+
 def sigusr1_handler(signum, frame):
     # handle SIGUSR1 signal for forced loop iteration
     pass
@@ -75,4 +80,5 @@ if __name__ == '__main__':
     signal.signal(signal.SIGUSR1, sigusr1_handler)
     while True:
         update_hourly_averages()
+        cleanup_unbound_stale_measures()
         time.sleep(MAIN_LOOP_INTERVAL.total_seconds())
