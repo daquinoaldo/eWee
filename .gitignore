@@ -4,4 +4,4 @@
 **/node_modules
 
 !**/.gitnotignore
-**/mongo
+trash_bin/mongo
