@@ -3,10 +3,12 @@
 .DS_Store
 
 **/node_modules
-trash_bin/mongo
 
 trash_bin
 
+demo
 network
 smartness
+systemd
 ui
+updater
