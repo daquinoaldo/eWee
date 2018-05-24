@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "start": "webpack-dev-server --progress"
+    "start": "webpack-dev-server --progress",
+    "dev": "webpack-dev-server --progress"
   },
   "license": "Apache-2.0",
   "devDependencies": {
