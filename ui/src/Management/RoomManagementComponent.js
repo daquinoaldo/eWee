@@ -44,7 +44,7 @@ export default class RoomManagement extends React.Component {
     this.deleteButton.current.disabled = true;
 
     this.mdcMenu = new MDCMenu(this.menu.current);
-    // this.getUnbounded(); // TODO: uncomment
+    this.getUnbounded();
   }
 
   remove = () => {
@@ -174,7 +174,7 @@ export default class RoomManagement extends React.Component {
                   Add
                 </button>
                 <div ref={this.menu} style={{position: 'absolute', left: '0'}} className="mdc-menu" tabIndex="-1">
-                  <ul className="mdc-menu__items mdc-list" role="menu" aria-hidden="true">
+                  <ul className="select-max-height mdc-menu__items mdc-list" role="menu" aria-hidden="true">
                     {this.unmboundMenuHtml()}
                   </ul>
                 </div>

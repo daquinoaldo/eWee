@@ -11,6 +11,7 @@ export default class PolicySection extends React.Component {
     this.state = {
       items: [props.items],
       select: {name: props.default},
+      pattern: props.pattern ? props.pattern : ''
     }
     this.menu = React.createRef();
     this.selection = React.createRef();
@@ -33,7 +34,7 @@ export default class PolicySection extends React.Component {
   }
 
   getSelected = () => {
-
+    return this.state.select;
   }
 
   itemSelected = (item) => {
@@ -49,6 +50,7 @@ export default class PolicySection extends React.Component {
         <li className="mdc-list-item" role="menuitem"
           tabIndex="0" key={i} onClick={() => this.itemSelected(actualItem)}>
           {actualItem.name ? actualItem.name : actualItem}
+          {this.state.pattern}
         </li>
       );
     }

@@ -54,6 +54,11 @@ $mdc-theme-text-color: rgba(0, 0, 0, 0.42);
   padding: 32px;
 }
 
+// Max selection menu height
+.select-max-height {
+  max-height: 100px;
+}
+
 // /// /// /// UTILITY /// /// /// //
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
