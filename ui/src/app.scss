@@ -5,6 +5,7 @@ $mdc-theme-secondary:  #fdd835;
 $mdc-theme-background: #fff;
 $mdc-theme-important: #ef5350;
 $mdc-theme-important_: #fbc02d;
+$mdc-theme-text-color: rgba(0, 0, 0, 0.42);
 
 @import "@material/card/mdc-card";
 @import "@material/textfield/mdc-text-field";
@@ -40,4 +41,42 @@ $mdc-theme-important_: #fbc02d;
 .switch-wrapper {
   position: absolute;
   width: 100%;
+}
+
+.switch-wrapper .section-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section-wrapper {
+  position: absolute;
+  padding: 32px;
+}
+
+// /// /// /// UTILITY /// /// /// //
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+// /// /// /// CARDS /// /// /// //
+.card__primary {
+  padding: 1rem;
+}
+
+.card__subtitle {
+  @include mdc-theme-prop(color, text-secondary-on-background);
+  margin: 0;
+}
+
+.card__secondary {
+  @include mdc-theme-prop(color, text-secondary-on-background);
+  word-wrap: break-word;
+  width: 400px;
+  padding: 0 1rem 8px 1rem;
 }

@@ -29,7 +29,7 @@ export default class App extends React.Component {
   update = () => {
     const currentRoute = this.router.current.history.location.pathname;
     if (currentRoute=='/management') this.ManagementSection.current.update();
-    if (currentRoute=='/policy') this.PolicySection.current.update();
+    else if (currentRoute=='/policy') this.PolicySection.current.update();
     else this.AnaliticaSection.current.update();
   }
 

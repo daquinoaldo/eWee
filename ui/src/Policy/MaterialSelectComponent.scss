@@ -1,5 +1,5 @@
 .disable-select-app {
-  width: 200px;
+  max-width: 200px;
   position: relative;
   z-index: -1;
 
@@ -10,12 +10,6 @@
   appearance: none;
 }
 
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
+.select-max-height {
+  max-height: 100px;
 }

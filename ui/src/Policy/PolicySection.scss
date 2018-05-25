@@ -1,0 +1,19 @@
+.policy-key-value {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.value-text-wrap {
+  height: 52px;
+  position: relative;
+  // width: 100px;
+}
+
+.value-text-wrap span {
+  white-space: nowrap;
+  color: $mdc-theme-text-color;
+  position: absolute;
+  bottom: 9px;
+}

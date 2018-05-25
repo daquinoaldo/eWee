@@ -48,7 +48,7 @@ export default class PolicySection extends React.Component {
       shtml.push(
         <li className="mdc-list-item" role="menuitem"
           tabIndex="0" key={i} onClick={() => this.itemSelected(actualItem)}>
-          {actualItem.name}
+          {actualItem.name ? actualItem.name : actualItem}
         </li>
       );
     }
@@ -60,14 +60,14 @@ export default class PolicySection extends React.Component {
       <div>
         <div style={{position: 'relative'}}>
           <div ref={this.selection} className="mdc-select" onClick={this.openMenu}>
-            <select style={{width: '200px'}} className="disable-select-app mdc-select__native-control">
+            <select style={{'width': '150px'}} className="disable-select-app mdc-select__native-control">
               <option value="" disabled></option>
             </select>
-            <label className="noselect mdc-floating-label">{this.state.select.name}</label>
+            <label className="noselect mdc-floating-label">{this.state.select.name ? this.state.select.name : this.state.select}</label>
             <div className="mdc-line-ripple"></div>
           </div>
           <div ref={this.menu} style={{position: 'absolute', left: '0', top: '100%'}} className="mdc-menu" tabIndex="-1">
-            <ul className="mdc-menu__items mdc-list" role="menu" aria-hidden="true" style={{'minWidth': '200px'}}>
+            <ul className="mdc-menu__items mdc-list select-max-height" role="menu" aria-hidden="true" style={{'minWidth': '200px'}}>
               {this.itemMenuHtml()}
             </ul>
           </div>

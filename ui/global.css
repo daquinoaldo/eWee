@@ -6,8 +6,3 @@ html, body, #app {
 .flex-item {
   margin: 10px;
 }
-
-.section-wrapper {
-  position: absolute;
-  margin: 32px;
-}
