@@ -1,13 +1,22 @@
 {
-  "name": "raspberry-pi",
+  "name": "receiver",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bluethooth receiver",
   "main": "master.js",
   "scripts": {
-    "test": "test"
+    "start": "node master.js",
+    "postinstall": "cd ../database && npm install"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daquinoaldo/MCPS.git"
+  },
+  "author": "Aldo D'Aquino",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/daquinoaldo/MCPS/issues"
+  },
+  "homepage": "https://github.com/daquinoaldo/MCPS#readme",
   "dependencies": {
     "moment": "^2.22.1",
     "noble": "github:sandeepmistry/noble"
