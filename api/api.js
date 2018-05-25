@@ -38,6 +38,7 @@ sensors (and rooms and devices):
 - home/<attribute>
 - room/<id>
 - room/<id>/<attribute>
+- room/<id>/stats/yyyy/mm/dd
 - sensor/<id>
 - sensor/<id>/<attribute>
 
@@ -94,6 +95,13 @@ app.get('/room/:id', (req, res) => {
 // Get a specific attribute of the status of a specific room
 app.get('/room/:id/:attribute', (req, res) => {
   Query.getRoomStatus(req.params.id, req.params.attribute)
+    .then(attr => res.send(attr.toString()))
+    .catch(err => res.status(404).send({error: err}))
+});
+
+// Get statistic of a specific room in a specific day
+app.get('/room/:id/stats/:yyyy/:mm/:dd', (req, res) => {
+  Query.getStats(req.params.id, req.params.yyyy, req.params.mm, req.params.dd)
     .then(attr => res.send(attr.toString()))
     .catch(err => res.status(404).send({error: err}))
 });

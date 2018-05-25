@@ -464,17 +464,51 @@ class Query {
 
   /**
    * Return the policy of all the rooms (or of a specific room)
-   * @param roomID, option, the specific room
+   * @param roomID, optional, the specific room
    * @returns Promise<any> promise
    */
   static getPolicy(roomID) {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room.");
-      Db.query(collections.policy, {_id: ObjectID(roomID)})
+      Db.queryLast(collections.policy, {_id: ObjectID(roomID)})
         .then(policy => resolve(policy))
         .catch(err => {
           console.error(err);
           reject("A policy for the room "+roomID+" doesn't exist.")
+        })
+    });
+  }
+
+  /**
+   * Return the statistic statistic of a specific room in a specific day
+   * @param roomID the specific room
+   * @param yyyy the year
+   * @param mm the month
+   * @param dd the day
+   * @returns Promise<any> promise with an object with this format: { characteristic1: [<value1>, ..., <value24>],
+   * characteristic2: [...values], ... }.
+   * Note that if you pick the current day you may have less than 24 values in the arrays.
+   */
+  static getStats(roomID, yyyy, mm, dd) {
+    return new Promise((resolve, reject) => {
+      if (!roomID) reject("You must specify the room.");
+      if (!yyyy) reject("You must specify an year.");
+      if (!mm) reject("You must specify a month.");
+      if (!dd) reject("You must specify a day.");
+      const query = {
+        room: ObjectID(roomID),
+        year: yyyy,
+        month: mm,
+        day: dd
+      };
+      Db.query(collections.statistics, query).toArray()
+        .then(statistics => {
+          console.log(JSON.stringify(statistics));
+          resolve(statistics);
+        })
+        .catch(err => {
+          console.error(err);
+          reject("A policy for the room "+roomID+" doesn't exist.");
         })
     });
   }
