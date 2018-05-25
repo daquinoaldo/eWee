@@ -33,6 +33,15 @@ $mdc-theme-text-color: rgba(0, 0, 0, 0.42);
 @import "./Policy/PolicySection.scss";
 @import "./Policy/MaterialSelectComponent.scss";
 
+html, body, #app {
+  margin: 0;
+  height: 100%;
+}
+
+.flex-item {
+  margin: 10px;
+}
+
 .body-wrapper {
   width: 100%;
   position: relative;
