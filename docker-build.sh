@@ -6,11 +6,7 @@ sudo docker build --no-cache -t mcps/api -f api.dockerfile .
 sudo docker build --no-cache -t mcps/smartness smartness
 
 #UI
-cd ui
-npm install
-npm run build
-cd ..
-sudo docker build --no-cache -t mcps/ui ESTIA
+sudo docker build --no-cache -t mcps/ui ui
 
 #DEMO
 sudo docker build --no-cache -t mcps/demo demo
