@@ -2,7 +2,3 @@
 *.iml
 .DS_Store
 **/node_modules
-ui/ESTIA/bundle.*
-
-!**/.gitnotignore
-trash_bin/mongo
