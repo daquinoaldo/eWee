@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "webpack-dev-server --progress",
-    "dev": "webpack-dev-server --progress"
+    "build": "NODE_ENV=production webpack --progress --colors"
   },
   "license": "Apache-2.0",
   "devDependencies": {

@@ -1,4 +1,6 @@
+var webpack = require('webpack');
 var path = require('path');
+const env = process.env.NODE_ENV;
 module.exports = [
   {
     entry: "./index.js",
@@ -7,6 +9,11 @@ module.exports = [
       publicPath: '/',
       filename: "bundle.js"
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(env)
+      })
+    ],
     module: {
       rules: [{
         test: /\.scss$/,
