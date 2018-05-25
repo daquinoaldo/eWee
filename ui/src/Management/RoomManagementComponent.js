@@ -56,7 +56,7 @@ export default class RoomManagement extends React.Component {
   }
 
   update = () => {
-    console.log(this.state.roomname);
+    // console.log(this.state.roomname);
     this.getAvailable();
   }
 

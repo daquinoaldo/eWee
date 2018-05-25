@@ -39,18 +39,19 @@ export default class ManagementSection extends React.Component {
     });
 
     // Updating unbound devices
+    for (const s of this.unboundedCmps) {
+      if (s) s.update();
+    }
+    // Updating rooms cards
     for (const room of this.roomsCmps) {
       if (room) room.update();
     }
-    // Updating rooms cards
-    // for (let i=0; i < this.roomsCmps.length; i++) {
-    //   this.roomsCmps[i].update();
-    // }
   }
 
 
   // ----- ----- HTML RENDERERS ----- ----- //
   sensorsHtml = () => {
+    this.unboundedCmps.clear();
     const shtml = [];
     const unbounded = this.state.unboundDevices;
     for (var i = 0; i < unbounded.length; i++) {
@@ -64,6 +65,7 @@ export default class ManagementSection extends React.Component {
   }
 
   roomsHtml = () => {
+    this.roomsCmps.clear();
     const shtml = [];
     for (var i = 0; i < this.state.rooms.length; i++) {
       const actualRoom = this.state.rooms[i];

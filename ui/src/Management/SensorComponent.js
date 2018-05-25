@@ -23,18 +23,14 @@ export default class SensorChip extends React.Component {
     const chipSet = new MDCChipSet(this.sensorChip.current);
     MDCRipple.attachTo(this.sensorChip.current);
 
-    this.interval = setInterval(this.regularUpdate, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
+    this.update();
   }
 
   componentWillReceiveProps = (props) => {
     this.setState({icon: props.icon});
   }
 
-  regularUpdate = () => {
+  update = () => {
     this.isActive();
   }
 
