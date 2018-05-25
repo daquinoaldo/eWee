@@ -45,7 +45,7 @@ export default class AnaliticaSection extends React.Component {
 
   render() {
     return (
-      <div className="analitica-section-wrapper">
+      <div className="section-wrapper">
         {this.roomsHtml()}
       </div>
     )};

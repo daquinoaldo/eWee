@@ -41,6 +41,9 @@ export default class Head extends React.Component {
             <Link to="/management">
               <span className="mdc-tab" onClick={() => this.sectionChange('management')}>Management</span>
             </Link>
+            <Link to="/policy">
+              <span className="mdc-tab" onClick={() => this.sectionChange('policy')}>Policy</span>
+            </Link>
             <span className="mdc-tab-bar__indicator"></span>
           </nav>
         </div>

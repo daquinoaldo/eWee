@@ -24,10 +24,6 @@ export default class ManagementSection extends React.Component {
     this.update();
   }
 
-  componentWillUnmount () {
-    clearInterval(this.updateTimer)
-  }
-
 
   // ----- ----- UPDATES ----- ----- //
   update = () => {
@@ -80,7 +76,7 @@ export default class ManagementSection extends React.Component {
 
   render() {
     return (
-      <div className="management-wrapper">
+      <div className="section-wrapper">
         <h1>Available <span className="h1-blue">Sensors</span></h1>
         <div className="sensor-flex-wrapper">
           {this.sensorsHtml()}

@@ -6,6 +6,17 @@ $mdc-theme-background: #fff;
 $mdc-theme-important: #ef5350;
 $mdc-theme-important_: #fbc02d;
 
+@import "@material/card/mdc-card";
+@import "@material/textfield/mdc-text-field";
+@import "@material/button/mdc-button";
+@import "@material/icon-toggle/mdc-icon-toggle";
+@import "@material/menu/mdc-menu";
+@import "@material/list/mdc-list";
+@import "@material/layout-grid/mdc-layout-grid";
+@import "@material/fab/mdc-fab";
+@import "@material/chips/mdc-chips";
+@import "@material/select/mdc-select";
+
 @import "./MaterialButton/MaterialButton.scss";
 @import "./FloatingAction/FloatingAction.scss";
 @import "./TitleBanner/TitleComponent.scss";
@@ -18,6 +29,8 @@ $mdc-theme-important_: #fbc02d;
 @import "./Analitica/RoomAnaliticaComponent.scss";
 @import "./Management/SensorComponent.scss";
 @import "./Management/RoomManagementComponent.scss";
+@import "./Policy/PolicySection.scss";
+@import "./Policy/MaterialSelectComponent.scss";
 
 .body-wrapper {
   width: 100%;
