@@ -2,9 +2,11 @@
 @import "@material/textfield/mdc-text-field";
 @import "@material/button/mdc-button";
 @import "@material/icon-toggle/mdc-icon-toggle";
+@import "@material/menu/mdc-menu";
+@import "@material/list/mdc-list";
 
-.value-card-wrapper {
-  width: 350px;
+.room-card-wrapper {
+  width: 400px;
 }
 
 .remove-button {
@@ -13,6 +15,19 @@
 
 .highlight-value {
   color: #1565c0;
+}
+
+.delete-icon-hide {
+  opacity: 0;
+}
+
+.remove-room {
+  width: 48px;
+  height: 48px;
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  transition: opacity 0.25s;
 }
 
 .sensor-flex-wrapper {
@@ -27,6 +42,7 @@
 }
 
 .room-management-wrapper {
+  position: relative;
   padding-bottom: 21px;
 }
 

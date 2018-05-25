@@ -3,12 +3,14 @@ import React from 'react';
 import ChartCard from './ChartCardComponent';
 import ValueCard from './ValueCardComponent';
 
-import * as api from './apiInterface.js';
+// import * as api from './apiInterface.js';
 
 var tempt = {title: 'Temperature'}
 var humidity = {title: 'Humidity'}
 var light = {title: 'Light'}
 var occupied = {title: 'Occupied'}
+
+import * as api from '../remoteApi.js';
 
 export default class AnaliticaSection extends React.Component {
   constructor(props) {
@@ -23,18 +25,23 @@ export default class AnaliticaSection extends React.Component {
     this.occupied = React.createRef();
   }
 
-  componentDidMount() {
-    this.updateTimer = api.startFullDataPulse(
-      this.state.url,
-      this.temperature.current.updateGraph,
-      this.humidity.current.updateValue,
-      this.light.current.updateValue,
-      this.occupied.current.updateValue
-    );
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.updateTimer);
+  update = () => {
+    api.get(this.state.url, (res, err) => {
+      if (!err) {
+        // Temperature
+        this.temperature.current.updateGraph(res.temp);
+        // Humidity
+        const humidity = res.humidity ? res.humidity + '%' : 'no data';
+        this.humidity.current.updateValue(humidity);
+        // Light
+        const light = res.light ? res.light + 'lx' : 'no data';
+        this.light.current.updateValue(light);
+        // Presence
+        const presence = res.occupied ? 'yes' : 'no';
+        this.occupied.current.updateValue(presence);
+      }
+      else console.error(err);
+    })
   }
 
   render() {

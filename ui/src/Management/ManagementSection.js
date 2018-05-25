@@ -14,16 +14,38 @@ export default class ManagementSection extends React.Component {
       unboundDevices: [],
       rooms: []
     }
+    this.roomsCmps = new Set();
+    this.unboundedCmps = new Set();
   }
 
 
   // ----- ----- LIFECYCLE HOOKS ----- ----- //
   componentDidMount() {
+    this.update();
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.updateTimer)
+  }
+
+
+  // ----- ----- UPDATES ----- ----- //
+  update = () => {
+    // Updating room status
     api.get(api.url+'/home', (res, error) => {
       if (!error)
         this.setState({ unboundDevices: res.unboundDevices, rooms: res.rooms });
       else console.error(error);
-    })
+    });
+
+    // Updating unbound devices
+    for (const room of this.roomsCmps) {
+      if (room) room.update();
+    }
+    // Updating rooms cards
+    // for (let i=0; i < this.roomsCmps.length; i++) {
+    //   this.roomsCmps[i].update();
+    // }
   }
 
 
@@ -34,7 +56,7 @@ export default class ManagementSection extends React.Component {
     for (var i = 0; i < unbounded.length; i++) {
       shtml.push(
         <div className="flex-item" key={i}>
-          <SensorChip uuid={unbounded[i]}/>
+          <SensorChip ref={(ref) => this.unboundedCmps.add(ref)} uuid={unbounded[i]}/>
         </div>
       );
     }
@@ -47,7 +69,7 @@ export default class ManagementSection extends React.Component {
       const actualRoom = this.state.rooms[i];
       shtml.push(
         <div className="flex-item" key={i}>
-          <RoomManagement roomname={actualRoom.name} roomid={actualRoom._id}/>
+          <RoomManagement ref={(ref) => this.roomsCmps.add(ref)} roomname={actualRoom.name} roomid={actualRoom._id}/>
         </div>
       );
     }

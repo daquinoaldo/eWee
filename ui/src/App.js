@@ -16,20 +16,23 @@ import './app.scss';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      section: 'analitica'
-    }
+    this.ManagementSection = React.createRef();
+    this.AnaliticaSection = React.createRef();
+    this.router = React.createRef();
+
+    this.update = setInterval(this.update, 1000);
   }
 
-  updateSection = (newSection) => {
-    console.log(newSection);
-    this.setState({ section: newSection })
+  update = () => {
+    const currentRoute = this.router.current.history.location.pathname;
+    if (currentRoute=='/management') this.ManagementSection.current.update();
+    else this.AnaliticaSection.current.update();
   }
 
   render() {
     return(
       <div className="body-wrapper">
-        <Router>
+        <Router ref={this.router}>
           <div >
             <TitleBanner />
             <AnimatedSwitch
@@ -38,8 +41,8 @@ export default class App extends React.Component {
              atActive={{ opacity: 1 }}
              className="switch-wrapper"
             >
-              <Route exac path="/management" component={Management} />
-              <Route path="/" component={Analitica} />
+              <Route exac path="/management" component={() => <Management ref={this.ManagementSection} />} />
+              <Route path="/" component={() => <Analitica ref={this.AnaliticaSection} />} />
             </AnimatedSwitch>
           </div>
         </Router>

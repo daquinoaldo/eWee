@@ -10,6 +10,13 @@ export default class AnaliticaSection extends React.Component {
     this.state = {
       rooms: []
     }
+    this.roomsCmps = [];
+  }
+
+  update = () => {
+    for (let i=0; i < this.roomsCmps.length; i++) {
+      this.roomsCmps[i].update();
+    }
   }
 
   componentDidMount() {
@@ -28,7 +35,7 @@ export default class AnaliticaSection extends React.Component {
       rows.push(
         <div key={i} href={i} className="room-section-wrapper">
           <h1>Room: <span className="room-name">{actualRoom.name}</span></h1>
-          <Room url={api.url+'/room/'+actualRoom._id}/>
+          <Room ref={(ref) => this.roomsCmps.push(ref)} url={api.url+'/room/'+actualRoom._id}/>
         </div>
       );
     }
