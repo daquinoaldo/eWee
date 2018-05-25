@@ -12,6 +12,7 @@ import { AnimatedSwitch } from 'react-router-transition';
 
 import './app.scss';
 
+const UPDATE_PULSE = 1000;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -20,7 +21,7 @@ export default class App extends React.Component {
     this.AnaliticaSection = React.createRef();
     this.router = React.createRef();
 
-    this.update = setInterval(this.update, 1000);
+    this.update = setInterval(this.update, UPDATE_PULSE);
   }
 
   update = () => {
