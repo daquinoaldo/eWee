@@ -5,7 +5,7 @@
   "main": "master.js",
   "scripts": {
     "start": "node master.js",
-    "postinstall": "cd ../database && npm install"
+    "postinstall": "cd ../../database && npm install"
   },
   "repository": {
     "type": "git",
