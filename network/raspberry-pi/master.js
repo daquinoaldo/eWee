@@ -1,6 +1,5 @@
 // ----- ----- REQUIREMENTS ----- ----- //
 const noble = require('noble');
-const moment = require('moment');
 
 const UUID = require('../UUIDs.js');
 const Query = require('../../database/query.js').Query;
@@ -23,20 +22,17 @@ let lastActionTimestamp = new Date();
 // ];
 
 
-<<<<<<< HEAD
 setInterval(() => Query.getActions(lastActionTimestamp).then(actions => {
   for (let i = 0; i < actions.length; i++)
     pendingActions.push(reverseTranslator(actions[i]))
   if (actions.length && actions[actions.length-1].timestamp) lastActionTimestamp = actions[actions.length-1].timestamp;
 }), 1000);
+
 /*
  * It seems that noble stop scanning from time to time
  */
 setInterval(() => noble.startScanning(), 10000);
 
-
-=======
->>>>>>> dd67f1ce295a21540882c160a43f2f330fc17778
 // ----- ----- SETUP AND START ----- ----- //
 async function setup() {
   await Query.init();
@@ -173,7 +169,7 @@ function getServiceDiscoveryPromise (peripheral, timeout) {
   return new Promise(function (resolve, reject) {
     peripheral.discoverServices(null, (error, services) => {
       if (error) reject(error);
-      else if (services.length==0) reject('No services found');
+      else if (services.length === 0) reject('No services found');
       else resolve(services);
     });
     setTimeout(() => reject('(' + peripheral.address + ') ' + 'Service discovery error: time elapsed '), timeout);
@@ -270,14 +266,10 @@ function getExecutionPromise (peripheral, characteristicTable, timeout) {
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
-<<<<<<< HEAD
     const todo = pendingActions.filter((el) => { return el.device === peripheral.address });
-=======
-    let todo = pendingActions.find((el) => { return el.device === peripheral.address });
->>>>>>> dd67f1ce295a21540882c160a43f2f330fc17778
     // Iterating till there is something to do
-    for (let i=0; i < todo.length; i++) {
-      const actualAction = todo[i]
+    for (let i = 0; i < todo.length; i++) {
+      const actualAction = todo[i];
       // Getting the characteristic
       let newValue = null;
       let characteristic = characteristicTable.find( (el) => {
