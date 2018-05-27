@@ -497,13 +497,24 @@ class Query {
       if (!dd) reject("You must specify a day.");
       const query = {
         room: ObjectID(roomID),
-        year: yyyy,
-        month: mm,
-        day: dd
+        year: +yyyy,
+        month: +mm,
+        day: +dd
       };
-      Db.query(collections.statistics, query).toArray()
-        .then(statistics => {
-          console.log(JSON.stringify(statistics));
+      Db.query(collections.statistics, query).sort({"hour": 1}).toArray()
+        .then(res => {
+          const exclude = ["_id", "year", "month", "day", "room"];
+          const statistics = {};
+          statistics.room = res[0].room;
+          statistics.year = res[0].year;
+          statistics.month = res[0].month;
+          statistics.day = res[0].day;
+          for (let i = 0; i < res.length; i++)
+            for (const key in res[i])
+              if (!exclude.includes(key)) {
+                if (!statistics.hasOwnProperty(key)) statistics[key] = [];
+                statistics[key][i] = res[i][key];
+              }
           resolve(statistics);
         })
         .catch(err => {

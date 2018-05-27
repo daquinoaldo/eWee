@@ -48,8 +48,8 @@ policy:
 POST
 actuators:
 - actuator/<id>/<attribute=value>
-room/<id>/<attribute=value>
-home/<attribute=value>
+TODO: room/<id>/<attribute=value>
+TODO: home/<attribute=value>
 
 rooms and binding:
 - home/room/<name=value>
