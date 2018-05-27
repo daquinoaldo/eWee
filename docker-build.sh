@@ -9,4 +9,5 @@ sudo docker build --no-cache -t mcps/smartness smartness
 sudo docker build --no-cache -t mcps/ui ui/ESTIA
 
 #DEMO
-sudo docker build --no-cache -t mcps/demo demo
+sudo docker build --no-cache -t mcps/bigsensorgen -f demo/bigsensorgen.dockerfile demo
+sudo docker build --no-cache -t mcps/sensorgen -f demo/sensorgen.dockerfile demo
