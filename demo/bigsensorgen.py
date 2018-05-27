@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import pymongo
 import datetime
-import time
 import random
 import os
 
