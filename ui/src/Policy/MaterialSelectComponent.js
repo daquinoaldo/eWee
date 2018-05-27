@@ -9,7 +9,7 @@ export default class PolicySection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [props.items],
+      items: props.items,
       select: {name: props.default},
       pattern: props.pattern ? props.pattern : ''
     }

@@ -63,10 +63,10 @@ export default class PolicySection extends React.Component {
   render() {
     const sepMargin = {'marginBottom': '17px'};
 
-    let nLinearFromk = (k, n) => { return Array.from(new Array(n), (x,i) => k+i); }
-    const temptRange = nLinearFromk(20, 30);
-    const illRange = nLinearFromk(20, 30);
-    const co2Range = nLinearFromk(20, 30);
+    let nLinearFromk = (k, n, step) => { return Array.from(new Array(n), (x,i) => k+(i*(step))); }
+    const temptRange = nLinearFromk(10, 30, 0.5);
+    const illRange = nLinearFromk(0, 11, 100);
+    const co2Range = nLinearFromk(100, 11, 100);
     return (
       <div className="section-wrapper section-center">
         <div className="mdc-card">
