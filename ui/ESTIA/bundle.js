@@ -778,11 +778,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.send = send;
 exports.get = get;
-var url = exports.url = process.env.API || "http://localhost:3000";
+//export const url = "http://localhost:3000";
 
 //TODO: DELETE IN PRODUCTION
 // uncomment this line (and comment the previous one) to use remote api from localhost
-// export const url = process.env.API || "http://p1.aldodaquino.com:3000";
+var url = exports.url = process.env.API || "https://api.p1.aldodaquino.com";
 
 function send(url, method, data, callback) {
   var options = { method: method,
@@ -21445,14 +21445,14 @@ var PolicySection = function (_React$Component) {
     value: function render() {
       var sepMargin = { 'marginBottom': '17px' };
 
-      var nLinearFromk = function nLinearFromk(k, n) {
+      var nLinearFromk = function nLinearFromk(k, n, step) {
         return Array.from(new Array(n), function (x, i) {
-          return k + i;
+          return k + i * step;
         });
       };
-      var temptRange = nLinearFromk(20, 30);
-      var illRange = nLinearFromk(20, 30);
-      var co2Range = nLinearFromk(20, 30);
+      var temptRange = nLinearFromk(10, 30, 0.5);
+      var illRange = nLinearFromk(0, 11, 100);
+      var co2Range = nLinearFromk(100, 11, 100);
       return _react2.default.createElement(
         'div',
         { className: 'section-wrapper section-center' },
@@ -21635,7 +21635,7 @@ var PolicySection = function (_React$Component) {
     _initialiseProps.call(_this);
 
     _this.state = {
-      items: [props.items],
+      items: props.items,
       select: { name: props.default },
       pattern: props.pattern ? props.pattern : ''
     };
