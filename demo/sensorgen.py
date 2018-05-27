@@ -8,7 +8,7 @@ import os
 # NOTE: uncomment room generation in main to make also the room configuration in db
 
 # configuration and parameters
-GENERATION_LOOP_INTERVAL = 10 #seconds
+GENERATION_LOOP_INTERVAL = 10  # seconds
 GENERATION_TIMESPAN = datetime.timedelta(minutes=30)
 PIR_THRESHOLD = 0.8
 
@@ -64,17 +64,20 @@ BINDINGS = {
 }
 
 # database connection
-#NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
+# NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
+
 
 def get_room_of_device(device):
     room = db.rooms.find_one({'things': device})
     return room['_id'] if room else None
 
+
 def make_configuration_in_db():
     for room, things in BINDINGS.items():
         db.rooms.insert_one({'name': room, 'things': things})
+
 
 def next_generation(start_time):
     # compute position in linear progression for start to end value
@@ -99,7 +102,7 @@ def next_generation(start_time):
 
 if __name__ == "__main__":
     # uncomment to produce entries in room document
-    #make_configuration_in_db()
+    # make_configuration_in_db()
     start_time = datetime.datetime.utcnow()
     while start_time + GENERATION_TIMESPAN > datetime.datetime.utcnow():
         next_generation(start_time)

@@ -7,7 +7,7 @@ import os
 # NOTE: uncomment room generation in main to make also the room configuration in db
 
 # configuration and parameters
-GENERATION_LOOP_NUMBER = 3 # iterations (days)
+GENERATION_LOOP_NUMBER = 3  # iterations (days)
 GENERATION_LOOP_INTERVAL = datetime.timedelta(seconds=20)
 GENERATION_TIMESPAN = datetime.timedelta(days=1)
 PIR_THRESHOLD = 0.8
@@ -64,17 +64,20 @@ BINDINGS = {
 }
 
 # database connection
-#NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
+# NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
+
 
 def get_room_of_device(device):
     room = db.rooms.find_one({'things': device})
     return room['_id'] if room else None
 
+
 def make_configuration_in_db():
     for room, things in BINDINGS.items():
         db.rooms.insert_one({'name': room, 'things': things})
+
 
 def next_generation(start_time, now):
     # compute position in linear progression for start to end value
@@ -101,12 +104,13 @@ def next_generation(start_time, now):
 
 if __name__ == "__main__":
     # uncomment to produce entries in room document
-    #make_configuration_in_db()
-    start_time = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1)
+    make_configuration_in_db()
+    start_time = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(
+        days=1)
     start_time -= GENERATION_LOOP_NUMBER * GENERATION_TIMESPAN
     for iteration in range(0, GENERATION_LOOP_NUMBER):
         iteration_start_time = start_time + iteration * GENERATION_TIMESPAN
         iteration_time = iteration_start_time
-        while iteration_time < start_time + (iteration+1) * GENERATION_TIMESPAN:
+        while iteration_time < start_time + (iteration + 1) * GENERATION_TIMESPAN:
             next_generation(iteration_start_time, iteration_time)
             iteration_time += GENERATION_LOOP_INTERVAL
