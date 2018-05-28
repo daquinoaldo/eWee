@@ -9,4 +9,4 @@ systemctl enable master
 systemctl enable smartd
 systemctl enable statsd
 
-systemctl daemon-reaload
+systemctl daemon-reload

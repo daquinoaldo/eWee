@@ -327,7 +327,7 @@ function translator (obj) {
   newObj.timestamp = obj.timestamp;
   for (const uuid in obj) {
     const property = UUID.UUIDToProperty(uuid);
-    if (property) newObj[property] = obj[uuid];
+    if (property) newObj[property] = isNaN(+obj[uuid]) ? obj[uuid] : +obj[uuid];
   }
   return newObj;
 }
@@ -338,14 +338,14 @@ function reverseTranslator (obj) {
   newObj.timestamp = obj.timestamp;
   for (const property in obj) {
     const uuid = UUID.propertyToUUID(property);
-    if (uuid) newObj[uuid] = obj[property];
+    if (uuid) newObj[uuid] = obj[property].toString();
   }
   return newObj;
 }
 
 function isSampler (peripheral) {
   // @note: it may happen that name is correct but the mac address in unknown
-  if (peripheral.address=='unknown') return false;
+  if (peripheral.address === 'unknown') return false;
 
   let devname = peripheral.advertisement.localName;
   if (devname==null || devname.length<7) return false;
