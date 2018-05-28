@@ -97,7 +97,7 @@ class Query {
     return new Promise((resolve, reject) => {
       if (!room) reject("Policy must refer to a room.");
       if (!policy) reject("You must specify a policy.");
-      Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(res => resolve(res.insertedId.toString()));
+      Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(res => resolve(true));
     });
   }
 
