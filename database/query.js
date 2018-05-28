@@ -521,7 +521,7 @@ class Query {
         })
         .catch(err => {
           console.error(err);
-          reject("A policy for the room "+roomID+" doesn't exist.");
+          reject("Statistics for the room "+roomID+" doesn't exist.");
         })
     });
   }
