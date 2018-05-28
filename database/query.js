@@ -89,13 +89,14 @@ class Query {
 
   /**
    * Specify a new policy for a room
+   * @param room
    * @param policy for the room
    * @returns Promise<any> resolved with the id of the inserted room
    */
-  static setPolicy(policy) {
+  static setPolicy(room, policy) {
     return new Promise((resolve, reject) => {
+      if (!room) reject("Policy must refer to a room.");
       if (!policy) reject("You must specify a policy.");
-      if (!policy.room) reject("Policy must refer to a room.");
       Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(res => resolve(res.insertedId.toString()));
     });
   }

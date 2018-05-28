@@ -166,7 +166,7 @@ app.post('/room/:roomID/device/:deviceID', (req, res) => {
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
 app.post('/policy/:room/',  (req, res) => {
-  Query.setPolicy(req.params.room)
+  Query.setPolicy(req.params.room, req.body)
     .then(id => res.send(id))
     .catch(err => res.status(403).send({error: err}))
 });
