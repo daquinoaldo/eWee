@@ -102,7 +102,7 @@ app.get('/room/:id/:attribute', (req, res) => {
 // Get statistic of a specific room in a specific day
 app.get('/room/:id/stats/:yyyy/:mm/:dd', (req, res) => {
   Query.getStats(req.params.id, req.params.yyyy, req.params.mm, req.params.dd)
-    .then(attr => res.send(attr.toString()))
+    .then(stats => res.send(stats))
     .catch(err => res.status(404).send({error: err}))
 });
 

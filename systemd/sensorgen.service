@@ -1,0 +1,17 @@
+[Unit]
+Description=Sensor simulator daemon
+Requires=mongodb.service
+After=mongodb.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/MCPS/demo/sensorgen.py
+ExecReload=/bin/kill -USR1 $MAINPID
+WorkingDirectory=/opt/MCPS/demo
+Restart=always
+RestartSec=1
+TimeoutStartSec=10
+TimeoutStopSec=1
+
+[Install]
+WantedBy=multi-user.target

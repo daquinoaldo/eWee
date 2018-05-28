@@ -8,5 +8,6 @@ systemctl enable api
 systemctl enable master
 systemctl enable smartd
 systemctl enable statsd
+systemctl enable sensorgen
 
 systemctl daemon-reload
