@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "REST API",
+  "main": "api.js",
+  "scripts": {
+    "start": "node node_modules/mongo-express/app.js",
+    "postinstall": "sed -i -e 's/localhost/0.0.0.0/g' node_modules/mongo-express/config.default.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daquinoaldo/MCPS.git"
+  },
+  "author": "Aldo D'Aquino",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/daquinoaldo/MCPS/issues"
+  },
+  "homepage": "https://github.com/daquinoaldo/MCPS#readme",
+  "dependencies": {
+    "mongo-express": "latest"
+  }
+}
