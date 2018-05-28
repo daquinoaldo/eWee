@@ -11,7 +11,8 @@ export default class PolicySection extends React.Component {
     this.state = {
       items: props.items,
       select: {name: props.default},
-      pattern: props.pattern ? props.pattern : ''
+      pattern: props.pattern ? props.pattern : '',
+      callback: props.callback
     }
     this.menu = React.createRef();
     this.selection = React.createRef();
@@ -38,7 +39,8 @@ export default class PolicySection extends React.Component {
   }
 
   itemSelected = (item) => {
-    this.setState({ select: item })
+    this.setState({ select: item });
+    if (this.state.callback) this.state.callback(item)
   }
 
   // ----- ----- HTML RENDERERS ----- ----- //
