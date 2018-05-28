@@ -50,7 +50,7 @@ def detect_room_occupancy(room_id, since):
     if not pir_measures:
         return None
     for pir_measure in pir_measures:
-        if pir_measure['pir'] == True:
+        if pir_measure['pir']:
             return True
     return False
 
@@ -91,14 +91,14 @@ def check_and_enforce_policy(room_id, status):
             post_new_action(room_id, 'cooling', False)
             post_new_action(room_id, 'heating', False)
             policy_status['temp'] = True
-    if status['occupied'] == True:
+    if status['occupied']:
         if status['light'] is not None:
             post_new_action(room_id, 'illumination', status['light'] < policy_to_enforce['light'])
             policy_status['light'] = (status['light'] > policy_to_enforce['light'])
         if status['carbon'] is not None:
             post_new_action(room_id, 'fan', status['carbon'] > policy_to_enforce['carbon'])
             policy_status['carbon'] = (status['carbon'] < policy_to_enforce['carbon'])
-    elif status['occupied'] == False:
+    elif not status['occupied']:
         post_new_action(room_id, 'illumination', False)
         post_new_action(room_id, 'fan', False)
         policy_status['light'] = True
