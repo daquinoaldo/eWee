@@ -11,6 +11,7 @@
     "babel-core": "^6.22.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.0",
@@ -22,7 +23,6 @@
     "webpack-dev-server": "^2.4.3"
   },
   "dependencies": {
-    "@material-ui/core": "^1.1.0",
     "@material/button": "^0.35.0",
     "@material/card": "^0.35.0",
     "@material/chips": "^0.35.1",
@@ -39,7 +39,6 @@
     "@material/typography": "^0.35.0",
     "chart.js": "^2.7.2",
     "classnames": "^2.2.5",
-    "material-ui-datetimepicker": "^1.0.7",
     "moment": "^2.22.1",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
