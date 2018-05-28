@@ -5,6 +5,7 @@ import TitleBanner from './TitleBanner/TitleComponent';
 import Analitica from './Analitica/AnaliticaSection';
 import Management from './Management/ManagementSection';
 import Policy from './Policy/PolicySection';
+import Statistic from './Analitica/StatisticSection';
 import Foot from './Foot/FootComponent';
 
 // ----- ----- ROUTING ----- ----- //
@@ -30,6 +31,7 @@ export default class App extends React.Component {
     const currentRoute = this.router.current.history.location.pathname;
     if (currentRoute=='/management') this.ManagementSection.current.update();
     else if (currentRoute=='/policy') this.PolicySection.current.update();
+    else if (currentRoute=='/statistics') {}
     else this.AnaliticaSection.current.update();
   }
 
@@ -47,6 +49,7 @@ export default class App extends React.Component {
             >
               <Route exac path="/management" component={() => <Management ref={this.ManagementSection} />} />
               <Route exac path="/policy" component={() => <Policy ref={this.PolicySection} />} />
+              <Route exac path="/statistics" component={() => <Statistic ref={this.StatisticSection} />} />
               <Route path="/" component={() => <Analitica ref={this.AnaliticaSection} />} />
             </AnimatedSwitch>
           </div>

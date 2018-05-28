@@ -1,6 +1,7 @@
 import React from 'react';
 
 import MaterialSelect from './MaterialSelectComponent';
+import Alert from './AlertComponent';
 
 import * as api from '../remoteApi.js';
 
@@ -117,7 +118,6 @@ export default class PolicySection extends React.Component {
             </div>
           </div>
         </div>
-
       </div>
     )};
 }

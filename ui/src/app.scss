@@ -17,6 +17,7 @@ $mdc-theme-text-color: rgba(0, 0, 0, 0.42);
 @import "@material/fab/mdc-fab";
 @import "@material/chips/mdc-chips";
 @import "@material/select/mdc-select";
+@import "@material/dialog/mdc-dialog";
 
 @import "./MaterialButton/MaterialButton.scss";
 @import "./FloatingAction/FloatingAction.scss";
@@ -32,6 +33,7 @@ $mdc-theme-text-color: rgba(0, 0, 0, 0.42);
 @import "./Management/RoomManagementComponent.scss";
 @import "./Policy/PolicySection.scss";
 @import "./Policy/MaterialSelectComponent.scss";
+@import "./Policy/AlertComponent.scss";
 
 html, body, #app {
   margin: 0;
