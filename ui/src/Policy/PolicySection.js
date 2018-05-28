@@ -44,13 +44,13 @@ export default class PolicySection extends React.Component {
   sendPolicy = () => {
     const roomid = this.pickedRoom.current.getSelected()._id
     const emptyPolicy = {
-      tmp: {
+      temp: {
         min: this.emptyTmpMin.current.getSelected(),
         max: this.emptyTmpMax.current.getSelected()
       }
     }
     const occupiedPolicy = {
-      tmp: {
+      temp: {
         min: this.occTmpMin.current.getSelected(),
         max: this.occTmpMax.current.getSelected()
       },

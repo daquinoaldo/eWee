@@ -1,9 +1,5 @@
 import React from 'react';
 
-import DateTimePicker from 'material-ui-datetimepicker';
-// import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog'
-// import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
-
 import * as utils from './chart.js';
 import * as api from '../remoteApi.js';
 import MaterialSelect from '../Policy/MaterialSelectComponent';
@@ -49,13 +45,15 @@ export default class StisticSection extends React.Component {
   }
 
   render() {
-    const { selectedDate } = new Date();
+    const alignRooms_date = { 'width': '100%', 'justifyContent': 'space-around'}
+    const alignDate = {'transform': 'TranslateY(25%)'};
     return (
       <div className="section-wrapper">
         <div className="mdc-card chart-card-wrapper">
           <div className="mdc-card__actions">
-            <div className="mdc-card__action-buttons">
+            <div style={alignRooms_date} className="mdc-card__action-buttons">
               <MaterialSelect ref={this.pickedRoom} items={this.state.rooms} default='Pick a room' />
+              <input style={alignDate} type="date" />
             </div>
           </div>
           <div>
