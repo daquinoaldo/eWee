@@ -1,11 +1,12 @@
 const UUIDs = {
   "temp": "2A1F",
-  "humidity": "2A1F",
+  "humidity": "2A6F",
   "light": "2A77",
   "pir": "2AC5",
   "door": "0000",
   "carbon": "0001",
-  "blink": "0003"
+  "blink": "0003",
+  "switch": "0002"
 };
 
 /**

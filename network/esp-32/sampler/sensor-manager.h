@@ -11,6 +11,7 @@ class SensorManager {
     int RS_PIN;
     adc1_channel_t* TEMT_PIN;
     int MQ135_PIN;
+    int BUTTON_PIN;
     
   public:
     /*
@@ -22,7 +23,7 @@ class SensorManager {
      * Setup
      * to be called in the setup function of the Arduino sketch
      */
-    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN);
+    void setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN, int BUTTON_PIN);
 
     /*
      * Get movement information from PIR
@@ -61,6 +62,12 @@ class SensorManager {
      * @return ?
      */
     float getMQ135();
+
+    /*
+     * Get information about the button
+     * @return 1 if pressed, else 0
+     */
+    int getButton();
 };
 
 #endif
