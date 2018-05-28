@@ -6,9 +6,9 @@ import time
 import os
 
 # configuration and parameters
-MAIN_LOOP_INTERVAL = 30  # seconds
+MAIN_LOOP_INTERVAL = 15  # seconds
 STALE_MEASURE_DELTA = datetime.timedelta(minutes=5)
-OCCUPANCY_DELTA = datetime.timedelta(minutes=10)
+OCCUPANCY_DELTA = datetime.timedelta(minutes=1)
 
 # database connection
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
