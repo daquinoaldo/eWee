@@ -33,7 +33,7 @@ export default class Head extends React.Component {
     return (
       <div className="banner">
         <div className="vertical-wrapper">
-          <h1>ESTIA<span>v0.1</span></h1>
+          <h1>eWee<span>v1.0</span></h1>
           <nav ref={this.tab_bar} id="my-mdc-tab-bar" className="mdc-tab-bar nav-correction">
             <Link to="/analitica">
               <span className="mdc-tab mdc-tab--active" onClick={() => this.sectionChange('analitica')}>Analitica</span>
