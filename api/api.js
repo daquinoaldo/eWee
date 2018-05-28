@@ -124,7 +124,7 @@ app.get('/sensor/:id/:attribute', (req, res) => {
 // Get the policy from a specific room
 app.get('/policy/:room', (req, res) => {
   Query.getPolicy(req.params.room)
-    .then(measure => res.send(measure))
+    .then(policy => res.send(policy))
     .catch(err => res.status(404).send({error: err}))
 });
 

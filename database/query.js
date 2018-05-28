@@ -472,7 +472,7 @@ class Query {
   static getPolicy(roomID) {
     return new Promise((resolve, reject) => {
       if (!roomID) reject("You must specify the room.");
-      Db.queryLast(collections.policy, {_id: ObjectID(roomID)})
+      Db.queryLast(collections.policy, {room: ObjectID(roomID)})
         .then(policy => resolve(policy))
         .catch(err => {
           console.error(err);
