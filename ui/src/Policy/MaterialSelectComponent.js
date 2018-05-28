@@ -11,6 +11,7 @@ export default class PolicySection extends React.Component {
     this.state = {
       items: props.items,
       select: {name: props.default},
+      def: props.default,
       pattern: props.pattern ? props.pattern : '',
       callback: props.callback
     }
@@ -36,6 +37,11 @@ export default class PolicySection extends React.Component {
 
   getSelected = () => {
     return this.state.select;
+  }
+
+  setSelection = (newSelect) => {
+    if (newSelect == null) newSelect = this.state.def;
+    this.setState({ select: newSelect });
   }
 
   itemSelected = (item) => {

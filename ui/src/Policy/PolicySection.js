@@ -41,6 +41,28 @@ export default class PolicySection extends React.Component {
     this.mdcMenu.open = !this.menu.open;
   }
 
+  loadPolicy = (room) => {
+    const targetUrl = api.url + '/policy/' + room._id;
+    api.get(targetUrl, (res, err) => {
+      if (err) {
+        this.emptyTmpMax.current.setSelection(null);
+        this.emptyTmpMin.current.setSelection(null);
+        this.occTmpMin.current.setSelection(null);
+        this.occTmpMax.current.setSelection(null);
+        this.occCo2Max.current.setSelection(null);
+        this.occLxMin.current.setSelection(null);
+      }
+      else {
+        this.emptyTmpMax.current.setSelection(res.empty.temp.max);
+        this.emptyTmpMin.current.setSelection(res.empty.temp.min);
+        this.occTmpMin.current.setSelection(res.occupied.temp.min);
+        this.occTmpMax.current.setSelection(res.occupied.temp.max);
+        this.occCo2Max.current.setSelection(res.occupied.carbon);
+        this.occLxMin.current.setSelection(res.occupied.light);
+      }
+    });
+  }
+
   sendPolicy = () => {
     const roomid = this.pickedRoom.current.getSelected()._id
     const emptyPolicy = {
@@ -80,7 +102,7 @@ export default class PolicySection extends React.Component {
       <div className="section-wrapper section-center">
         <div className="mdc-card">
           <div className="card__primary">
-            <MaterialSelect ref={this.pickedRoom} items={this.state.rooms} default='Pick a room' />
+            <MaterialSelect ref={this.pickedRoom} items={this.state.rooms} default='Pick a room' callback={this.loadPolicy} />
           </div>
           <div style={sepMargin} className="card__secondary mdc-typography--body2">
             <h3 className="noselect card__subtitle mdc-typography--subtitle2">Empty</h3>
