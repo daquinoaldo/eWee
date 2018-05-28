@@ -2,6 +2,8 @@
 Description=MCPS Raspberry master
 Requires=mongodb.service
 After=mongodb.service
+Requires=bluetooth.target
+After=bluetooth.target
 
 [Service]
 Type=simple
