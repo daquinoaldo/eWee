@@ -62,10 +62,8 @@ export default class PolicySection extends React.Component {
       occupied: occupiedPolicy
     }
     const targetUrl = api.url + '/policy/' + roomid
-    api.send(api.url, 'POST', policy, (res, error) => {
-      if (!error)
-        this.setState({ unboundDevices: res.unboundDevices, rooms: res.rooms });
-      else console.error(error);
+    api.send(targetUrl, 'POST', policy, (res, error) => {
+      if (error) console.error(error);
     });
   }
 

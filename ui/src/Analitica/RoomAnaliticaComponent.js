@@ -28,7 +28,6 @@ export default class AnaliticaSection extends React.Component {
   update = () => {
     api.get(this.state.url, (res, err) => {
       if (!err) {
-        console.log(res);
         // Temperature
         this.temperature.current.updateGraph(res.temp);
         // Humidity
