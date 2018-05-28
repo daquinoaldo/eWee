@@ -285,14 +285,14 @@ function getExecutionPromise (peripheral, characteristicTable, timeout) {
         try {
           // @note: the order in which the actions are executed may be important
           await getWritePromise(characteristic, newValue, timeout);
-          pendingActions.splice(pendingActions.indexOf(todo), 1);
+          pendingActions.splice(pendingActions.indexOf(actualAction), 1);
         } catch (e) {
-          errorsArray.push(e + JSON.stringify(todo));
+          errorsArray.push(e + JSON.stringify(actualAction));
         }
       } // if the characteristic exist, then need to set the actuator
       else {
-        errorsArray.push('Characteristic to trigger not found: ' + JSON.stringify(todo));
-        pendingActions.splice(pendingActions.indexOf(todo), 1);
+        errorsArray.push('Characteristic to trigger not found: ' + JSON.stringify(actualAction));
+        pendingActions.splice(pendingActions.indexOf(actualAction), 1);
       } // Otherwise we can delete the pending action
     }
     if (errorsArray.length>0) reject(errorsArray);
