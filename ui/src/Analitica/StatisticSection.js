@@ -1,7 +1,8 @@
-import React, { PureComponent } from 'react';
-// import MomentUtils from 'material-ui-pickers/utils/moment-utils';
-// import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-// import TimePicker from 'material-ui-pickers/TimePicker';
+import React from 'react';
+
+import DateTimePicker from 'material-ui-datetimepicker';
+// import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog'
+// import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
 
 import * as utils from './chart.js';
 import * as api from '../remoteApi.js';
@@ -55,7 +56,6 @@ export default class StisticSection extends React.Component {
           <div className="mdc-card__actions">
             <div className="mdc-card__action-buttons">
               <MaterialSelect ref={this.pickedRoom} items={this.state.rooms} default='Pick a room' />
-
             </div>
           </div>
           <div>
