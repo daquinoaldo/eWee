@@ -12,12 +12,14 @@ SensorManager::SensorManager() { }
  * Setup
  * to be called in the setup function of the Arduino sketch
  */
-void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN) {
+void SensorManager::setup(
+    int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN, int BUTTON_PIN) {
   this->PIR_PIN = PIR_PIN;
   this->DHT_PIN = DHT_PIN;
   this->RS_PIN = RS_PIN;
   this->TEMT_PIN = TEMT_PIN;
   this->MQ135_PIN = MQ135_PIN;
+  this->BUTTON_PIN = BUTTON_PIN;
   if (PIR_PIN >= 0) pinMode(PIR_PIN, INPUT);
   if (DHT_PIN >= 0) {
     pinMode(DHT_PIN, INPUT);
@@ -30,6 +32,7 @@ void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* 
     adc1_config_channel_atten(*TEMT_PIN, ADC_ATTEN_DB_11);  //ADC_ATTEN_DB_11 = 0-3,6V
   }
   if (MQ135_PIN >= 0) pinMode(MQ135_PIN, INPUT);
+  if (BUTTON_PIN >= 0) pinMode(BUTTON_PIN, INPUT);
 }
 
 /*
@@ -123,4 +126,19 @@ float SensorManager::getMQ135() {
   Serial.print("MQ135: ");
   Serial.println(mq);
   return mq;
+}
+
+/*
+ * Get information about the button
+ * @return 1 if pressed, else 0
+ */
+int SensorManager::getButton() {
+  if (BUTTON_PIN < 0) {
+    Serial.println("E: BUTTON_PIN not defined.");
+    return -1;
+  }
+  int button = digitalRead(BUTTON_PIN);
+  Serial.print("Button: ");
+  Serial.println(button);
+  return button;
 }

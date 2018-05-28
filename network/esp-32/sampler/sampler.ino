@@ -23,6 +23,8 @@
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
 #define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
 #define BLINKING_UUID        (BLEUUID((uint16_t)0x0003)).toString() //TODO: ???
+#define SWITCH_UUID          (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
+#define BUTTON_UUID          (BLEUUID((uint16_t)0x0004)).toString() //TODO: ???
 
 #define LED_BUILTIN 2
 
@@ -30,12 +32,14 @@
 // ----- ----- PIN CONFIGURATIONS ----- ----- //
 // Do NOT use pin 2
 #define PIR_PIN 27
-//#define DHT_PIN 14
+#define DHT_PIN 14
 #define RS_PIN 13
-//#define TEMT6000_PIN ADC1_CHANNEL_0
+#define TEMT6000_PIN ADC1_CHANNEL_0
+#define BUTTON_PIN 26
+#define LED_PIN 25
 //#define MQ135_PIN -1
 
-#define DEVICE_NAME "kitchen"
+#define DEVICE_NAME "sampler"
 
 
 // ----- ----- GLOBALS ----- ----- //
@@ -63,6 +67,9 @@ adc1_channel_t temt_p = TEMT6000_PIN;
 #ifndef MQ135_PIN
 #define MQ135_PIN -1
 #endif
+#ifndef BUTTON_PIN
+#define BUTTON_PIN -1
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -84,14 +91,16 @@ void setup() {
   if (RS_PIN >= 0) ble.NewCharacteristic(DOOR_UUID, BLECharacteristic::PROPERTY_READ);
   if (TEMT_PIN != nullptr) ble.NewCharacteristic(ILLUMINATION_UUID, BLECharacteristic::PROPERTY_READ);
   if (MQ135_PIN >= 0) ble.NewCharacteristic(AIR_UUID, BLECharacteristic::PROPERTY_READ);
+  if (BUTTON_PIN >= 0) ble.NewCharacteristic(BUTTON_UUID, BLECharacteristic::PROPERTY_READ);
   ble.NewCharacteristic(BLINKING_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
   // Starting the server
   ble.ServiceStart();
 
   // Setup the sensors
-  sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN);
-  // Setup builtin led
+  sensors.setup(PIR_PIN, DHT_PIN, RS_PIN, TEMT_PIN, MQ135_PIN, BUTTON_PIN);
+  // Setup leds
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
 }
 
 
@@ -104,11 +113,12 @@ void loop() {
   if (RS_PIN >= 0) ble.SetCharacteristic(DOOR_UUID, int2string(sensors.getReedSwitch()));
   if (TEMT_PIN != nullptr) ble.SetCharacteristic(ILLUMINATION_UUID, float2string(sensors.getLight()));
   if (MQ135_PIN >= 0) ble.SetCharacteristic(AIR_UUID, float2string(sensors.getMQ135()));
+  if (BUTTON_PIN >= 0) ble.SetCharacteristic(BUTTON_UUID, int2string(sensors.getButton()));
 
   // Blink if motion detected:
   if (PIR_PIN >= 0 && !isInternalBlinking) {
-    if (sensors.getPIR() > 0) digitalWrite(LED_BUILTIN, HIGH);
-    else digitalWrite(LED_BUILTIN, LOW);
+    if (sensors.getPIR() > 0) digitalWrite(LED_PIN, HIGH);
+    else digitalWrite(LED_PIN, LOW);
   }
   
   // Blinking logic
