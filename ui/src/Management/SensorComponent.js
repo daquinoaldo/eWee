@@ -5,7 +5,7 @@ import {MDCRipple} from '@material/ripple';
 
 import * as api from '../remoteApi.js';
 
-const INACTIVE_TIMEOUT = 1000 * 60 * 60 * 60
+const INACTIVE_TIMEOUT = 15000 // * 60 * 60 * 60
 
 export default class SensorChip extends React.Component {
   constructor(props) {

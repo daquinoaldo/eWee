@@ -41,13 +41,14 @@ export default class PolicySection extends React.Component {
   }
 
   sendPolicy = () => {
-    const empty = {
+    const roomid = this.pickedRoom.current.getSelected()._id
+    const emptyPolicy = {
       tmp: {
         min: this.emptyTmpMin.current.getSelected(),
         max: this.emptyTmpMax.current.getSelected()
       }
     }
-    const occupied = {
+    const occupiedPolicy = {
       tmp: {
         min: this.occTmpMin.current.getSelected(),
         max: this.occTmpMax.current.getSelected()
@@ -55,8 +56,17 @@ export default class PolicySection extends React.Component {
       light: this.occLxMin.current.getSelected(),
       carbon: this.occCo2Max.current.getSelected()
     }
-    console.log(empty);
-    console.log(occupied);
+    const policy = {
+      room: roomid,
+      empty: emptyPolicy,
+      occupied: occupiedPolicy
+    }
+    const targetUrl = api.url + '/policy/' + roomid
+    api.send(api.url, 'POST', policy, (res, error) => {
+      if (!error)
+        this.setState({ unboundDevices: res.unboundDevices, rooms: res.rooms });
+      else console.error(error);
+    });
   }
 
 
