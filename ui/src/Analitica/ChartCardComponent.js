@@ -26,7 +26,7 @@ export default class ChartCard extends React.Component {
     this.cleanEnvir();
 
     canvasCtx = this.canvas.current.getContext('2d');
-    this.chart = utils.createChart(canvasCtx, 10, {min:15, max:45});
+    this.chart = utils.createChart(canvasCtx, '°C', 10, {min:15, max:45}, null, '#f44336');
     this._mount = true;
   }
 

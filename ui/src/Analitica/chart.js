@@ -41,7 +41,7 @@ let nZeros = (n) => { return Array.from(new Array(n), (x,i) => 0); }
  * @param bounds: an object containing the mimum and maximum expected values
  *   the object has to be in the format: {min: minValue, max: maxValue}
  */
-export function createChart(ctx, queueSize, bounds, data) {
+export function createChart(ctx, l, queueSize, bounds, data, color) {
   const gdata = data ? data : nZeros(queueSize);
   let chartConfig = newChartConfig();
 
@@ -49,8 +49,8 @@ export function createChart(ctx, queueSize, bounds, data) {
   chartConfig.data = {
     labels: nLinear(queueSize),
     datasets: [{
-      label: '°C',
-      borderColor: '#1565c0',
+      label: l ? l : 'unknown',
+      borderColor: color ? color : '#1565c0',
       data: gdata,
       fill: false,
     }
