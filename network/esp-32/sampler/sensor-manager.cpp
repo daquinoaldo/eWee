@@ -103,11 +103,12 @@ float SensorManager::getLight() {
     light = light / 1023.0;
     light = pow(light, 2.0);*/
     int raw = adc1_get_raw(*TEMT_PIN);
-    float volts = raw * 3.0 / 1024.0;
+    float volts = raw * 3.3 / 1024.0;
     float amps = volts / 10000.0;  // across 10,000 Ohms
     float microamps = amps * 1000000;
-    float lux = microamps * 2.0;
-    float light = lux;
+    /*float lux = microamps * 2.0;
+    float light = lux;*/
+    float light = exp(1.2 * log(microamps));
     Serial.print("Light: ");
     Serial.println(light);
     return light;
