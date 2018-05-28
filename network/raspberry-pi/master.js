@@ -327,7 +327,7 @@ function translator (obj) {
   newObj.timestamp = obj.timestamp;
   for (const uuid in obj) {
     const property = UUID.UUIDToProperty(uuid);
-    if (property) newObj[property] = +obj[uuid];
+    if (property) newObj[property] = isNaN(+obj[uuid]) ? obj[uuid] : +obj[uuid];
   }
   return newObj;
 }
