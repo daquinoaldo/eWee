@@ -3,10 +3,11 @@ const UUIDs = {
   "humidity": "2A6F",
   "light": "2A77",
   "pir": "2AC5",
-  "door": "0000",
-  "carbon": "0001",
-  "blink": "0003",
-  "illumination": "0002"
+  "door": "5001",
+  "carbon": "5002",
+  "button": "5003",
+  "blink": "A000",
+  "illumination": "A001"
 };
 
 /**

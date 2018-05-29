@@ -12,8 +12,7 @@ SensorManager::SensorManager() { }
  * Setup
  * to be called in the setup function of the Arduino sketch
  */
-void SensorManager::setup(
-    int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN, int BUTTON_PIN) {
+void SensorManager::setup(int PIR_PIN, int DHT_PIN, int RS_PIN, adc1_channel_t* TEMT_PIN, int MQ135_PIN, int BUTTON_PIN) {
   this->PIR_PIN = PIR_PIN;
   this->DHT_PIN = DHT_PIN;
   this->RS_PIN = RS_PIN;
@@ -94,24 +93,18 @@ int SensorManager::getReedSwitch() {
  * @return a float value with the light in percentage
  */
 float SensorManager::getLight() {
-    if (TEMT_PIN == nullptr) {
-      Serial.println("TEMT_PIN not defined");
-      return -1;
-    }
-    /* value from 0 to 1
-    float light = adc1_get_raw(*TEMT_PIN);
-    light = light / 1023.0;
-    light = pow(light, 2.0);*/
-    int raw = adc1_get_raw(*TEMT_PIN);
-    float volts = raw * 3.3 / 1024.0;
-    float amps = volts / 10000.0;  // across 10,000 Ohms
-    float microamps = amps * 1000000;
-    /*float lux = microamps * 2.0;
-    float light = lux;*/
-    float light = exp(1.2 * log(microamps));
-    Serial.print("Light: ");
-    Serial.println(light);
-    return light;
+  if (TEMT_PIN == nullptr) {
+    Serial.println("TEMT_PIN not defined");
+    return -1;
+  }
+  int raw = adc1_get_raw(*TEMT_PIN);
+  float volts = raw * 3.3 / 1024.0;
+  float amps = volts / 10000.0;  // across 10,000 Ohms
+  float microamps = amps * 1000000;
+  float light = exp(1.2 * log(microamps));
+  Serial.print("Light: ");
+  Serial.println(light);
+  return light;
 }
 
 /*

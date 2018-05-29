@@ -13,18 +13,18 @@
 
 // ----- ----- SAMPLER UUIDs ----- ----- //
 #define SENSING_SERVICE_UUID (BLEUUID((uint16_t)0x181A)).toString()
-//#define LAST_MOD_UUID        (BLEUUID((uint16_t)0x2AC2)).toString()
-//#define MASTER_ID_UUID       (BLEUUID((uint16_t)0x2AC3)).toString()
+
 // Sensors
-#define MOVEMENT_UUID        (BLEUUID((uint16_t)0x2AC5)).toString() //TODO: Object Action Control Point?
+#define MOVEMENT_UUID        (BLEUUID((uint16_t)0x2AC5)).toString() //Object Action Control Point (PIR)
 #define TEMP_UUID            (BLEUUID((uint16_t)0x2A1F)).toString() //Temperature Celsius
 #define HUMID_UUID           (BLEUUID((uint16_t)0x2A6F)).toString() //Humidity
-#define DOOR_UUID            (BLEUUID((uint16_t)0x0000)).toString() //TODO: ???
+#define DOOR_UUID            (BLEUUID((uint16_t)0x5001)).toString() //Custom: door
 #define ILLUMINATION_UUID    (BLEUUID((uint16_t)0x2A77)).toString() //Irradiance
-#define AIR_UUID             (BLEUUID((uint16_t)0x0001)).toString() //TODO: ???
-#define BLINKING_UUID        (BLEUUID((uint16_t)0x0003)).toString() //TODO: ???
-#define SWITCH_UUID          (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
-#define BUTTON_UUID          (BLEUUID((uint16_t)0x0004)).toString() //TODO: ???
+#define AIR_UUID             (BLEUUID((uint16_t)0x5002)).toString() //Custom: carbon (Air quality)
+#define BUTTON_UUID          (BLEUUID((uint16_t)0x5003)).toString() //Custom: button
+
+// Actuators
+#define BLINKING_UUID        (BLEUUID((uint16_t)0xA000)).toString() //Custom: (internal) led blinking
 
 #define LED_BUILTIN 2
 
@@ -73,12 +73,9 @@ adc1_channel_t temt_p = TEMT6000_PIN;
 
 void setup() {
   Serial.begin(115200);
-  srand (time(NULL));
 
   // Setting up ble device UUID
-  char uuid[5];
-  rndStr(uuid, 5);
-  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);//std::string(uuid);
+  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);
 
   // BLE device initialization
   BLEDevice::init(samplerUUID);
@@ -152,25 +149,9 @@ void blinktask(void* args) {
 }
 
 
+// ----- ----- AUXILIAR FUNCTIONS ----- ----- //
+// Converts values into strings
 
-// ----- ----- MISCELLANEOUS ----- ----- //
-/*
- * Generates a random string of len characters and stores it in s
- */
-void rndStr(char *s, const int len) {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < len; ++i) {
-        s[i] = alphanum[random(9999) % (sizeof(alphanum) - 1)];
-    }
-    s[len] = 0;
-}
-
-/*
- * Converts values into strings
- */
 std::string int2string(int tValue) {
   std::ostringstream convert;
   convert << tValue;

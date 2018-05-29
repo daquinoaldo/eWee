@@ -11,8 +11,10 @@
 
 // ----- ----- SAMPLER UUIDs ----- ----- //
 #define SENSING_SERVICE_UUID (BLEUUID((uint16_t)0x181A)).toString()
-#define BLINKING_UUID        (BLEUUID((uint16_t)0x0003)).toString() //TODO: ???
-#define SWITCH_UUID          (BLEUUID((uint16_t)0x0002)).toString() //TODO: ???
+
+// Actuators
+#define BLINKING_UUID        (BLEUUID((uint16_t)0xA000)).toString() //Custom: (internal) led blinking
+#define SWITCH_UUID          (BLEUUID((uint16_t)0xA001)).toString() //Custom: relay
 
 #define LED_BUILTIN 2
 
@@ -36,12 +38,9 @@ bool isInternalBlinking = false;
 
 void setup() {
   Serial.begin(115200);
-  srand (time(NULL));
 
-  // Setting up ble device UUID
-  char uuid[5];
-  rndStr(uuid, 5);
-  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);//std::string(uuid);
+  // Device name
+  std::string samplerUUID = "sampler_" + std::string(DEVICE_NAME);
 
   // BLE device initialization
   BLEDevice::init(samplerUUID);
@@ -107,24 +106,9 @@ void blinktask(void* args) {
 
 
 
-// ----- ----- MISCELLANEOUS ----- ----- //
-/*
- * Generates a random string of len characters and stores it in s
- */
-void rndStr(char *s, const int len) {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < len; ++i) {
-        s[i] = alphanum[random(9999) % (sizeof(alphanum) - 1)];
-    }
-    s[len] = 0;
-}
+// ----- ----- AUXILIAR FUNCTIONS ----- ----- //
+// Converts values into strings
 
-/*
- * Converts values into strings
- */
 std::string int2string(int tValue) {
   std::ostringstream convert;
   convert << tValue;
