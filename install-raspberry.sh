@@ -15,3 +15,5 @@ cd
 rm -rf temp-download
 # Clone the repository
 git clone https://github.com/daquinoaldo/MCPS.git
+cd MCPS
+bash configure-raspberry.sh
