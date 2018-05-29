@@ -1,8 +1,4 @@
-// export const url = "http://localhost:3000";
-
-//TODO: DELETE IN PRODUCTION
-// uncomment this line (and comment the previous one) to use remote api from localhost
-export const url = process.env.API || "https://api.p1.aldodaquino.com";
+export const url = process.env.API || "http://192.168.1.42:3000";
 
 export function send (url, method, data, callback) {
   const options = { method: method,
