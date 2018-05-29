@@ -98,7 +98,7 @@ class Query {
       if (!room) reject("Policy must refer to a room.");
       if (!policy) reject("You must specify a policy.");
       if(typeof policy.room !== typeof new ObjectID()) policy.room = ObjectID(policy.room);
-      Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(res => resolve(true));
+      Db.updateWithQuery(collections.policy, {room: policy.room}, policy).then(() => resolve(true));
     });
   }
 
