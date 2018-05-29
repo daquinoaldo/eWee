@@ -390,7 +390,7 @@ class Query {
           let cLight = 0;
           for (let i = 0; i < statuses.length; i++) {
             const status = statuses[i];
-            home.timestamp = Math.max(home.timestamp, status.timestamp);  //TODO
+            home.timestamp = maxDate(home.timestamp, status.timestamp);
             if (status.occupied) home.occupied = true;
             if (status.temp) {
               home.temp += status.temp;
@@ -531,3 +531,13 @@ class Query {
 module.exports = {
   Query : Query
 };
+
+/* AUXILIAR FUNCTION */
+function maxDate(date1, date2) {
+  if(!date1 && !date2) return null;
+  if(!date1 && date2) return date2;
+  if(!date2 && date1) return date1;
+  if(typeof date1 !== typeof new Date()) date1 = new Date(date1);
+  if(typeof date2 !== typeof new Date()) date2 = new Date(date2);
+  return date2 > date1 ? date2 : date1;
+}
