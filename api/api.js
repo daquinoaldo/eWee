@@ -48,8 +48,6 @@ policy:
 POST
 actuators:
 - actuator/<id>/<attribute=value>
-TODO: room/<id>/<attribute=value>
-TODO: home/<attribute=value>
 
 rooms and binding:
 - home/room/<name=value>
@@ -140,7 +138,6 @@ app.post('/actuator/:id/:attribute',  (req, res) => {
   Query.setKey(req.params.id, req.params.attribute, req.body.value)
     .then(ok => res.send(ok))
     .catch(err => res.status(403).send({error: err}))
-    //TODO: check that the actuator exists?
 });
 
 // Create new room, pass the room name in the body as a JSON obj: {"name": "the_room_name"}
