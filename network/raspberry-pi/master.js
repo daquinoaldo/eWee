@@ -256,7 +256,7 @@ function getSamplePromise (peripheral, characteristicTable, timeout) {
     // Iterating over all the characteristics
     for (let characteristic of characteristicTable) {
       try {
-        const uuid_16 = characteristic.uuid.toString().substring(4, 8);
+        //const uuid_16 = characteristic.uuid.toString().substring(4, 8);
         const res = await getReadPromise(characteristic, timeout);
         peripheralData[res.uuid_16] = res.data; // Updating sample data
       } catch (e) {
@@ -278,9 +278,9 @@ function getExecutionPromise (peripheral, characteristicTable, timeout) {
 
   return new Promise(async function (resolve, reject) {
     // Finding actions to execute
-    const todoIndex = pendingActions.findIndex((el) => { return el.device === peripheral.address });
+    let todoIndex = pendingActions.findIndex((el) => { return el.device === peripheral.address });
     // Iterating till there is something to do
-    while (todoIndex != -1) {
+    while (todoIndex !== -1) {
       const actualAction = pendingActions[todoIndex];
       pendingActions.slice(todoIndex, 1);
       // Searching for the characteristic in the device
@@ -308,7 +308,7 @@ function getExecutionPromise (peripheral, characteristicTable, timeout) {
       } // Otherwise we can delete the pending action
 
       // Taking next action
-      const todoIndex = pendingActions.findIndex((el) => { return el.device === peripheral.address });
+      todoIndex = pendingActions.findIndex((el) => { return el.device === peripheral.address });
     }
     // If some error occurred we have to reject
     if (errorsArray.length>0) reject(errorsArray);
@@ -356,7 +356,7 @@ function reverseTranslator (obj) {
  *   this function has to return true every time
  */
 function isSampler (peripheral) {
-  /* ** UnCOMMENT FOR FULL COMPADIBILITY  ** */
+  /* ** UNCOMMENT FOR FULL COMPATIBILITY  ** */
   // return true;
 
   // @note: it may happen that name is correct but the mac address in unknown
