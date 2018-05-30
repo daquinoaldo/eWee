@@ -1,7 +1,8 @@
 # eWee
 _Ensuring Wellness with Energy Efficiency_
   
-For more information check our [introduction file](introducing-eWee.pdf)
+A group project for the Mobile and Cyber-Physical Systems course at University of Pisa.  
+For more information check our [introduction file](introducing-eWee.pdf) or the [poster](poster.pdf).
 ## Installation
 ### On Raspberry Pi
 `cd /opt`  
