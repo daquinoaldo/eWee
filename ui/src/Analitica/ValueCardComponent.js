@@ -9,7 +9,7 @@ export default class ValueCard extends React.Component {
     this.state = {
       data: '',
       title: this.props.descriptor.title,
-    }
+    };
     this._mount = false;
   }
 
@@ -24,7 +24,7 @@ export default class ValueCard extends React.Component {
   updateValue = (v) => {
     if (!this._mount) return;
     this.setState({ data: v });
-  }
+  };
 
   render() {
     return (

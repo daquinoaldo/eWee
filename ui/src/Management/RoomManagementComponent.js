@@ -17,7 +17,7 @@ export default class RoomManagement extends React.Component {
       roomid: props.roomid,
       unbounded: [122, 333],
       available: []
-    }
+    };
     this.textfield = React.createRef();
     this.saveButton = React.createRef();
     this.editButton = React.createRef();
@@ -53,12 +53,12 @@ export default class RoomManagement extends React.Component {
       if (!error)
         this.setState({ available: res.things ? res.things : [] });
     });
-  }
+  };
 
   update = () => {
     // console.log(this.state.roomname);
     this.getAvailable();
-  }
+  };
 
 
   // ----- ----- UPDATES ----- ----- //
@@ -68,7 +68,7 @@ export default class RoomManagement extends React.Component {
       if (!error)
         this.setState({ available: res.things ? res.things : [] });
     });
-  }
+  };
 
   getUnbounded = () => {
     api.get(api.url+'/home', (res, error) => {
@@ -76,21 +76,21 @@ export default class RoomManagement extends React.Component {
         this.setState({ unbounded: res.unboundDevices });
       else console.log(error);
     });
-  }
+  };
 
 
   // ----- ----- USER ACTIONS ----- ----- //
   openMenu = () => {
     this.mdcMenu.open = !this.menu.open;
-  }
+  };
 
   bind = (mac) => {
-    const targetUrl = api.url + '/room/' + this.state.roomid + '/device/' + mac
+    const targetUrl = api.url + '/room/' + this.state.roomid + '/device/' + mac;
     api.send(targetUrl, 'POST', null, (res, error) => {
       if (error) console.error(error);
       console.log(res);
     });
-  }
+  };
 
   editMode = () => {
     let isEditing = !this.state.editmode;
@@ -101,7 +101,7 @@ export default class RoomManagement extends React.Component {
     this.deleteButton.current.disabled = !isEditing;
     this.iconToggle.on = isEditing;
     if (!isEditing) this.mdcTextfield.value = '';
-  }
+  };
 
   save = () => {
     // Taking input value and discarding if there are no changes
@@ -109,7 +109,7 @@ export default class RoomManagement extends React.Component {
     if (actualValue=='' || actualValue==this.state.roomname) {
       this.editMode();
       return;
-    };
+    }
     // Updating room name and resetting to default mode
     this.setState({roomname: this.mdcTextfield.value}, () => this.editMode());
     // Sending the update
@@ -118,7 +118,7 @@ export default class RoomManagement extends React.Component {
       if (error) console.error(error);
       console.log(res);
     });
-  }
+  };
 
   // ----- ----- HTML RENDERERS ----- ----- //
   sensorsHtml = () => {
@@ -133,7 +133,7 @@ export default class RoomManagement extends React.Component {
       );
     }
     return shtml;
-  }
+  };
 
   unmboundMenuHtml = () => {
     // Preparing the available sensors
@@ -148,7 +148,7 @@ export default class RoomManagement extends React.Component {
       );
     }
     return shtml;
-  }
+  };
 
 
   render() {

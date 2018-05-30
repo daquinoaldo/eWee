@@ -11,7 +11,7 @@ export default class PolicySection extends React.Component {
 
     this.state = {
       rooms: [],
-    }
+    };
     this.menu = React.createRef();
     this.selection = React.createRef();
     this.pickedRoom = React.createRef();
@@ -24,7 +24,7 @@ export default class PolicySection extends React.Component {
   // ----- ----- LIFECYCLE HOOKS ----- ----- //
   update = () => {
 
-  }
+  };
 
   componentDidMount() {
     const targetUrl = api.url+'/home';
@@ -39,7 +39,7 @@ export default class PolicySection extends React.Component {
   // ----- ----- USER ACTIONS ----- ----- //
   openMenu = () => {
     this.mdcMenu.open = !this.menu.open;
-  }
+  };
 
   loadPolicy = (room) => {
     const targetUrl = api.url + '/policy/' + room._id;
@@ -61,16 +61,16 @@ export default class PolicySection extends React.Component {
         this.occLxMin.current.setSelection(res.occupied.light);
       }
     });
-  }
+  };
 
   sendPolicy = () => {
-    const roomid = this.pickedRoom.current.getSelected()._id
+    const roomid = this.pickedRoom.current.getSelected()._id;
     const emptyPolicy = {
       temp: {
         min: this.emptyTmpMin.current.getSelected(),
         max: this.emptyTmpMax.current.getSelected()
       }
-    }
+    };
     const occupiedPolicy = {
       temp: {
         min: this.occTmpMin.current.getSelected(),
@@ -78,23 +78,23 @@ export default class PolicySection extends React.Component {
       },
       light: this.occLxMin.current.getSelected(),
       carbon: this.occCo2Max.current.getSelected()
-    }
+    };
     const policy = {
       room: roomid,
       empty: emptyPolicy,
       occupied: occupiedPolicy
-    }
-    const targetUrl = api.url + '/policy/' + roomid
+    };
+    const targetUrl = api.url + '/policy/' + roomid;
     api.send(targetUrl, 'POST', policy, (res, error) => {
       if (error) console.error(error);
     });
-  }
+  };
 
 
   render() {
     const sepMargin = {'marginBottom': '17px'};
 
-    let nLinearFromk = (k, n, step) => { return Array.from(new Array(n), (x,i) => k+(i*(step))); }
+    let nLinearFromk = (k, n, step) => { return Array.from(new Array(n), (x,i) => k+(i*(step))); };
     const temptRange = nLinearFromk(10, 30, 0.5);
     const illRange = nLinearFromk(0, 11, 100);
     const co2Range = nLinearFromk(100, 11, 100);

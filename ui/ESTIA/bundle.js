@@ -2706,7 +2706,7 @@ function shouldUseNative() {
 		// Detect buggy property enumeration order in older V8 versions.
 
 		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc'); // eslint-disable-line no-new-wrappers
+		var test1 = String('abc'); // eslint-disable-line no-new-wrappers
 		test1[5] = 'de';
 		if (Object.getOwnPropertyNames(test1)[0] === '5') {
 			return false;
@@ -4971,7 +4971,7 @@ var _initialiseProps = function _initialiseProps() {
         var lastUpdate = new Date(res.timestamp);
         var diff = now - lastUpdate;
         if (diff > INACTIVE_TIMEOUT) _this2.setState({ active: false });
-      };
+      }
     });
   };
 
@@ -5000,7 +5000,7 @@ var _initialiseProps = function _initialiseProps() {
     var blink = function blink() {
       if (_this2.state.icon == 'clear') {
         return null;
-      };
+      }
       var newmod = _this2.state.icon == 'blinking' ? 'standard' : 'blinking';
       _this2.setState({ icon: newmod });
       if (i < 5) {
@@ -8122,7 +8122,7 @@ function Ka(a, b) {
 }var Na = { injectEventPluginOrder: wa, injectEventPluginsByName: xa };
 function Oa(a, b) {
   var c = a.stateNode;if (!c) return null;var d = Da(c);if (!d) return null;c = d[b];a: switch (b) {case "onClick":case "onClickCapture":case "onDoubleClick":case "onDoubleClickCapture":case "onMouseDown":case "onMouseDownCapture":case "onMouseMove":case "onMouseMoveCapture":case "onMouseUp":case "onMouseUpCapture":
-      (d = !d.disabled) || (a = a.type, d = !("button" === a || "input" === a || "select" === a || "textarea" === a));a = !d;break a;default:
+      (d = !d.disabled) || (a = a.type, d = !("button" === a || "input" === a || "select" === a || "textarea" === a));a = !d;break;default:
       a = !1;}if (a) return null;c && "function" !== typeof c ? D("231", b, typeof c === "undefined" ? "undefined" : _typeof(c)) : void 0;
   return c;
 }function Pa(a, b) {
@@ -8387,7 +8387,7 @@ function Bc(a) {
   var b = "";do {
     a: switch (a.tag) {case 0:case 1:case 2:case 5:
         var c = a._debugOwner,
-            d = a._debugSource;var e = Ac(a);var f = null;c && (f = Ac(c));c = d;e = "\n    in " + (e || "Unknown") + (c ? " (at " + c.fileName.replace(/^.*[\\\/]/, "") + ":" + c.lineNumber + ")" : f ? " (created by " + f + ")" : "");break a;default:
+            d = a._debugSource;var e = Ac(a);var f = null;c && (f = Ac(c));c = d;e = "\n    in " + (e || "Unknown") + (c ? " (at " + c.fileName.replace(/^.*[\\\/]/, "") + ":" + c.lineNumber + ")" : f ? " (created by " + f + ")" : "");break;default:
         e = "";}b += e;a = a["return"];
   } while (a);return b;
 }
@@ -9493,7 +9493,7 @@ function lf(a) {
           d = a.sibling;if (0 === (a.effectTag & 512)) {
         b = Cb(b, a, Z);var e = a;if (1073741823 === Z || 1073741823 !== e.expirationTime) {
           b: switch (e.tag) {case 3:case 2:
-              var f = e.updateQueue;f = null === f ? 0 : f.expirationTime;break b;default:
+              var f = e.updateQueue;f = null === f ? 0 : f.expirationTime;break;default:
               f = 0;}for (var g = e.child; null !== g;) {
             0 !== g.expirationTime && (0 === f || f > g.expirationTime) && (f = g.expirationTime), g = g.sibling;
           }e.expirationTime = f;
@@ -12909,11 +12909,11 @@ module.exports = function () {
       return;
     }
     invariant(false, 'Calling PropTypes validators directly is not supported by the `prop-types` package. ' + 'Use PropTypes.checkPropTypes() to call them. ' + 'Read more at http://fb.me/use-check-prop-types');
-  };
+  }
   shim.isRequired = shim;
   function getShim() {
     return shim;
-  };
+  }
   // Important!
   // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
   var ReactPropTypes = {
@@ -17084,7 +17084,7 @@ var RoomManagement = function (_React$Component) {
       if (actualValue == '' || actualValue == _this.state.roomname) {
         _this.editMode();
         return;
-      };
+      }
       // Updating room name and resetting to default mode
       _this.setState({ roomname: _this.mdcTextfield.value }, function () {
         return _this.editMode();
@@ -22650,8 +22650,8 @@ var MDCDialogFoundation = function (_MDCFoundation) {
         this.adapter_.removeClass(MDCDialogFoundation.cssClasses.ANIMATING);
         if (this.isOpen_) {
           this.adapter_.trapFocusOnSurface();
-        };
-      };
+        }
+      }
     }
   }, {
     key: 'disableScroll_',

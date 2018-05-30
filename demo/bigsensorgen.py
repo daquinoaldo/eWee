@@ -12,7 +12,7 @@ GENERATION_LOOP_INTERVAL = datetime.timedelta(seconds=20)
 GENERATION_TIMESPAN = datetime.timedelta(days=1)
 PIR_THRESHOLD = 0.8
 
-# max deviations from trends (absoltue values)
+# max deviations from trends (absolute values)
 NOISE = {
     'temp': 0.5,
     'humidity': 10,

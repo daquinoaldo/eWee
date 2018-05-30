@@ -5,10 +5,10 @@ import ValueCard from './ValueCardComponent';
 
 // import * as api from './apiInterface.js';
 
-var tempt = {title: 'Temperature'}
-var humidity = {title: 'Humidity'}
-var light = {title: 'Light'}
-var occupied = {title: 'Occupied'}
+var tempt = {title: 'Temperature'};
+var humidity = {title: 'Humidity'};
+var light = {title: 'Light'};
+var occupied = {title: 'Occupied'};
 
 import * as api from '../remoteApi.js';
 
@@ -17,7 +17,7 @@ export default class AnaliticaSection extends React.Component {
     super(props);
     this.state = {
       url: props.url
-    }
+    };
 
     this.temperature = React.createRef();
     this.humidity = React.createRef();
@@ -42,7 +42,7 @@ export default class AnaliticaSection extends React.Component {
       }
       else console.error(err);
     })
-  }
+  };
 
   render() {
     return (

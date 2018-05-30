@@ -15,10 +15,12 @@ UNBOUND_STALE_MEASURES_TIME_DELTA = datetime.timedelta(hours=1)
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
 
+
 def get_room_list():
     """Returns the list of room IDs.
     """
     return [room['_id'] for room in db.rooms.find({})]
+
 
 def update_hourly_averages():
     """Updates the hourly averages of room status for all the current rooms.
@@ -78,6 +80,7 @@ def update_hourly_averages():
     except pymongo.errors.InvalidOperation:
         pass
 
+
 def cleanup_unbound_stale_measures():
     """Remove old measures for unbound devices.
     """
@@ -86,6 +89,7 @@ def cleanup_unbound_stale_measures():
     # delete all measures older than this
     db.measures.delete_many({'room': None, 'timestamp': {'$lt': scheduled_cleanup}})
 
+
 def sigusr1_handler(signum, frame):
     """Handles USR1 signal to force loop iteration.
      - signum: signal code (unused)
@@ -93,6 +97,7 @@ def sigusr1_handler(signum, frame):
     """
     # actually do nothing, already woken up from the sleep
     pass
+
 
 if __name__ == '__main__':
     # set handler for USR1 signal

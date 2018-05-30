@@ -33,7 +33,7 @@ export default class App extends React.Component {
     else if (currentRoute=='/policy') this.PolicySection.current.update();
     else if (currentRoute=='/statistics') {}
     else this.AnaliticaSection.current.update();
-  }
+  };
 
   render() {
     return(

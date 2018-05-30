@@ -8,7 +8,7 @@ export default class FloatingAction extends React.Component {
     super(props);
     this.state = {
       isHidden: 'scale-to-zero'
-    }
+    };
     this.actionButton = React.createRef();
   }
 
@@ -28,19 +28,19 @@ export default class FloatingAction extends React.Component {
       body: JSON.stringify({'name': 'new room'})
     };
     fetch(postValue, options).then((res) => console.log(res));
-  }
+  };
 
   collapse = () => {
     this.setState({
       isHidden: 'scale-to-zero'
     })
-  }
+  };
 
   riseUp = () => {
     this.setState({
       isHidden: ''
     })
-  }
+  };
 
   render() {
     const wrapperClasses = "white-margin absolute-center " + this.state.isHidden;

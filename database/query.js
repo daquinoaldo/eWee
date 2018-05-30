@@ -8,7 +8,7 @@ class Query {
 
   /**
    * Must be called before everything
-   * @returns a promise
+   * @returns Promise<any> promise
    */
   static init() {
     return db.connect();

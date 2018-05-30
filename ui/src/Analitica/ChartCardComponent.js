@@ -11,7 +11,7 @@ export default class ChartCard extends React.Component {
       title: this.props.descriptor.title,
       subtitle: this.props.descriptor.subtitle,
       description: this.props.descriptor.description
-    }
+    };
     this.canvas = React.createRef();
     this._mount = false;
   }
@@ -32,7 +32,7 @@ export default class ChartCard extends React.Component {
 
   cleanEnvir = () => {
     if(this.chart) this.chart.destroy();
-  }
+  };
 
   /*
    * Update the chart
@@ -44,11 +44,11 @@ export default class ChartCard extends React.Component {
     this.chart.data.datasets[0].data.shift();
     this.chart.data.datasets[0].data.push(v);
     this.chart.update();
-  }
+  };
 
   render() {
     // const charContainer = { width: '300px', height:'300px' }
-    const charContainer = {}
+    const charContainer = {};
     return (
       <div className="mdc-card chart-card-wrapper">
         <div style={charContainer}>

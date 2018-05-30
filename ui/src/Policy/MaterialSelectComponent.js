@@ -14,7 +14,7 @@ export default class PolicySection extends React.Component {
       def: props.default,
       pattern: props.pattern ? props.pattern : '',
       callback: props.callback
-    }
+    };
     this.menu = React.createRef();
     this.selection = React.createRef();
   }
@@ -27,27 +27,27 @@ export default class PolicySection extends React.Component {
 
   componentWillReceiveProps = (props) => {
     this.setState({items: props.items});
-  }
+  };
 
 
   // ----- ----- USER ACTIONS ----- ----- //
   openMenu = () => {
     this.mdcMenu.open = !this.menu.open;
-  }
+  };
 
   getSelected = () => {
     return this.state.select;
-  }
+  };
 
   setSelection = (newSelect) => {
     if (newSelect == null) newSelect = this.state.def;
     this.setState({ select: newSelect });
-  }
+  };
 
   itemSelected = (item) => {
     this.setState({ select: item });
     if (this.state.callback) this.state.callback(item)
-  }
+  };
 
   // ----- ----- HTML RENDERERS ----- ----- //
   itemMenuHtml = () => {
@@ -63,7 +63,7 @@ export default class PolicySection extends React.Component {
       );
     }
     return shtml;
-  }
+  };
 
   render() {
     return (

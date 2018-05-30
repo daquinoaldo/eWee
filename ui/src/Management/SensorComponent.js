@@ -5,7 +5,7 @@ import {MDCRipple} from '@material/ripple';
 
 import * as api from '../remoteApi.js';
 
-const INACTIVE_TIMEOUT = 15000 // * 60 * 60 * 60
+const INACTIVE_TIMEOUT = 15000; // * 60 * 60 * 60
 
 export default class SensorChip extends React.Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class SensorChip extends React.Component {
       active: true,
       uuid: props.uuid,
       icon: (this.props.icon ? this.props.icon : 'default'),
-    }
+    };
     this.sensorChip = React.createRef();
   }
 
@@ -28,11 +28,11 @@ export default class SensorChip extends React.Component {
 
   componentWillReceiveProps = (props) => {
     this.setState({icon: props.icon});
-  }
+  };
 
   update = () => {
     this.isActive();
-  }
+  };
 
   // ----- ----- UPDATES ----- ----- //
   isActive = () => {
@@ -48,9 +48,9 @@ export default class SensorChip extends React.Component {
         let lastUpdate = new Date(res.timestamp);
         var diff = now - lastUpdate;
         if (diff > INACTIVE_TIMEOUT) this.setState({active: false});
-      };
+      }
     });
-  }
+  };
 
 
   // ----- ----- USER ACTIONS ----- ----- //
@@ -72,25 +72,27 @@ export default class SensorChip extends React.Component {
       // Blinking the icon
       this.iconBlinkAnimation();
     }
-  }
+  };
 
   iconBlinkAnimation = () => {
     let stop = false;
     let i = 0;
     let blink = () => {
-      if (this.state.icon == 'clear') { return null; };
+      if (this.state.icon == 'clear') {
+        return null;
+      }
       const newmod = (this.state.icon == 'blinking' ? 'standard' : 'blinking');
       this.setState({ icon: newmod });
       if (i < 5) { i++; setTimeout(blink, 500); }
     };
     blink();
-  }
+  };
 
   render() {
-    const iconClass = 'material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon '
-    const blink_visibility = (this.state.icon == 'blinking' ? 'sensor-icon-show' : 'sensor-icon-hide')
-    const unchecked_visibility = (this.state.icon == 'clear'  ? 'sensor-icon-hide' : 'sensor-icon-show')
-    const clear_visibility = (this.state.icon == 'clear' ? 'sensor-icon-show' : 'sensor-icon-hide')
+    const iconClass = 'material-icons mdc-chip__icon mdc-chip__icon--leading sensor-chip-icon ';
+    const blink_visibility = (this.state.icon == 'blinking' ? 'sensor-icon-show' : 'sensor-icon-hide');
+    const unchecked_visibility = (this.state.icon == 'clear'  ? 'sensor-icon-hide' : 'sensor-icon-show');
+    const clear_visibility = (this.state.icon == 'clear' ? 'sensor-icon-show' : 'sensor-icon-hide');
 
     const blinkingIconClass = 'inner-radio ' + iconClass + blink_visibility;
     const clearIconClass = iconClass + clear_visibility;

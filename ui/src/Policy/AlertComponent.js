@@ -8,7 +8,7 @@ export default class Alert extends React.Component {
 
     this.state = {
       hidden: true,
-    }
+    };
     this.dialog = React.createRef();
   }
 
@@ -20,11 +20,11 @@ export default class Alert extends React.Component {
   // ----- ----- USER ACTIONS ----- ----- //
   show = () => {
     this.setState({ hidden: false });
-  }
+  };
 
   hide = () => {
     this.setState({ hidden: true });
-  }
+  };
 
   render() {
     return (

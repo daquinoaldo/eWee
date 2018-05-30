@@ -9,7 +9,7 @@ export default class AnaliticaSection extends React.Component {
     super(props);
     this.state = {
       rooms: []
-    }
+    };
     this.roomsCmps = new Set();
   }
 
@@ -17,7 +17,7 @@ export default class AnaliticaSection extends React.Component {
     for (const room of this.roomsCmps) {
       if (room) room.update();
     }
-  }
+  };
 
   componentDidMount() {
     // Getting rooms
@@ -41,7 +41,7 @@ export default class AnaliticaSection extends React.Component {
       );
     }
     return rows;
-  }
+  };
 
   render() {
     return (

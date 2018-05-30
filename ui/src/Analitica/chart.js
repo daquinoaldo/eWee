@@ -19,7 +19,7 @@ var newChartConfig = () => {
     }
   };
   return chartConfig;
-}
+};
 
 
 // ----- ----- GENERATOR ----- ----- //
@@ -27,12 +27,12 @@ var newChartConfig = () => {
  * Creates an array with values from 0 to n, not included.
  *   e.g.: nLinear(n) -> [0, ..., n-1]
  */
-let nLinear = (n) => { return Array.from(new Array(n), (x,i) => i); }
+let nLinear = (n) => { return Array.from(new Array(n), (x,i) => i); };
 
 /*
  * Creates an array with n zeros
  */
-let nZeros = (n) => { return Array.from(new Array(n), (x,i) => 0); }
+let nZeros = (n) => { return Array.from(new Array(n), (x,i) => 0); };
 
 /*
  * Creates the chart, if it doesn't exist, and initializes it with n zeros.

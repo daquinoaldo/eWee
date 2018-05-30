@@ -14,5 +14,5 @@ declare -i newversion=`cat version.txt`
 # do the updater if we got a newer version
 if ((newversion > version)); then
     # launch the update script with versions as arguments
-    bash do-update.sh $version $newversion
+    bash do-update.sh ${version} ${newversion}
 fi

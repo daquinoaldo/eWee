@@ -13,7 +13,7 @@ export default class ManagementSection extends React.Component {
     this.state = {
       unboundDevices: [],
       rooms: []
-    }
+    };
     this.roomsCmps = new Set();
     this.unboundedCmps = new Set();
   }
@@ -42,7 +42,7 @@ export default class ManagementSection extends React.Component {
     for (const room of this.roomsCmps) {
       if (room) room.update();
     }
-  }
+  };
 
 
   // ----- ----- HTML RENDERERS ----- ----- //
@@ -58,7 +58,7 @@ export default class ManagementSection extends React.Component {
       );
     }
     return shtml;
-  }
+  };
 
   roomsHtml = () => {
     this.roomsCmps.clear();
@@ -72,7 +72,7 @@ export default class ManagementSection extends React.Component {
       );
     }
     return shtml;
-  }
+  };
 
   render() {
     return (

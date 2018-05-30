@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 export default class Head extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {};
 
     this.tab_bar = React.createRef();
     this.floatingAction = React.createRef();
@@ -27,7 +27,7 @@ export default class Head extends React.Component {
     else {
       this.floatingAction.current.collapse()
     }
-  }
+  };
 
   render() {
     return (

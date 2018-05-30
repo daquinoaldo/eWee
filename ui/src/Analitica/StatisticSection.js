@@ -10,7 +10,7 @@ export default class StisticSection extends React.Component {
 
     this.state = {
       rooms: []
-    }
+    };
     this.pickedRoom = React.createRef();
     this.dateInput = React.createRef();
     // Canvases
@@ -44,7 +44,7 @@ export default class StisticSection extends React.Component {
         this.setState({ rooms: res.rooms });
       else console.error(error);
     });
-  }
+  };
 
   getStatics = (room) => {
     if (!room) room = this.pickedRoom.current.getSelected();
@@ -56,7 +56,7 @@ export default class StisticSection extends React.Component {
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
 
-      const targetUrl = api.url + '/room/' + roomid + '/stats/' + year + '/' + month + '/' + day
+      const targetUrl = api.url + '/room/' + roomid + '/stats/' + year + '/' + month + '/' + day;
       api.get(targetUrl, (res, err) => {
         if (err) { console.log(err); }
         // Chart data
@@ -66,7 +66,7 @@ export default class StisticSection extends React.Component {
         let occData = this.occChart.data.datasets[0];
         // this.chart.update();
 
-        let nZeros = (n) => { return Array.from(new Array(n), (x,i) => null); }
+        let nZeros = (n) => { return Array.from(new Array(n), (x,i) => null); };
         let nTmpData = nZeros(24);
         let nHumData = nZeros(24);
         let nLuxData = nZeros(24);
@@ -90,17 +90,17 @@ export default class StisticSection extends React.Component {
         this.occChart.update();
       });
     }
-  }
+  };
 
   cleanEnvir = () => {
     if(this.tmpChart) this.tmpChart.destroy();
     if(this.humChart) this.humChart.destroy();
     if(this.luxChart) this.luxChart.destroy();
     if(this.occChart) this.occChart.destroy();
-  }
+  };
 
   render() {
-    const alignRooms_date = { 'width': '100%', 'justifyContent': 'space-around'}
+    const alignRooms_date = { 'width': '100%', 'justifyContent': 'space-around'};
     const alignDate = {'transform': 'TranslateY(25%)'};
     return (
       <div className="section-wrapper">

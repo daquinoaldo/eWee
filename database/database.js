@@ -75,12 +75,6 @@ class Database {
   static delete(collection, id) {
     return Database.deleteWithQuery(collection, {_id: ObjectID(id)});
   }
-
-  // Used only for tests
-  static queryAll(collection) {
-    return mongoDB.collection(collection).find({}).toArray();
-  }
-
 }
 
 const collections = {
