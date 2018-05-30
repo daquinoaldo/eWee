@@ -1,5 +1,5 @@
 [Unit]
-Description=Timer for MCPS system updater
+Description=Timer for eWee system updater
 
 [Timer]
 Unit=updater.service

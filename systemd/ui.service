@@ -1,19 +1,19 @@
 [Unit]
-Description=MCPS web user interface
+Description=eWee web user interface
 Requires=mongodb.service
 After=mongodb.service
 
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/npm start
-WorkingDirectory=/opt/MCPS/ui
+WorkingDirectory=/opt/eWee/ui
 Restart=always
 RestartSec=10
 TimeoutStartSec=60
 TimeoutStopSec=1
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=mcps-ui
+SyslogIdentifier=ewee-ui
 
 [Install]
 WantedBy=multi-user.target

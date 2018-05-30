@@ -4,7 +4,7 @@ const ObjectID = require('mongodb').ObjectID;
 // ----- ----- CONSTANTS AND GLOBALS ----- ----- //
 const MONGO = process.env.MONGO || "localhost";
 const URL = "mongodb://"+MONGO+":27017/";
-const DB_NAME = "mcps";
+const DB_NAME = "ewee";
 
 let mongoDB;
 

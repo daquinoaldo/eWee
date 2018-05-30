@@ -5,9 +5,9 @@ After=mongodb.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /opt/MCPS/smartness/statsd.py
+ExecStart=/usr/bin/python3 /opt/eWee/smartness/statsd.py
 ExecReload=/bin/kill -USR1 $MAINPID
-WorkingDirectory=/opt/MCPS/smartness
+WorkingDirectory=/opt/eWee/smartness
 Restart=always
 RestartSec=1
 TimeoutStartSec=10

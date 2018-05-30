@@ -5,9 +5,9 @@ After=mongodb.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /opt/MCPS/demo/sensorgen.py
+ExecStart=/usr/bin/python3 /opt/eWee/demo/sensorgen.py
 ExecReload=/bin/kill -USR1 $MAINPID
-WorkingDirectory=/opt/MCPS/demo
+WorkingDirectory=/opt/eWee/demo
 Restart=always
 RestartSec=1
 TimeoutStartSec=10

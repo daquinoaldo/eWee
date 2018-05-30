@@ -1,7 +1,7 @@
 [Unit]
-Description=MCPS system updater
+Description=eWee system updater
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /opt/MCPS/updater/updater.sh
-WorkingDirectory=/opt/MCPS/updater
+ExecStart=/bin/bash /opt/eWee/updater/updater.sh
+WorkingDirectory=/opt/eWee/updater

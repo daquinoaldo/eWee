@@ -13,7 +13,7 @@ UNBOUND_STALE_MEASURES_TIME_DELTA = datetime.timedelta(hours=1)
 
 # Database connection
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
-db = client['mcps']
+db = client['ewee']
 
 
 def get_room_list():

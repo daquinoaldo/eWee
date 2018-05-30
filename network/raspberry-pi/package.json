@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daquinoaldo/MCPS.git"
+    "url": "git+https://github.com/daquinoaldo/eWee.git"
   },
   "author": "Aldo D'Aquino",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/daquinoaldo/MCPS/issues"
+    "url": "https://github.com/daquinoaldo/eWee/issues"
   },
-  "homepage": "https://github.com/daquinoaldo/MCPS#readme",
+  "homepage": "https://github.com/daquinoaldo/eWee#readme",
   "dependencies": {
     "moment": "^2.22.1",
     "noble": "github:sandeepmistry/noble"

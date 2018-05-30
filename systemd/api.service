@@ -5,15 +5,15 @@ After=mongodb.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /opt/MCPS/api/api.js
-WorkingDirectory=/opt/MCPS/api
+ExecStart=/usr/local/bin/node /opt/eWee/api/api.js
+WorkingDirectory=/opt/eWee/api
 Restart=always
 RestartSec=1
 TimeoutStartSec=10
 TimeoutStopSec=1
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=mcps-rest-api
+SyslogIdentifier=ewee-rest-api
 
 [Install]
 WantedBy=multi-user.target

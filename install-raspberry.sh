@@ -14,6 +14,6 @@ sudo cp -R * /usr/local/
 cd
 rm -rf temp-download
 # Clone the repository
-git clone https://github.com/daquinoaldo/MCPS.git
-cd MCPS
+git clone https://github.com/daquinoaldo/eWee.git
+cd eWee
 bash configure-raspberry.sh

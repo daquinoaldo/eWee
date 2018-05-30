@@ -1,5 +1,5 @@
 [Unit]
-Description=MCPS Raspberry master
+Description=eWee Raspberry master
 Requires=mongodb.service
 After=mongodb.service
 Requires=bluetooth.target
@@ -7,15 +7,15 @@ After=bluetooth.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node /opt/MCPS/network/raspberry-pi/master.js
-WorkingDirectory=/opt/MCPS/network/raspberry-pi
+ExecStart=/usr/local/bin/node /opt/eWee/network/raspberry-pi/master.js
+WorkingDirectory=/opt/eWee/network/raspberry-pi
 Restart=always
 RestartSec=1
 TimeoutStartSec=10
 TimeoutStopSec=1
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=mcps-raspberry-master
+SyslogIdentifier=ewee-raspberry-master
 
 [Install]
 WantedBy=multi-user.target

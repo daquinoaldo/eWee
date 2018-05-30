@@ -66,7 +66,7 @@ BINDINGS = {
 # database connection
 # NOTE: change to db of choice if not local, eg. 'mongodb://p1.aldodaquino.com:27017/'
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
-db = client['mcps']
+db = client['ewee']
 
 
 def get_room_of_device(device):
