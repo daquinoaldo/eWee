@@ -143,7 +143,7 @@ def check_and_enforce_policy(room_id, status):
     # occupation-dependent controls
     if status['occupied']:
         if status['light'] is not None:
-            # turn on lights if the room is occupied and the illumination is unsufficient
+            # turn on lights if the room is occupied and the illumination is insufficient
             post_new_action(room_id, 'illumination', status['light'] < policy_to_enforce['light'])
             policy_status['light'] = (status['light'] > policy_to_enforce['light'])
         if status['carbon'] is not None:
@@ -182,7 +182,7 @@ def sigusr1_handler(signum, frame):
 if __name__ == '__main__':
     # set handler for USR1 signal
     signal.signal(signal.SIGUSR1, sigusr1_handler)
-    # service infite loop
+    # service infinite loop
     while True:
         smart_loop()
         time.sleep(MAIN_LOOP_INTERVAL.total_seconds())

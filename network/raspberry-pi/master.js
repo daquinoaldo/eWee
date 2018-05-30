@@ -13,7 +13,7 @@ const AUTOMATION_IO = '181a';
  * @note: the 'noble' dependency, used for ble, get stuck on remote invocations
  *   if the other device goes offline. To work around this problem we've
  *   introduced timer to each remote call. After 'CONNECTION_TIMEOUT' each
- *   call is considered 'stuck' and the binded promise rejects the request.
+ *   call is considered 'stuck' and the bound promise rejects the request.
  */
 const CONNECTION_TIMEOUT = 5000;
 
@@ -191,7 +191,7 @@ function getServiceDiscoveryPromise (peripheral, timeout) {
 /*
  * Promises to discover all the characteristic hosted on a given service at
  *   most in 'timeout' milliseconds. Otherwise the promise is rejected.
- * @return: null if an error occurres, an array of characteristic otherwise
+ * @return: null if an error occurs, an array of characteristic otherwise
  */
 function getCharacteristicPromise (service, timeout) {
   return new Promise(function (resolve, reject) {
@@ -211,7 +211,7 @@ function getCharacteristicPromise (service, timeout) {
 function getReadPromise (characteristic, timeout) {
   return new Promise(function (resolve, reject) {
     characteristic.read((error, data) => {
-      // @note: it may happen that no error occurres but data is undefined
+      // @note: it may happen that no error occurs but data is undefined
       if (error || !data) reject(error);
       // Let's return a good formatted data structure
       let asciiData = data.toString('ascii');
@@ -239,7 +239,7 @@ function getWritePromise (characteristic, data, timeout) {
  * Promises to read all the characteristics (a sample) from
  *   the result of a 'discoverCharacteristics' invocation at most in 'timeout'
  *   milliseconds. Otherwise the promise is rejected.
- * @return: null if some error occurres, otherwise an object containing the
+ * @return: null if some error occurs, otherwise an object containing the
  *   sample read and the device name stored into the 'device' field
  * @note: the promise isn't resolved/rejected if the connection is lost
  *   (characteristic.read doesn't throw errors, it simply hangs)
@@ -352,7 +352,7 @@ function reverseTranslator (obj) {
  * Returns true if compatible with our system
  * @note: our intent for the demo was to use only our devices.
  *   At the moment this function check only if the ble adv name starts with
- *   sampler. To make the system fully compatibile with every ble device
+ *   sampler. To make the system fully compatible with every ble device
  *   this function has to return true every time
  */
 function isSampler (peripheral) {
