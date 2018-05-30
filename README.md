@@ -2,7 +2,7 @@
 Ensuring Wellness with Energy Efficiency
 ## Installation
 ### On Raspberry Pi
-`cd /opt`
+`cd /opt`  
 `curl https://raw.githubusercontent.com/daquinoaldo/eWee/master/install-raspberry.sh | sudo bash`
 ### Prepare devices (ESP32)
 Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) and the [ESP32 Tools](https://github.com/espressif/arduino-esp32#installation-instructions)  
