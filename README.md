@@ -1,5 +1,7 @@
 # eWee
-Ensuring Wellness with Energy Efficiency
+_Ensuring Wellness with Energy Efficiency_
+  
+For more information check our [introduction file](introducing-eWee.pdf)
 ## Installation
 ### On Raspberry Pi
 `cd /opt`  
