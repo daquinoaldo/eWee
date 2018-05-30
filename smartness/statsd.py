@@ -5,20 +5,27 @@ import signal
 import time
 import os
 
-# configuration and parameters
+# Configuration parameters
+# interval between service loop iterations
 MAIN_LOOP_INTERVAL = datetime.timedelta(minutes=15)
+# measures of sensors not bound to rooms are cleaned up after this interval
 UNBOUND_STALE_MEASURES_TIME_DELTA = datetime.timedelta(hours=1)
 
-# database connection
+# Database connection
 client = pymongo.MongoClient(os.environ['MONGO']) if 'MONGO' in os.environ else pymongo.MongoClient()
 db = client['mcps']
 
 def get_room_list():
-    # returns the list of room IDs
+    """Returns the list of room IDs.
+    """
     return [room['_id'] for room in db.rooms.find({})]
 
 def update_hourly_averages():
+    """Updates the hourly averages of room status for all the current rooms.
+    """
+    # get current rooms
     room_ids = get_room_list()
+    # aggregate hourly averages, day by day, for each room
     stats = db.measures.aggregate([
         {'$match': {
             'room': {'$in': room_ids}
@@ -63,6 +70,8 @@ def update_hourly_averages():
             'occupied': '$occupied'
         }}
     ])
+    # workaround: older versions of mongodb don't support
+    # the `out` stage in the previous pipeline
     db.statistics.remove({})
     try:
         db.statistics.insert_many(stats)
@@ -70,15 +79,25 @@ def update_hourly_averages():
         pass
 
 def cleanup_unbound_stale_measures():
+    """Remove old measures for unbound devices.
+    """
+    # cut-off timestamp
     scheduled_cleanup = datetime.datetime.utcnow() - UNBOUND_STALE_MEASURES_TIME_DELTA
+    # delete all measures older than this
     db.measures.delete_many({'room': None, 'timestamp': {'$lt': scheduled_cleanup}})
 
 def sigusr1_handler(signum, frame):
-    # handle SIGUSR1 signal for forced loop iteration
+    """Handles USR1 signal to force loop iteration.
+     - signum: signal code (unused)
+     - frame: stack frame (unused)
+    """
+    # actually do nothing, already woken up from the sleep
     pass
 
 if __name__ == '__main__':
+    # set handler for USR1 signal
     signal.signal(signal.SIGUSR1, sigusr1_handler)
+    # service infite loop
     while True:
         update_hourly_averages()
         cleanup_unbound_stale_measures()
